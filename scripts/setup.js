@@ -1,5 +1,4 @@
-import {WebGLRenderer, PerspectiveCamera, Scene, BoxGeometry, Mesh, MeshNormalMaterial,
-    Color, AmbientLight, Clock, Vector3, DirectionalLight} from './three.module.js';
+import {WebGLRenderer, Scene, Color, AmbientLight, DirectionalLight} from './three.module.js';
     
 function setupScene() {
     var scene = new Scene();

@@ -1,12 +1,11 @@
 import { Capsule } from './Capsule.js';
-import {WebGLRenderer, PerspectiveCamera, Scene, BoxGeometry, Mesh, MeshNormalMaterial,
-	Color, AmbientLight, Clock, Vector3, DirectionalLight} from './three.module.js';
+import {Vector3} from './three.module.js';
 
 const GRAVITY = 30;
 
 class Player {
 
-    playerCollider = new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 1, 0 ), 0.35 );
+    playerCollider = new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 );
     playerVelocity = new Vector3();
     playerDirection = new Vector3();
     playerOnFloor = false;
