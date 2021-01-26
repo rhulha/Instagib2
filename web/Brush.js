@@ -14,7 +14,6 @@ class Brush {
 		}
     }
 
-	// public List<List<Vector3>>
 	/**
 	 * @returns {Vector3[][]}
 	 */

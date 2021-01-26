@@ -1,4 +1,4 @@
-import {PerspectiveCamera, Clock, Geometry, Face3} from './three/build/three.module.js';
+import {PerspectiveCamera, Clock, Geometry, Face3, Group, Mesh, BufferGeometry} from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
@@ -13,6 +13,8 @@ camera.position.z = 2.13;
 const scene = setupScene(camera);
 const renderer = setupRenderer();
 setupResizeListener( camera, renderer);
+
+const jumpPadsGroup = new Group();
 
 var brushes = getBrushes()
 for(var brush of brushes) {
@@ -38,11 +40,17 @@ for(var brush of brushes) {
 			}
 		}
 	}
-	addDebugBox( scene, geometry)
+	var box = addDebugBox( scene, geometry)
+	var m = new Mesh(new BufferGeometry().fromGeometry(geometry), box.material);
+	jumpPadsGroup.add( m );
+
 }
 
+const jumpPadsOctree = new Octree();
+jumpPadsOctree.fromGraphNode(jumpPadsGroup);
+
 const worldOctree = new Octree();
-var player = new Player(worldOctree, camera);
+var player = new Player(worldOctree, jumpPadsOctree, camera);
 
 const loader = new GLTFLoader().setPath( './models/' );
 loader.load( 'q3dm17.gltf', ( gltf ) => {

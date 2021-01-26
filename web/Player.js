@@ -14,15 +14,12 @@ class Player {
 
     /**
      * @param {Octree} worldOctree
+     * @param {Octree} jumpPadsOctree
      * @param {Camera} camera
-     * return {boolean}
      */
-    constructor(worldOctree, camera) {
-        /* @type {Octree} */
-        /*
-         * @member {Octree} worldOctree
-         */
+    constructor(worldOctree, jumpPadsOctree, camera) {
         this.worldOctree = worldOctree;
+        this.jumpPadsOctree = jumpPadsOctree;
         this.camera = camera;
         this.playerCollider.translate(new Vector3( 0, 11, 0 ))
         document.addEventListener( 'keydown', ( event ) => this.keyStates[ event.code ] = true, false );
@@ -39,7 +36,6 @@ class Player {
     }
     
     playerCollisions() {
-        //this.worldOctree.getRayTriangles
         const result = this.worldOctree.capsuleIntersect( this.playerCollider );
         this.playerOnFloor = false;
         if ( result ) {
@@ -48,7 +44,17 @@ class Player {
                 this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
             }
             this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
-            this.playerCollider.getCenter
+        }
+
+        const result2 = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
+        //this.playerOnFloor = false;
+        if ( result2 ) {
+            this.playerVelocity.y = 35;
+            //this.playerOnFloor = result.normal.y > 0;
+            if ( ! this.playerOnFloor ) {
+                //this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
+            }
+            //this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
         }
     }
 
@@ -100,6 +106,6 @@ class Player {
             }
         }
     }
-    }
+}
 
 export {Player};

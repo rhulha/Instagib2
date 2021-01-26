@@ -32,12 +32,15 @@ function addRandomPoints(scene) {
 /**
  * @param {Scene} scene 
  * @param {Geometry} geometry 
+ * @returns {Mesh}
  */
 function addDebugBox(scene, geometry) {
     var material = new MeshNormalMaterial();
     geometry.computeFaceNormals();
     const mesh = new Mesh(geometry, material);
     scene.add( mesh );
+    return mesh;
 }
+// https://threejsfundamentals.org/threejs/lessons/threejs-custom-geometry.html
 
 export { addDebugPoints, addDebugBox };
