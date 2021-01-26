@@ -1,6 +1,6 @@
-import {Points, PointsMaterial, Float32BufferAttribute, Face3, BufferGeometry, TextureLoader} from './three.module.js';
+import {Points, PointsMaterial, Float32BufferAttribute, Face3, BufferGeometry, TextureLoader} from './three/build/three.module.js';
     
-function addPoints(scene, vertices) {
+function addDebugPoints(scene, vertices) {
     const bg = new BufferGeometry();
     const sprite = new TextureLoader().load( 'disc.png' );
     bg.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
@@ -29,4 +29,4 @@ function addRandomPoints(scene) {
     scene.add( particles );
 }
 
-export {addPoints };
+export { addDebugPoints };

@@ -1,0 +1,15 @@
+{
+  "name": "instagib",
+  "version": "0.0.1",
+  "description": "Q3DM17 in WebGL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "engines": {
+    "node": "12.x"
+  }
+}

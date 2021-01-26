@@ -1,13 +1,10 @@
-//import * as T from './three.module.js';
-import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Plane, Face3} from './three.module.js';
-import { GLTFLoader } from './GLTFLoader.js';
-import { Octree } from './Octree.js';
+import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Plane, Face3} from './three/build/three.module.js';
+import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
+import { Octree } from './three/examples/jsm/math/Octree.js';
 import { setupScene, setupRenderer } from './setup.js';
 import { Player } from './Player.js';
-import { Brush } from './Brush.js';
-import { addPoints } from './addPoints.js';
-import { trigger_push } from './trigger.js';
-
+import { addDebugPoints } from './addPoints.js';
+import { getBrushes } from './trigger.js';
 
 const clock = new Clock();
 var camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -16,18 +13,8 @@ camera.position.z = 2.13;
 var scene = setupScene();
 const renderer = setupRenderer();
 
-var brushess = [];
-
-for( var planes_map of trigger_push) {
-	var planes = [];
-	for(var plane of planes_map) {
-		var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
-		[,p1x,p1z,p1y,,,p2x,p2z,p2y,,,p3x,p3z,p3y] = plane.split(" ");
-		var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
-		planes.push(p);
-	}
-	var brush = new Brush(planes);
-
+var brushes = getBrushes()
+for(var brush of brushes) {
 	const vertices = [];
 	//const geometry = new Geometry();
 	var polygons = brush.getPolygons();
@@ -39,8 +26,7 @@ for( var planes_map of trigger_push) {
 			vertices.push( point.x, point.y, point.z );
 		}
 	}
-	
-	addPoints(scene, vertices);
+	addDebugPoints(scene, vertices);
 }
 
 

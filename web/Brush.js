@@ -1,4 +1,4 @@
-import {Vector3, Plane} from './three.module.js';
+import {Vector3, Plane} from './three/build/three.module.js';
 
 
 class Brush {
@@ -14,7 +14,10 @@ class Brush {
 		}
     }
 
-    // public List<List<Vector3>> 
+	// public List<List<Vector3>>
+	/**
+	 * @returns {Vector3[][]}
+	 */
 	getPolygons() {
         var planes = this.planes;
 		if( this.polysInitialized ) {
@@ -37,7 +40,6 @@ class Brush {
 						var d = planes[m].distanceToPoint(intersection);
 						if (d > this.epsilon) {
 							legal = false;
-							//console.log("legal = false");
 							//System.out.println("ILLEGAL: " + planes.get(m).toString2() + ", d: " + d + ", i: " + intersection);
 							break;
 						}
@@ -93,7 +95,7 @@ class Brush {
 
 				for (var j = i + 1; j < polygon.length; j++) {
 					var d = p.distanceToPoint(polygon[j]);
-					console.log("d=" + d);
+					//console.log("d=" + d);
 					if (d > -this.epsilon) {
 						var b = new Vector3().subVectors(polygon[j], center).normalize();
 						var angle = a.dot(b);
@@ -102,7 +104,7 @@ class Brush {
 							smallest = j;
 						}
 					}
-					console.log("j=" + j);
+					//console.log("j=" + j);
 				}
 
 				if (smallest == -1) {

@@ -1,5 +1,6 @@
-import { Capsule } from './Capsule.js';
-import {Vector3} from './three.module.js';
+import { Vector3, Camera } from './three/build/three.module.js';
+import { Capsule } from './three/examples/jsm/math/Capsule.js';
+import { Octree } from './three/examples/jsm/math/Octree.js';
 
 const GRAVITY = 30;
 
@@ -11,7 +12,16 @@ class Player {
     playerOnFloor = false;
     keyStates = {};
 
+    /**
+     * @param {Octree} worldOctree
+     * @param {Camera} camera
+     * return {boolean}
+     */
     constructor(worldOctree, camera) {
+        /* @type {Octree} */
+        /*
+         * @member {Octree} worldOctree
+         */
         this.worldOctree = worldOctree;
         this.camera = camera;
         this.playerCollider.translate(new Vector3( 0, 11, 0 ))
@@ -21,6 +31,7 @@ class Player {
     }
     
     playerCollisions() {
+        //this.worldOctree.getRayTriangles
         const result = this.worldOctree.capsuleIntersect( this.playerCollider );
         this.playerOnFloor = false;
         if ( result ) {
@@ -29,6 +40,7 @@ class Player {
                 this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
             }
             this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
+            this.playerCollider.getCenter
         }
     }
 

@@ -1,3 +1,7 @@
+import {Vector3, Plane} from './three/build/three.module.js';
+import { Brush } from './Brush.js';
+
+
 var t93 = [
     "( 2488 256 268 ) ( 2360 256 188 ) ( 2360 384 188 ) common/trigger 0 0 0 0.500000 0.500000 134217728 0 0",
     "( 2360 384 180 ) ( 2360 384 164 ) ( 2488 384 164 ) common/trigger 0 0 0 0.500000 0.500000 134217728 0 0",
@@ -103,4 +107,24 @@ var t94 = [
 
 var trigger_push = [t93, t89, t88, t87, t92, t86, t85, t82, t84, t83, t94];
 
-export {trigger_push};
+/**
+ * @returns {Brush[]}
+ */
+function getBrushes() {
+    var brushes = [];
+
+    for( var planes_map of trigger_push) {
+        var planes = [];
+        for(var plane of planes_map) {
+            var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
+            [,p1x,p1z,p1y,,,p2x,p2z,p2y,,,p3x,p3z,p3y] = plane.split(" ");
+            var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
+            planes.push(p);
+        }
+        brushes.push( new Brush(planes) );
+    }
+
+    return brushes;
+}
+
+export {getBrushes};

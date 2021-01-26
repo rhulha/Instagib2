@@ -1,4 +1,4 @@
-import {WebGLRenderer, Scene, Color, AmbientLight, DirectionalLight} from './three.module.js';
+import {WebGLRenderer, Scene, Color, AmbientLight, DirectionalLight} from './three/build/three.module.js';
     
 function setupScene() {
     var scene = new Scene();
