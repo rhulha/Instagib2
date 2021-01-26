@@ -1,10 +1,12 @@
 //import * as T from './three.module.js';
-import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Face3, Face4} from './three.module.js';
+import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Points,
+	PointsMaterial, Float32BufferAttribute, Face3, BufferGeometry, TextureLoader} from './three.module.js';
 import { GLTFLoader } from './GLTFLoader.js';
 import { Octree } from './Octree.js';
 import { setupScene, setupRenderer } from './setup.js';
 import { Player } from './Player.js';
 import { Plane, Brush } from './Brush.js';
+import { addPoints } from './addPoints.js';
 
 const clock = new Clock();
 var camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -33,8 +35,9 @@ for(var plane of planes_map) {
 	console.log(p.toString());
 }
 
-const geometry = new Geometry();
+const vertices = [];
 
+const geometry = new Geometry();
 var brush = new Brush(planes);
 var polygons = brush.getPolygons();
 for(var face of polygons) {
@@ -42,8 +45,14 @@ for(var face of polygons) {
 	for( var point of face) {
 		geometry.vertices.push(	point);
 		console.log(point)
+		vertices.push( point.x, point.y, point.z );
 	}
 }
+
+for ( let i = 0; i < 10000; i ++ ) {
+}
+
+addPoints(scene, vertices);
 
 geometry.faces.push(
 	// front
