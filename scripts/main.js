@@ -1,11 +1,10 @@
 //import * as T from './three.module.js';
-import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Points,
-	PointsMaterial, Float32BufferAttribute, Face3, BufferGeometry, TextureLoader} from './three.module.js';
+import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Plane, Face3} from './three.module.js';
 import { GLTFLoader } from './GLTFLoader.js';
 import { Octree } from './Octree.js';
 import { setupScene, setupRenderer } from './setup.js';
 import { Player } from './Player.js';
-import { Plane, Brush } from './Brush.js';
+import { Brush } from './Brush.js';
 import { addPoints } from './addPoints.js';
 
 const clock = new Clock();
@@ -30,9 +29,8 @@ var planes = [];
 for(var plane of planes_map) {
 	var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
 	[,p1x,p1z,p1y,,,p2x,p2z,p2y,,,p3x,p3z,p3y] = plane.split(" ");
-	var p = new Plane(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
+	var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
 	planes.push(p);
-	console.log(p.toString());
 }
 
 const vertices = [];
@@ -47,9 +45,6 @@ for(var face of polygons) {
 		console.log(point)
 		vertices.push( point.x, point.y, point.z );
 	}
-}
-
-for ( let i = 0; i < 10000; i ++ ) {
 }
 
 addPoints(scene, vertices);

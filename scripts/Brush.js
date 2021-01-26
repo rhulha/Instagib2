@@ -1,24 +1,5 @@
-import {Vector3} from './three.module.js';
+import {Vector3, Plane} from './three.module.js';
 
-class Plane {
-	normal;
-    distance;
-    
-    constructor(p1,p2,p3) {
-        // WARNING Three.js applies all math function to the "this" vector!
-        this.normal = p3.sub(p2).cross( p1.sub(p2)).normalize();
-		//normal = p3.minus(p1).cross( p2.minus(p1)).normalize();
-		this.distance = -this.normal.dot( p2);
-    }
-
-    distance2point(p) {
-		return this.normal.dot(p) + this.distance;
-	}
-
-	toString() {
-		return "normal: " + this.normal.x +"," + this.normal.y + "," + this.normal.z + ", distance: " + this.distance;
-	}
-}
 
 class Brush {
     planes = [];
@@ -53,9 +34,10 @@ class Brush {
 					var legal = true;
 					for (var m = 0; m < count; m++) {
 						// Test if the point is outside the brush
-						var d = planes[m].distance2point(intersection);
+						var d = planes[m].distanceToPoint(intersection);
 						if (d > this.epsilon) {
 							legal = false;
+							//console.log("legal = false");
 							//System.out.println("ILLEGAL: " + planes.get(m).toString2() + ", d: " + d + ", i: " + intersection);
 							break;
 						}
@@ -83,9 +65,9 @@ class Brush {
 		//System.out.println("b: " + b.toString2());
 		//System.out.println("c: " + c.toString2());
 		// p = -d1 * ( n2.Cross ( n3 ) ) - d2 * ( n3.Cross ( n1 ) ) - d3 * ( n1.Cross ( n2 ) ) / denom;
-		var temp1 = new Vector3().crossVectors(b.normal, c.normal).multiplyScalar(-a.distance);
-		var temp2 = new Vector3().crossVectors(c.normal, a.normal).multiplyScalar(b.distance);
-		var temp3 = new Vector3().crossVectors(a.normal, b.normal).multiplyScalar(c.distance);
+		var temp1 = new Vector3().crossVectors(b.normal, c.normal).multiplyScalar(-a.constant);
+		var temp2 = new Vector3().crossVectors(c.normal, a.normal).multiplyScalar(b.constant);
+		var temp3 = new Vector3().crossVectors(a.normal, b.normal).multiplyScalar(c.constant);
 		return temp1.sub(temp2).sub(temp3).divideScalar(denom);
 	}
 
@@ -107,10 +89,11 @@ class Brush {
 				var smallestAngle = -1;
 				var smallest = -1;
 				var a = new Vector3().subVectors(polygon[i], center).normalize();
-				var p = new Plane(polygon[i], center, new Vector3().addVectors(center, plane.normal), "");
+				var p = new Plane().setFromCoplanarPoints(polygon[i], center, new Vector3().addVectors(center, plane.normal));
 
 				for (var j = i + 1; j < polygon.length; j++) {
-					var d = p.distance2point(polygon[j]);
+					var d = p.distanceToPoint(polygon[j]);
+					console.log("d=" + d);
 					if (d > -this.epsilon) {
 						var b = new Vector3().subVectors(polygon[j], center).normalize();
 						var angle = a.dot(b);
@@ -119,10 +102,11 @@ class Brush {
 							smallest = j;
 						}
 					}
+					console.log("j=" + j);
 				}
 
 				if (smallest == -1) {
-					console.log("Error: Degenerate polygon!");
+					console.log("Error: Degenerate polygon! " + "n=" + n + ", i=" + i);
 					return;
 				}
 
@@ -130,7 +114,6 @@ class Brush {
 				polygon[smallest] = polygon[i + 1];
 				polygon[i + 1] = t;
 			}
-
 		}
 	}
 }
