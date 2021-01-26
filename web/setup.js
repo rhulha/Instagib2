@@ -16,6 +16,14 @@ function setupScene() {
     return scene;
 }
 
+function setupResizeListener(camera, renderer) {
+    window.addEventListener( 'resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+    }, false );
+}
+
 function setupRenderer() {
     var renderer = new WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -25,4 +33,4 @@ function setupRenderer() {
     return renderer;
 }
 
-export { setupScene, setupRenderer };
+export { setupScene, setupRenderer, setupResizeListener };

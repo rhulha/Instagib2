@@ -1,4 +1,4 @@
-import {Points, PointsMaterial, Float32BufferAttribute, Face3, BufferGeometry, TextureLoader} from './three/build/three.module.js';
+import {Points, PointsMaterial, Float32BufferAttribute, Face3, Geometry, BufferGeometry, Mesh, MeshNormalMaterial, TextureLoader, Vector3} from './three/build/three.module.js';
     
 function addDebugPoints(scene, vertices) {
     const bg = new BufferGeometry();
@@ -29,4 +29,45 @@ function addRandomPoints(scene) {
     scene.add( particles );
 }
 
-export { addDebugPoints };
+function addDebugBox(scene, vertices) {
+    const geometry = new Geometry();
+    geometry.vertices.push(
+      new Vector3(-1, -1,  1),  // 0
+      new Vector3( 1, -1,  1),  // 1
+      new Vector3(-1,  1,  1),  // 2
+      new Vector3( 1,  1,  1),  // 3
+      new Vector3(-1, -1, -1),  // 4
+      new Vector3( 1, -1, -1),  // 5
+      new Vector3(-1,  1, -1),  // 6
+      new Vector3( 1,  1, -1),  // 7
+    );
+
+    geometry.faces.push(
+        // front
+        new Face3(0, 3, 2),
+        new Face3(0, 1, 3),
+        // right
+        new Face3(1, 7, 3),
+        new Face3(1, 5, 7),
+        // back
+        new Face3(5, 6, 7),
+        new Face3(5, 4, 6),
+        // left
+        new Face3(4, 2, 6),
+        new Face3(4, 0, 2),
+        // top
+        new Face3(2, 7, 6),
+        new Face3(2, 3, 7),
+        // bottom
+        new Face3(4, 1, 0),
+        new Face3(4, 5, 1),
+    );
+
+    var material = new MeshNormalMaterial();
+    geometry.computeFaceNormals();
+    const mesh = new Mesh(geometry, material);
+    scene.add( mesh );
+    
+}
+
+export { addDebugPoints, addDebugBox };

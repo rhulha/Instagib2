@@ -28,6 +28,14 @@ class Player {
         document.addEventListener( 'keydown', ( event ) => this.keyStates[ event.code ] = true, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
         document.addEventListener( 'mousedown', () => document.body.requestPointerLock(), false );
+
+        document.body.addEventListener( 'mousemove', ( event ) => {
+            if ( document.pointerLockElement === document.body ) {
+                camera.rotation.y -= event.movementX / 500;
+                camera.rotation.x -= event.movementY / 500;
+            }
+        }, false );
+        
     }
     
     playerCollisions() {

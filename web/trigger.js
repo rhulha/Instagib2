@@ -108,23 +108,29 @@ var t94 = [
 var trigger_push = [t93, t89, t88, t87, t92, t86, t85, t82, t84, t83, t94];
 
 /**
+ * @param {string[]} mapDef 
+ * @returns {Brush}
+ */
+function getBrushFromMapDef(mapDef) {
+    var planes = [];
+    for(var plane of mapDef) {
+        var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
+        [,p1x,p1z,p1y,,,p2x,p2z,p2y,,,p3x,p3z,p3y] = plane.split(" ");
+        var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
+        planes.push(p);
+    }
+    return new Brush(planes);
+}
+
+/**
  * @returns {Brush[]}
  */
 function getBrushes() {
     var brushes = [];
-
-    for( var planes_map of trigger_push) {
-        var planes = [];
-        for(var plane of planes_map) {
-            var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
-            [,p1x,p1z,p1y,,,p2x,p2z,p2y,,,p3x,p3z,p3y] = plane.split(" ");
-            var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
-            planes.push(p);
-        }
-        brushes.push( new Brush(planes) );
+    for( var mapDef of trigger_push) {
+        brushes.push( getBrushFromMapDef(mapDef));
     }
-
     return brushes;
 }
 
-export {getBrushes};
+export {getBrushes, getBrushFromMapDef};
