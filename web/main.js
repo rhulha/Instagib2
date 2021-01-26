@@ -1,4 +1,4 @@
-import {PerspectiveCamera, Clock, Geometry, Vector3} from './three/build/three.module.js';
+import {PerspectiveCamera, Clock, Geometry, Face3} from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
@@ -16,22 +16,28 @@ setupResizeListener( camera, renderer);
 
 var brushes = getBrushes()
 for(var brush of brushes) {
-	const vertices = [];
 	var geometry = new Geometry();
-	console.log("new Geometry()")
+	var counter=0;
+	const vertices = [];
 	var polygons = brush.getPolygons();
-	for(var face of polygons) {
+	for(var p=0; p<polygons.length;p++) {
 		//console.log("new face");
-		for( var point of face) {
+		var face = polygons[p];
+		var current_counter_pos=counter;
+		for( var i=0; i<face.length;i++) {
+			var point = face[i];
 			//console.log(point)
-			vertices.push( point.x, point.y, point.z );
-			geometry.vertices.push(	point);
-			console.log("geometry.vertices.push(	point) " + point)
-			//geometry.vertices.push(new Vector3(point.x, point.y, point.z) );
+			//vertices.push( point.x, point.y, point.z );
+			// Godot Debug Points
+			// console.log('[node name="Position3D'+counter+'" type="Position3D" parent="."]');
+			// console.log('transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, '+point.x+', '+point.y+', '+point.z+' )');
+			counter++;
+			geometry.vertices.push(	point );
+			if( i >=2 ) {
+				geometry.faces.push( new Face3(current_counter_pos, current_counter_pos+i-1, current_counter_pos+i) );
+			}
 		}
 	}
-	addDebugPoints(scene, vertices);
-
 	addDebugBox( scene, geometry)
 }
 

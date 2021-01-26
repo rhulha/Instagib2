@@ -30,38 +30,14 @@ function addRandomPoints(scene) {
 }
 
 /**
- * 
  * @param {Scene} scene 
  * @param {Geometry} geometry 
  */
 function addDebugBox(scene, geometry) {
-
-    geometry.faces.push(
-        // front
-        new Face3(0, 1, 2),
-        new Face3(0, 2, 3),
-        // right
-        new Face3(4, 5, 6),
-        new Face3(4, 6, 7),
-        // back
-        new Face3(8, 9, 10),
-        new Face3(8, 10, 11),
-        // left
-        new Face3(12, 13, 14),
-        new Face3(12, 14, 15),
-        // top
-        new Face3(16, 17, 18),
-        new Face3(16, 18, 19),
-        // bottom
-        new Face3(20, 21, 22),
-        new Face3(20, 22, 23),
-    );
-
     var material = new MeshNormalMaterial();
     geometry.computeFaceNormals();
     const mesh = new Mesh(geometry, material);
     scene.add( mesh );
-    
 }
 
 export { addDebugPoints, addDebugBox };
