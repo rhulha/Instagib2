@@ -29,38 +29,32 @@ function addRandomPoints(scene) {
     scene.add( particles );
 }
 
-function addDebugBox(scene, vertices) {
-    const geometry = new Geometry();
-    geometry.vertices.push(
-      new Vector3(-1, -1,  1),  // 0
-      new Vector3( 1, -1,  1),  // 1
-      new Vector3(-1,  1,  1),  // 2
-      new Vector3( 1,  1,  1),  // 3
-      new Vector3(-1, -1, -1),  // 4
-      new Vector3( 1, -1, -1),  // 5
-      new Vector3(-1,  1, -1),  // 6
-      new Vector3( 1,  1, -1),  // 7
-    );
+/**
+ * 
+ * @param {Scene} scene 
+ * @param {Geometry} geometry 
+ */
+function addDebugBox(scene, geometry) {
 
     geometry.faces.push(
         // front
-        new Face3(0, 3, 2),
-        new Face3(0, 1, 3),
+        new Face3(0, 1, 2),
+        new Face3(0, 2, 3),
         // right
-        new Face3(1, 7, 3),
-        new Face3(1, 5, 7),
+        new Face3(4, 5, 6),
+        new Face3(4, 6, 7),
         // back
-        new Face3(5, 6, 7),
-        new Face3(5, 4, 6),
+        new Face3(8, 9, 10),
+        new Face3(8, 10, 11),
         // left
-        new Face3(4, 2, 6),
-        new Face3(4, 0, 2),
+        new Face3(12, 13, 14),
+        new Face3(12, 14, 15),
         // top
-        new Face3(2, 7, 6),
-        new Face3(2, 3, 7),
+        new Face3(16, 17, 18),
+        new Face3(16, 18, 19),
         // bottom
-        new Face3(4, 1, 0),
-        new Face3(4, 5, 1),
+        new Face3(20, 21, 22),
+        new Face3(20, 22, 23),
     );
 
     var material = new MeshNormalMaterial();

@@ -1,4 +1,4 @@
-import {PerspectiveCamera, Mesh, Clock, Vector3, Geometry, Plane, Face3} from './three/build/three.module.js';
+import {PerspectiveCamera, Clock, Geometry, Vector3} from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
@@ -12,24 +12,27 @@ camera.rotation.order = 'YXZ';
 camera.position.z = 2.13;
 const scene = setupScene(camera);
 const renderer = setupRenderer();
-setupResizeListener( scene, renderer);
+setupResizeListener( camera, renderer);
 
 var brushes = getBrushes()
 for(var brush of brushes) {
 	const vertices = [];
-	//const geometry = new Geometry();
+	var geometry = new Geometry();
+	console.log("new Geometry()")
 	var polygons = brush.getPolygons();
 	for(var face of polygons) {
 		//console.log("new face");
 		for( var point of face) {
-			//geometry.vertices.push(	point);
 			//console.log(point)
 			vertices.push( point.x, point.y, point.z );
+			geometry.vertices.push(	point);
+			console.log("geometry.vertices.push(	point) " + point)
+			//geometry.vertices.push(new Vector3(point.x, point.y, point.z) );
 		}
 	}
 	addDebugPoints(scene, vertices);
 
-	addDebugBox( scene, )
+	addDebugBox( scene, geometry)
 }
 
 const worldOctree = new Octree();
