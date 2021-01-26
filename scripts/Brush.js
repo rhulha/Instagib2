@@ -8,11 +8,15 @@ class Plane {
         // WARNING Three.js applies all math function to the "this" vector!
         this.normal = p3.sub(p2).cross( p1.sub(p2)).normalize();
 		//normal = p3.minus(p1).cross( p2.minus(p1)).normalize();
-		this.distance = -this.normal.dot( p1);
+		this.distance = -this.normal.dot( p2);
     }
 
     distance2point(p) {
 		return this.normal.dot(p) + this.distance;
+	}
+
+	toString() {
+		return "normal: " + this.normal.x +"," + this.normal.y + "," + this.normal.z + ", distance: " + this.distance;
 	}
 }
 

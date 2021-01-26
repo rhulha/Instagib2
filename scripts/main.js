@@ -1,5 +1,5 @@
 //import * as T from './three.module.js';
-import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry} from './three.module.js';
+import {PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Vector3, Geometry, Face3, Face4} from './three.module.js';
 import { GLTFLoader } from './GLTFLoader.js';
 import { Octree } from './Octree.js';
 import { setupScene, setupRenderer } from './setup.js';
@@ -28,26 +28,48 @@ var planes = [];
 for(var plane of planes_map) {
 	var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
 	[,p1x,p1z,p1y,,,p2x,p2z,p2y,,,p3x,p3z,p3y] = plane.split(" ");
-	planes.push(new Plane(new Vector3(p1x,p1y,p1z), new Vector3(p2x,p2y,p2z), new Vector3(p3x,p3y,p3z)));
+	var p = new Plane(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
+	planes.push(p);
+	console.log(p.toString());
 }
-var brush = new Brush(planes);
-brush.getPolygons();
 
 const geometry = new Geometry();
-geometry.vertices.push(
-  new Vector3(-1, -1,  1),  // 0
-  new Vector3( 1, -1,  1),  // 1
-  new Vector3(-1,  1,  1),  // 2
-  new Vector3( 1,  1,  1),  // 3
-  new Vector3(-1, -1, -1),  // 4
-  new Vector3( 1, -1, -1),  // 5
-  new Vector3(-1,  1, -1),  // 6
-  new Vector3( 1,  1, -1),  // 7
-);
 
-//var material = new MeshNormalMaterial();
-//var mesh = new Mesh( geometry, material );
-//scene.add( mesh );
+var brush = new Brush(planes);
+var polygons = brush.getPolygons();
+for(var face of polygons) {
+	console.log("new face");
+	for( var point of face) {
+		geometry.vertices.push(	point);
+		console.log(point)
+	}
+}
+
+geometry.faces.push(
+	// front
+	new Face3(0, 3, 2),
+	new Face3(0, 1, 3),
+	// right
+	new Face3(1, 7, 3),
+	new Face3(1, 5, 7),
+	// back
+	new Face3(5, 6, 7),
+	new Face3(5, 4, 6),
+	// left
+	new Face3(4, 2, 6),
+	new Face3(4, 0, 2),
+	// top
+	new Face3(2, 7, 6),
+	new Face3(2, 3, 7),
+	// bottom
+	new Face3(4, 1, 0),
+	new Face3(4, 5, 1),
+  );
+
+var material = new MeshNormalMaterial();
+geometry.computeFaceNormals();
+const mesh = new Mesh(geometry, material);
+scene.add( mesh );
 
 const worldOctree = new Octree();
 document.body.addEventListener( 'mousemove', ( event ) => {

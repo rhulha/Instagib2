@@ -76,7 +76,7 @@ class Player {
                 this.playerVelocity.add( this.getSideVector().multiplyScalar( speed * deltaTime ) );
             }
             if ( this.keyStates[ 'Space' ] ) {
-                this.playerVelocity.y = 15;
+                this.playerVelocity.y = 35;
             }
         }
     }
