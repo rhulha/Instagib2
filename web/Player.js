@@ -1,6 +1,7 @@
 import { Vector3, Camera } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
+import { targets } from './trigger.js';
 
 const GRAVITY = 30;
 
@@ -49,7 +50,7 @@ class Player {
         const result2 = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
         //this.playerOnFloor = false;
         if ( result2 ) {
-            console.log( result2.name )
+            console.log( targets[result2.name] )
             this.playerVelocity.y = 35;
             //this.playerOnFloor = result.normal.y > 0;
             if ( ! this.playerOnFloor ) {

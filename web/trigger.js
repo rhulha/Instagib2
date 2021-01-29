@@ -109,6 +109,26 @@ var t94 = [
 var trigger_push = [t93, t89, t88, t87, t92, t86, t85, t82, t84, t83, t94];
 var trigger_targets = ['t93', 't89', 't88', 't87', 't92', 't86', 't85', 't82', 't84', 't83', 't94'];
 
+var targets = {
+    "t95": "1900 64 628",
+    "t81": "796 732 -132",
+    "t91": "-84 -728 728",
+    "t86": "192 64 824",
+    "t88": "-384 208 836",
+    "t93": "1288 456 768",
+    "t87": "-192 64 1540",
+    "t94": "1288 -328 768",
+    "t89": "-384 -80 836",
+    "t92": "1856 64 640",
+    "t90": "-88 852 728",
+    "t83": "192 -320 604",
+    "t85": "-436 64 1152",
+    "t82": "192 448 604",
+    "t84": "560 64 580",
+    "t96": "-48 -772 352",
+    "t97": "-48 900 352"
+}
+
 /**
  * @param {string[]} mapDef 
  * @returns {Brush}
@@ -174,4 +194,4 @@ function getTriggerOctree(scene) {
     return jumpPadsOctree;
 }
 
-export {getTriggerBrushes, getTriggerOctree, getBrushFromMapDef};
+export {getTriggerBrushes, getTriggerOctree, getBrushFromMapDef, targets};
