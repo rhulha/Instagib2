@@ -107,12 +107,13 @@ var t94 = [
 ];
 
 var trigger_push = [t93, t89, t88, t87, t92, t86, t85, t82, t84, t83, t94];
+var trigger_targets = ['t93', 't89', 't88', 't87', 't92', 't86', 't85', 't82', 't84', 't83', 't94'];
 
 /**
  * @param {string[]} mapDef 
  * @returns {Brush}
  */
-function getBrushFromMapDef(mapDef) {
+function getBrushFromMapDef(mapDef, name) {
     var planes = [];
     for(var plane of mapDef) {
         var p1x, p1y, p1z, p2x, p2y, p2z, p3x, p3y, p3z;
@@ -120,7 +121,7 @@ function getBrushFromMapDef(mapDef) {
         var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
         planes.push(p);
     }
-    return new Brush(planes);
+    return new Brush(planes, name);
 }
 
 /**
@@ -128,8 +129,9 @@ function getBrushFromMapDef(mapDef) {
  */
 function getTriggerBrushes() {
     var brushes = [];
-    for( var mapDef of trigger_push) {
-        brushes.push( getBrushFromMapDef(mapDef));
+    for( var t=0; t<trigger_push.length; t++) {
+        var mapDef = trigger_push[t];
+        brushes.push( getBrushFromMapDef(mapDef, trigger_targets[t]));
     }
     return brushes;
 }
@@ -162,6 +164,7 @@ function getTriggerOctree(scene) {
         }
         var box = addDebugBox( scene, geometry)
         var m = new Mesh(new BufferGeometry().fromGeometry(geometry), box.material);
+        m.name = brush.name;
         jumpPadsGroup.add( m );
 
     }

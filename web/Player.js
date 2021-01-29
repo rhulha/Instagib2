@@ -49,6 +49,7 @@ class Player {
         const result2 = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
         //this.playerOnFloor = false;
         if ( result2 ) {
+            console.log( result2.name )
             this.playerVelocity.y = 35;
             //this.playerOnFloor = result.normal.y > 0;
             if ( ! this.playerOnFloor ) {
