@@ -42,7 +42,6 @@ class Player {
      */
     AimAtTarget(origin, target) {
         // var origin = new Vector.fromVector(m.mins).add(m.maxs).scale(0.5);
-    
         var height = target.y - origin.y;
         var gravity = 800.0*0.038;
         var time = Math.sqrt(height / (0.5 * gravity));
@@ -56,8 +55,7 @@ class Player {
         var forward = dist / time;
         origin2.multiplyScalar(forward);
         origin2.y = time * gravity;
-        return origin2; // weird value found by experimenting
-        // return origin2.scale(0.161); // weird value found by experimenting
+        return origin2;
       }
     
     playerCollisions() {
