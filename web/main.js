@@ -16,7 +16,7 @@ setupResizeListener( camera, renderer);
 
 const jumpPadsOctree = getTriggerOctree(scene);
 const worldOctree = new Octree();
-var player = new Player(worldOctree, jumpPadsOctree, camera);
+var player = new Player(worldOctree, jumpPadsOctree, camera, clock);
 
 const loader = new GLTFLoader().setPath( './models/' );
 loader.load( 'q3dm17.gltf', ( gltf ) => {
