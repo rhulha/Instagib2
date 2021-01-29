@@ -35,6 +35,30 @@ class Player {
         }, false );
         
     }
+
+    /**
+     * @param {Vector3} origin
+     * @param {Vector3} target
+     */
+    AimAtTarget(origin, target) {
+        // var origin = new Vector.fromVector(m.mins).add(m.maxs).scale(0.5);
+    
+        var height = target.y - origin.y;
+        var gravity = 800.0*0.038;
+        var time = Math.sqrt(height / (0.5 * gravity));
+        // set s.origin2 to the push velocity
+        var origin2 = target.clone();
+        origin2.sub(origin);
+        origin2.y = 0.0;
+        var dist = origin2.length();
+        origin2.normalize();
+    
+        var forward = dist / time;
+        origin2.multiplyScalar(forward);
+        origin2.y = time * gravity;
+        return origin2; // weird value found by experimenting
+        // return origin2.scale(0.161); // weird value found by experimenting
+      }
     
     playerCollisions() {
         const result = this.worldOctree.capsuleIntersect( this.playerCollider );
@@ -51,7 +75,14 @@ class Player {
         //this.playerOnFloor = false;
         if ( result2 ) {
             console.log( targets[result2.name] )
-            this.playerVelocity.y = 35;
+            var [x,z,y] = targets[result2.name].split(" ");
+
+            // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+            var vel = this.AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(0.038));
+            this.playerVelocity.copy(vel);
+            //this.playerVelocity.y = 35;
+            // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
             //this.playerOnFloor = result.normal.y > 0;
             if ( ! this.playerOnFloor ) {
                 //this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
