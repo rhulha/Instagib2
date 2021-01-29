@@ -1,6 +1,7 @@
-import {Vector3, Plane} from './three/build/three.module.js';
+import {Vector3, Plane, Geometry, Face3, Group, Mesh, BufferGeometry} from './three/build/three.module.js';
 import { Brush } from './Brush.js';
-
+import { addDebugPoints, addDebugBox } from './addPoints.js';
+import { CustomOctree } from './CustomOctree.js';
 
 var t93 = [
     "( 2488 256 268 ) ( 2360 256 188 ) ( 2360 384 188 ) common/trigger 0 0 0 0.500000 0.500000 134217728 0 0",
@@ -125,7 +126,7 @@ function getBrushFromMapDef(mapDef) {
 /**
  * @returns {Brush[]}
  */
-function getBrushes() {
+function getTriggerBrushes() {
     var brushes = [];
     for( var mapDef of trigger_push) {
         brushes.push( getBrushFromMapDef(mapDef));
@@ -133,4 +134,41 @@ function getBrushes() {
     return brushes;
 }
 
-export {getBrushes, getBrushFromMapDef};
+function getTriggerOctree(scene) {
+    const jumpPadsGroup = new Group();
+    var brushes = getTriggerBrushes()
+    for(var brush of brushes) {
+        var geometry = new Geometry();
+        var counter=0;
+        const vertices = [];
+        var polygons = brush.getPolygons();
+        for(var p=0; p<polygons.length;p++) {
+            //console.log("new face");
+            var face = polygons[p];
+            var current_counter_pos=counter;
+            for( var i=0; i<face.length;i++) {
+                var point = face[i];
+                //console.log(point)
+                //vertices.push( point.x, point.y, point.z );
+                // Godot Debug Points
+                // console.log('[node name="Position3D'+counter+'" type="Position3D" parent="."]');
+                // console.log('transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, '+point.x+', '+point.y+', '+point.z+' )');
+                counter++;
+                geometry.vertices.push(	point );
+                if( i >=2 ) {
+                    geometry.faces.push( new Face3(current_counter_pos, current_counter_pos+i-1, current_counter_pos+i) );
+                }
+            }
+        }
+        var box = addDebugBox( scene, geometry)
+        var m = new Mesh(new BufferGeometry().fromGeometry(geometry), box.material);
+        jumpPadsGroup.add( m );
+
+    }
+
+    const jumpPadsOctree = new CustomOctree();
+    jumpPadsOctree.fromGraphNode(jumpPadsGroup);
+    return jumpPadsOctree;
+}
+
+export {getTriggerBrushes, getTriggerOctree, getBrushFromMapDef};
