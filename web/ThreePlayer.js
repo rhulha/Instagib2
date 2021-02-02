@@ -70,6 +70,7 @@ class Player {
     update( deltaTime ) {
 
         if ( this.playerOnFloor ) {
+            // GROUND MOVE
             /*
             if(!this.wishJump)
                 this.ApplyFriction(1, deltaTime);
@@ -92,7 +93,10 @@ class Player {
                 this.wishJump = false;
             }
         } else {
-            //console.log("not on floor")
+            // AIR MOVE
+            this.wishdir.normalize();
+            this.wishdir.multiplyScalar(10*deltaTime); // some aircontrol
+            this.playerVelocity.add( this.wishdir );
             this.playerVelocity.y -= GRAVITY * deltaTime;
         }
         const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
