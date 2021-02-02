@@ -24,7 +24,7 @@ class Player {
         this.worldOctree = worldOctree;
         this.jumpPadsOctree = jumpPadsOctree;
         this.camera = camera;
-        this.playerCollider.translate(new Vector3( 0, 11, 0 ))
+        this.playerCollider.translate(new Vector3( 0, 11, 0 ));
         document.addEventListener( 'keydown', ( event ) => this.keyStates[ event.code ] = true, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
         document.addEventListener( 'mousedown', () => document.body.requestPointerLock(), false );
@@ -72,7 +72,6 @@ class Player {
         }
 
         const result2 = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
-        //this.playerOnFloor = false;
         if ( result2 ) {
             console.log( targets[result2.name] )
             var [x,z,y] = targets[result2.name].split(" ");
@@ -154,7 +153,6 @@ class Player {
     }
     
     controls( deltaTime ) {
-        const speed = 25;
         this.wishdir.set(0,0,0);
         if ( this.keyStates[ 'KeyW' ] ) {
             this.wishdir.add( this.getForwardVector() )
@@ -171,6 +169,10 @@ class Player {
         if ( this.keyStates[ 'Space' ] ) {
             this.playerVelocity.y = 0.6;
             this.wishJump=true;
+        }
+        if ( this.keyStates[ 'KeyK' ] ) {
+            this.playerCollider.copy(new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 ));
+            this.playerCollider.translate(new Vector3( 0, 11, 0 ));
         }
     }
 }
