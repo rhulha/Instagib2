@@ -2,7 +2,7 @@ import {PerspectiveCamera, Clock} from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { CustomOctree } from './CustomOctree.js';
 import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
-import { Player } from './QuakePlayer.js';
+import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
 
 const clock = new Clock();
@@ -33,7 +33,7 @@ loader.load( 'q3dm17.gltf', ( gltf ) => {
 } );
 
 function animate() {
-	const deltaTime = Math.min( 0.1, clock.getDelta() );
+	var deltaTime = Math.min( 0.1, clock.getDelta() );
 	player.controls( deltaTime );
 	player.update( deltaTime );
 	renderer.render( scene, camera );

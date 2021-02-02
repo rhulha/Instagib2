@@ -2,13 +2,15 @@ import { Vector3, Camera, Clock } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { targets } from './trigger.js';
+import { AimAtTarget } from './AimAtTarget.js';
 
 const GRAVITY = 20;
 const QuakeScale = 0.038;
-const moveSpeed = 7.0/3;  // Ground move speed
+const moveSpeed = 7.0;  // Ground move speed
 const runAcceleration = 14;   // Ground accel
 const runDeacceleration = 10;   // Deacceleration that occurs when running on the ground
 const airAcceleration = 2.0;   // Ground accel
+const airDeacceleration = 2.0;   // Ground accel
 const jumpSpeed = 8.0;  // The speed at which the character's up axis gains when hitting jump
 const friction = 6;
 
@@ -21,8 +23,10 @@ class Player {
     playerOnFloor = false;
     keyStates = {};
     wishJump=false;
-    result_normal_y;
-    got_result;
+
+    clamp(num, min, max) {
+        return num <= min ? min : num >= max ? max : num;
+    }
 
     /**
      * @param {Octree} worldOctree
@@ -34,7 +38,7 @@ class Player {
         this.jumpPadsOctree = jumpPadsOctree;
         this.camera = camera;
         this.clock = clock;
-        this.playerCollider.translate(new Vector3( 0, 11, 0 ))
+        this.playerCollider.translate(new Vector3( 11, 3, 11 ))
         document.addEventListener( 'keydown', ( event ) => this.keyStates[ event.code ] = true, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
         document.addEventListener( 'mousedown', () => document.body.requestPointerLock(), false );
@@ -43,57 +47,22 @@ class Player {
             if ( document.pointerLockElement === document.body ) {
                 camera.rotation.y -= event.movementX / 500;
                 camera.rotation.x -= event.movementY / 500;
-                if(camera.rotation.x < -Math.PI/2)
-                    camera.rotation.x = -Math.PI/2;
-                else if(camera.rotation.x > Math.PI/2)
-                    camera.rotation.x = Math.PI/2;
+                camera.rotation.x = this.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
             }
         }, false );
-    }
-
-    /**
-     * @param {Vector3} origin
-     * @param {Vector3} target
-     */
-    AimAtTarget(origin, target) {
-        // var origin = new Vector.fromVector(m.mins).add(m.maxs).scale(0.5);
-        var height = target.y - origin.y;
-        var gravity = GRAVITY*QuakeScale;
-        var time = Math.sqrt(height / (0.5 * gravity));
-        // set s.origin2 to the push velocity
-        var origin2 = target.clone();
-        origin2.sub(origin);
-        origin2.y = 0.0;
-        var dist = origin2.length();
-        origin2.normalize();
-    
-        var forward = dist / time;
-        origin2.multiplyScalar(forward);
-        origin2.y = time * gravity*2;
-        return origin2;
     }
     
     playerCollisions() {
         const result = this.worldOctree.capsuleIntersect( this.playerCollider );
         this.playerOnFloor = false;
         if ( result ) {
-            this.got_result=true;
-            this.result_normal_y=result.normal.y;
             this.playerOnFloor = result.normal.y > 0;
             if ( ! this.playerOnFloor ) {
                 // this is what happens if we hit the ceiling
-                this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
+                //this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
             }
             this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
-        } else {
-            this.got_result=false;
         }
- 
-        if( this.playerOnFloor)
-            document.getElementById("info").innerText = "got_result: "+ this.got_result;
-            //document.getElementById("info").innerText = "result_normal_y: "+ this.result_normal_y;
-        else
-            document.getElementById("info").innerText = "got_result: "+ this.got_result;
 
         // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX JUMP PADS
         if( this.jumpPadsOctree ) {
@@ -101,34 +70,40 @@ class Player {
             if ( result2 ) {
                 console.log( targets[result2.name] )
                 var [x,z,y] = targets[result2.name].split(" ");
-                var vel = this.AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale));
+                var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
                 this.playerVelocity.copy(vel);
             }
         }
         // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     }
 
-    ApplyFriction(t, deltaTime) {
-        var vec = this.playerVelocity.clone();
-    
-        vec.y = 0.0;
-        var speed = vec.length();
-        var drop = 0.0;
-    
-        if(this.playerOnFloor)
-        {
-            var control = (speed < runDeacceleration ? runDeacceleration : speed);
-            drop = control * friction * deltaTime * t;
+    update( deltaTime ) {
+        if ( this.playerOnFloor ) {
+            this.GroundMove(deltaTime);
+        } else {
+            this.AirMove(deltaTime);
+            //this.playerVelocity.y = - GRAVITY * deltaTime;
         }
+        this.playerCollider.translate( this.playerVelocity );
+        this.playerCollisions();
+        this.camera.position.copy( this.playerCollider.end );
+        document.getElementById("info").innerText = "" + this.playerVelocity.y;
+    }
     
-        var newspeed = speed - drop;
-        if(newspeed < 0)
-            newspeed = 0;
-        if(speed > 0)
-            newspeed /= speed;
-    
-        this.playerVelocity.x *= newspeed;
-        this.playerVelocity.z *= newspeed;
+    AirMove(deltaTime) {
+        var accel;
+        this.wishdir.normalize()
+        var wishspeed = this.wishdir.length()
+        wishspeed *= moveSpeed
+
+        if (this.playerVelocity.dot(this.wishdir) < 0)
+            accel = airDeacceleration;
+        else
+            accel = airAcceleration;
+        
+        this.Accelerate(this.wishdir, wishspeed, accel, deltaTime); //  accel
+        
+        this.playerVelocity.y -= GRAVITY * deltaTime
     }
 
     GroundMove(deltaTime) {
@@ -140,11 +115,6 @@ class Player {
 
         this.wishdir.normalize();
         var wishspeed = this.wishdir.length();
-        //if( wishspeed > 0)
-        if( this.playerOnFloor)
-            document.getElementById("info").innerText = "result_normal_y: "+ this.result_normal_y;
-        else
-            document.getElementById("info").innerText = "playerOnFloor: "+ this.playerOnFloor;
         wishspeed *= moveSpeed;
         this.wishdir.normalize();
 
@@ -157,7 +127,7 @@ class Player {
         // this.playerVelocity.y = 0; 
         
         if(this.wishJump) {
-            this.playerVelocity.y = jumpSpeed;
+            this.playerVelocity.y = jumpSpeed*0.3;
             this.wishJump = false;
         }
     }
@@ -182,54 +152,60 @@ class Player {
         this.playerVelocity.z += accelspeed * wishdir.z;
     }
 
-    update( deltaTime ) {
-        if ( this.playerOnFloor ) {
-            this.GroundMove(deltaTime);
-        } else {
-            this.playerVelocity.y = - GRAVITY * deltaTime;
-        }
-        this.playerCollider.translate( this.playerVelocity );
-        this.playerCollisions();
-        this.camera.position.copy( this.playerCollider.end );
-    }
-    
-    getForwardVector() {
+    getPlayerRelativeVector(side) {
         this.camera.getWorldDirection( this.playerDirection );
         this.playerDirection.y = 0;
         this.playerDirection.normalize();
-        return this.playerDirection;
-    }
-    
-    getSideVector() {
-        this.camera.getWorldDirection( this.playerDirection );
-        this.playerDirection.y = 0;
-        this.playerDirection.normalize();
-        this.playerDirection.cross( this.camera.up );
+        if( side)
+            this.playerDirection.cross( this.camera.up );
         return this.playerDirection;
     }
     
     controls( deltaTime ) {
         this.wishdir.set(0,0,0);
         if ( this.keyStates[ 'KeyW' ] ) {
-            this.wishdir.add( this.getForwardVector() )
+            this.wishdir.add( this.getPlayerRelativeVector(false) )
         }
         if ( this.keyStates[ 'KeyS' ] ) {
-            this.wishdir.sub( this.getForwardVector() )
+            this.wishdir.sub( this.getPlayerRelativeVector(false) )
         }
         if ( this.keyStates[ 'KeyA' ] ) {
-            this.wishdir.sub( this.getSideVector() )
+            this.wishdir.sub( this.getPlayerRelativeVector(true) )
         }
         if ( this.keyStates[ 'KeyD' ] ) {
-            this.wishdir.add( this.getSideVector() )
+            this.wishdir.add( this.getPlayerRelativeVector(true) )
         }
         if ( this.keyStates[ 'Space' ] ) {
             this.wishJump=true;
         }
         if ( this.keyStates[ 'KeyK' ] ) {
             this.playerCollider.copy(new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 ));
-            this.playerCollider.translate(new Vector3( 0, 11, 0 ));
+            this.playerCollider.translate(new Vector3( 11, 3, 11 ));
             this.playerVelocity = new Vector3();
         }
+    }
+
+    ApplyFriction(t, deltaTime) {
+        var vec = this.playerVelocity.clone();
+    
+        vec.y = 0.0;
+        var speed = vec.length();
+        var drop = 0.0;
+    
+        if(this.playerOnFloor)
+        {
+            var control = (speed < runDeacceleration ? runDeacceleration : speed);
+            drop = control * friction * deltaTime * t;
+        }
+    
+        var newspeed = speed - drop;
+        if(newspeed < 0)
+            newspeed = 0;
+        if(speed > 0)
+            newspeed /= speed;
+    
+        this.playerVelocity.x *= newspeed;
+        this.playerVelocity.z *= newspeed;
     }
 }
 

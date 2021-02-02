@@ -4,7 +4,7 @@ import { Octree } from './three/examples/jsm/math/Octree.js';
 import { targets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
 
-const GRAVITY = 30.4;
+const GRAVITY = 30;
 const QuakeScale = 0.038;
 
 class Player {
@@ -43,7 +43,7 @@ class Player {
         }, false );
         
     }
-
+    
     playerCollisions() {
         const result = this.worldOctree.capsuleIntersect( this.playerCollider );
         this.playerOnFloor = false;
@@ -61,66 +61,32 @@ class Player {
         if ( result2 ) {
             console.log( targets[result2.name] )
             var [x,z,y] = targets[result2.name].split(" ");
-            var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY*QuakeScale*0.5);
+            var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             this.playerVelocity.copy(vel);
         }
     }
 
     update( deltaTime ) {
+
         if ( this.playerOnFloor ) {
-            this.wishdir.normalize();
-            var s = this.MoveGround(this.wishdir, this.playerVelocity, deltaTime)
-            this.playerVelocity.copy(s);
+            if( this.wishdir.lengthSq() == 0 ) {
+                this.playerVelocity.addScaledVector( this.playerVelocity, -0.1 );
+            } else {
+                this.wishdir.normalize();
+                this.wishdir.multiplyScalar(2*25*deltaTime); // CHANGED: 2 * 
+                this.playerVelocity.add( this.wishdir );
+                const damping = Math.exp( - 3 * deltaTime ) - 1;
+                this.playerVelocity.addScaledVector( this.playerVelocity, damping );
+                // playerVelocity.y = 0;
+            }
         } else {
-            //var s = this.MoveAir(this.wishdir, this.playerVelocity, (50.0 / 3.0) * 0.0075)
-            //this.playerVelocity.copy(s);
-            this.playerVelocity.y -= GRAVITY * deltaTime * 0.038;
+            console.log("not on floor")
+            this.playerVelocity.y -= GRAVITY * deltaTime;
         }
-        const deltaPosition = this.playerVelocity.clone(); // .multiplyScalar( deltaTime );
+        const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
         this.playerCollider.translate( deltaPosition );
         this.playerCollisions();
         this.camera.position.copy( this.playerCollider.end );
-    }
-
-    // accelDir: normalized direction that the player has requested to move (taking into account the movement keys and look direction)
-    // prevVelocity: The current velocity of the player, before any additional calculations
-    // accelerate: The server-defined player acceleration value
-    // max_velocity: The server-defined maximum player velocity (this is not strictly adhered to due to strafejumping)
-    Accelerate(wishdir, prevVelocity, accelerate, max_velocity, deltaTime)
-    {
-        var projVel = prevVelocity.dot(wishdir); // Vector projection of Current velocity onto wishdir.
-        var accelVel = accelerate * deltaTime; // Accelerated velocity in direction of movment
-
-        // If necessary, truncate the accelerated velocity so the vector projection does not exceed max_velocity
-        if(projVel + accelVel > max_velocity)
-            accelVel = max_velocity - projVel;
-
-        return new Vector3().copy(prevVelocity).add(wishdir).multiplyScalar(accelVel);
-    }
-
-    // 
-    MoveGround(wishdir, prevVelocity, deltaTime)
-    {
-        const friction = 6;
-        // Apply Friction
-        var speed = prevVelocity.length();
-        if (speed != 0) // To avoid divide by zero errors
-        {
-            var drop = speed * friction * deltaTime;
-            prevVelocity.multiplyScalar(Math.max(speed - drop, 0) / speed); // Scale the velocity based on friction.
-        }
-        const ground_accelerate = 7.0*2;
-        const max_velocity_ground = 320;
-        // ground_accelerate and max_velocity_ground are server-defined movement variables
-        return this.Accelerate(wishdir, prevVelocity, ground_accelerate, max_velocity_ground, deltaTime);
-    }
-
-    MoveAir(accelDir, prevVelocity, deltaTime)
-    {
-        // air_accelerate and max_velocity_air are server-defined movement variables
-        const air_accelerate = 0.7;
-        const max_velocity_air = 1320;
-        return this.Accelerate(accelDir, prevVelocity, air_accelerate, max_velocity_air, deltaTime);
     }
 
     getPlayerRelativeVector(side) {
@@ -132,7 +98,6 @@ class Player {
         return this.playerDirection;
     }
 
-    
     controls( deltaTime ) {
         this.wishdir.set(0,0,0);
         if ( this.keyStates[ 'KeyW' ] ) {
@@ -148,8 +113,7 @@ class Player {
             this.wishdir.add( this.getPlayerRelativeVector(true) )
         }
         if ( this.keyStates[ 'Space' ] ) {
-            this.playerVelocity.y = 0.6;
-            this.wishJump=true;
+            this.playerVelocity.y = 15;
         }
         if ( this.keyStates[ 'KeyK' ] ) {
             this.playerCollider.copy(new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 ));
