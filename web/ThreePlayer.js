@@ -12,6 +12,7 @@ class Player {
     playerCollider = new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 );
     playerVelocity = new Vector3();
     wishdir = new Vector3(); // Quake
+    wishJump=false;
     playerDirection = new Vector3();
     playerOnFloor = false;
     keyStates = {};
@@ -30,7 +31,7 @@ class Player {
         this.jumpPadsOctree = jumpPadsOctree;
         this.camera = camera;
         this.playerCollider.translate(new Vector3( 0, 11, 0 ));
-        document.addEventListener( 'keydown', ( event ) => this.keyStates[ event.code ] = true, false );
+        document.addEventListener( 'keydown', ( event ) => { if( !event.repeat ) this.keyStates[ event.code ] = true;}, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
         document.addEventListener( 'mousedown', () => document.body.requestPointerLock(), false );
 
@@ -69,6 +70,13 @@ class Player {
     update( deltaTime ) {
 
         if ( this.playerOnFloor ) {
+            /*
+            if(!this.wishJump)
+                this.ApplyFriction(1, deltaTime);
+            else
+                this.ApplyFriction(0, deltaTime);
+            */
+           
             if( this.wishdir.lengthSq() == 0 ) {
                 this.playerVelocity.addScaledVector( this.playerVelocity, -0.1 );
             } else {
@@ -79,8 +87,12 @@ class Player {
                 this.playerVelocity.addScaledVector( this.playerVelocity, damping );
                 // playerVelocity.y = 0;
             }
+            if(this.wishJump) {
+                this.playerVelocity.y = 9;
+                this.wishJump = false;
+            }
         } else {
-            console.log("not on floor")
+            //console.log("not on floor")
             this.playerVelocity.y -= GRAVITY * deltaTime;
         }
         const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
@@ -113,7 +125,8 @@ class Player {
             this.wishdir.add( this.getPlayerRelativeVector(true) )
         }
         if ( this.keyStates[ 'Space' ] ) {
-            this.playerVelocity.y = 15;
+            this.wishJump=true;
+            this.keyStates[ 'Space' ] = false;
         }
         if ( this.keyStates[ 'KeyK' ] ) {
             this.playerCollider.copy(new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 ));

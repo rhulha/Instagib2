@@ -232,8 +232,8 @@ function getTriggerOctree(scene) {
                 }
             }
         }
-        var box = addDebugBox( scene, geometry)
-        var m = new Mesh(new BufferGeometry().fromGeometry(geometry), box.material);
+        //var box = addDebugBox( scene, geometry)
+        var m = new Mesh(new BufferGeometry().fromGeometry(geometry));
         m.name = brush.name;
         jumpPadsGroup.add( m );
 
