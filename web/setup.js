@@ -1,5 +1,8 @@
 import {WebGLRenderer, Scene, Color, AmbientLight, DirectionalLight} from './three/build/three.module.js';
     
+/**
+ * @returns {Scene}
+ */
 function setupScene() {
     var scene = new Scene();
     scene.background = new Color( 0x88ccff );
@@ -9,6 +12,10 @@ function setupScene() {
     fillLight1.position.set( - 1, 1, 2 );
     scene.add( fillLight1 );
     
+    //const hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
+    //hemiLight.position.set( 0, 20, 0 );
+    //scene.add( hemiLight );
+                
     //const fillLight2 = new DirectionalLight( 0x8888ff, 1.2 );
     //fillLight2.position.set( 0, - 1, 0 );
     //scene.add( fillLight2 );
