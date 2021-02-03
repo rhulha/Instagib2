@@ -21,6 +21,10 @@ class Player {
         return num <= min ? min : num >= max ? max : num;
     }
 
+    getPosAsString() {
+        return "" + this.playerCollider.start.x.toFixed(4) + "," + this.playerCollider.start.y.toFixed(4) + "," + this.playerCollider.start.z.toFixed(4);
+    }
+
     /**
      * @param {Octree} worldOctree
      * @param {Octree} jumpPadsOctree

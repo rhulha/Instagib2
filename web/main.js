@@ -4,6 +4,7 @@ import { CustomOctree } from './CustomOctree.js';
 import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
 import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
+import webSocket from './webSocket.js';
 
 const clock = new Clock();
 const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -20,6 +21,7 @@ const worldOctree = new CustomOctree();
 var player = new Player(worldOctree, jumpPadsOctree, camera, clock);
 
 var soldier;
+var soldier_obj3d;
 var soldier_actions;
 var soldier_mixer;
 
@@ -45,6 +47,7 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 	soldier=soldier_glb;
 	soldier.scene.traverse( ( obj ) => {
 		if ( obj.type === 'Object3D' ) {
+			soldier_obj3d=obj;
 			obj.scale.set(0.017,0.017,0.017);
 		}
 	});
@@ -66,7 +69,21 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 	})
 });
 
-//setTimeout(, 3000);
+webSocket.pos = function(msg) {
+	document.getElementById("info").innerText = "pos: "+ msg.pos;
+	var [x,y,z] = msg.pos.split(",");
+	soldier.scene.position.set(x,y,z);
+	//soldier_obj3d.updateMatrix();
+}
+
+function log(str) {
+	$("#log").prepend($("<span>"+str+"</span></br>"))
+}
+
+setTimeout(function() {
+	//soldier.scene.position.set(5,5,5);
+	//soldier.scene.updateMatrix();
+}, 3000);
 
 function animate() {
 	var deltaTime = Math.min( 0.1, clock.getDelta() );
@@ -74,6 +91,8 @@ function animate() {
 	player.update( deltaTime );
 	soldier_mixer.update( clock.getDelta() );
 	renderer.render( scene, camera );
+	//console.log({pos: player.getPosAsString()})
+	webSocket.send({cmd: "pos", pos: player.getPosAsString()});
 	requestAnimationFrame( animate );
 }
 

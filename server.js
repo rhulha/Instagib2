@@ -1,15 +1,33 @@
-const express = require("express");
+const express = require('express');
+const http = require('http');
+const url = require('url');
+const WebSocket = require('ws');
+
 const app = express();
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-app.use(express.static("web"));
+wss.on('connection', function connection(ws) {
+  // const location = url.parse(ws.upgradeReq.url, true);
+  // You might use location.query.access_token to authenticate or share sessions
+  // or ws.upgradeReq.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
 
-app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/web/index.html");
+  console.log('client connected');
+
+  ws.on('message', function incoming(message) {
+    //console.log('received: %s', message);
+    wss.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
 });
 
 
-const listener = app.listen(8080, () => {
-  console.log("Your app is listening on port " + listener.address().port);
+app.use(express.static('web'));
+
+server.listen(8080, function() {
+  console.log('Listening on %d', server.address().port);
 });
+
