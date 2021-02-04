@@ -16,6 +16,9 @@ class Player {
     playerDirection = new Vector3();
     playerOnFloor = false;
     keyStates = {};
+    railgun_audio;
+    jump_audio;
+    jumppad_audio;
 
     clamp(num, min, max) {
         return num <= min ? min : num >= max ? max : num;
@@ -41,7 +44,12 @@ class Player {
         this.playerCollider.translate(new Vector3( 0, 11, 0 ));
         document.addEventListener( 'keydown', ( event ) => { if( !event.repeat ) this.keyStates[ event.code ] = true;}, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
-        document.addEventListener( 'mousedown', () => document.body.requestPointerLock(), false );
+        document.addEventListener( 'mousedown', () => {
+            if ( document.pointerLockElement !== document.body )
+                document.body.requestPointerLock();
+            else
+                this.railgun_audio.play();
+        }, false );
 
         document.body.addEventListener( 'mousemove', ( event ) => {
             if ( document.pointerLockElement === document.body ) {
@@ -50,7 +58,11 @@ class Player {
                 camera.rotation.x = this.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
             }
         }, false );
-        
+     
+        this.railgun_audio = new Audio('sounds/railgf1a.wav');
+        this.jump_audio = new Audio('sounds/sarge/jump1.wav');
+        this.jumppad_audio = new Audio('sounds/jumppad.wav');
+
     }
     
     playerCollisions() {
@@ -72,6 +84,7 @@ class Player {
             var [x,z,y] = targets[result2.name].split(" ");
             var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             this.playerVelocity.copy(vel);
+            this.jumppad_audio.play();
         }
     }
 
@@ -99,6 +112,7 @@ class Player {
             if(this.wishJump) {
                 this.playerVelocity.y = 9;
                 this.wishJump = false;
+                this.jump_audio.play();
             }
         } else {
             // AIR MOVE

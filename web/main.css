@@ -22,6 +22,38 @@ button {
 	text-transform: uppercase;
 }
 
+#gun {
+	position: absolute;
+	bottom: 0px;
+	right: 15%;
+	padding: 10px;
+	box-sizing: border-box;
+	text-align: center;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
+#crosshair {
+	position: absolute;
+	height: 32px;
+	width: 32px;
+	position: absolute;
+	left: 50%;
+	margin-left: -16px;
+	top: 50%;
+	margin-top: -16px;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
 #info {
 	position: absolute;
 	top: 0px;

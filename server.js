@@ -15,11 +15,11 @@ fs.readFile('player_log.txt', 'utf8', function(err, contents) {
 });
 
 var player_log = "";
-
+var interval;
 
 function setStuffSlowly(client) {
   console.log('SetTimeout, setStuffSlowly');
-  var interval = setInterval(()=>{
+  interval = setInterval(()=>{
     var line = lines[lines_pos++%lines.length];
     if(line === undefined)
       clearInterval(interval);
@@ -62,6 +62,7 @@ process.on('SIGINT', function() {
     if (err) return console.log(err);
     console.log('writing player_log.');
   });*/
+  clearInterval(interval);
   wss.close();
   server.close();
 });
