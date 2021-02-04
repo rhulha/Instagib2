@@ -36,15 +36,17 @@ function setupModelAnimations(){
 		action.play();
 	} );
 	idleAction.setEffectiveTimeScale( 31 );
-	idleAction.setEffectiveWeight( 1 );
+	idleAction.setEffectiveWeight( 0 );
 	walkAction.setEffectiveWeight( 0 );
-	runAction.setEffectiveWeight( 0 );
+	runAction.setEffectiveWeight( 1 );
+	runAction.setEffectiveTimeScale( 31 );
 
 }
 
 const loader = new GLTFLoader().setPath( './models/' );
 loader.load( 'soldier.glb', function ( soldier_glb ) {
 	soldier=soldier_glb;
+	soldier.scene.rotation.order = 'YXZ'
 	soldier.scene.traverse( ( obj ) => {
 		if ( obj.type === 'Object3D' ) {
 			soldier_obj3d=obj;
@@ -72,7 +74,11 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 webSocket.pos = function(msg) {
 	document.getElementById("info").innerText = "pos: "+ msg.pos;
 	var [x,y,z] = msg.pos.split(",");
+	var [rx,ry] = msg.rot.split(",");
 	soldier.scene.position.set(x,y,z);
+	soldier.scene.rotation.x = rx;
+	soldier.scene.rotation.y = ry;
+	//soldier.scene.onRotationChange();
 	//soldier_obj3d.updateMatrix();
 }
 
@@ -92,7 +98,7 @@ function animate() {
 	soldier_mixer.update( clock.getDelta() );
 	renderer.render( scene, camera );
 	//console.log({pos: player.getPosAsString()})
-	webSocket.send({cmd: "pos", pos: player.getPosAsString()});
+	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
 	requestAnimationFrame( animate );
 }
 
