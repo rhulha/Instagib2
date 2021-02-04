@@ -18,7 +18,7 @@ setupResizeListener( camera, renderer);
 
 const jumpPadsOctree = getTriggerOctree(scene);
 const worldOctree = new CustomOctree();
-var player = new Player(worldOctree, jumpPadsOctree, camera, clock);
+var player = new Player(worldOctree, jumpPadsOctree, camera, clock, scene);
 
 var soldier;
 var soldier_obj3d;

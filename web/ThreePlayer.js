@@ -1,11 +1,13 @@
-import { Vector3, Camera } from './three/build/three.module.js';
+import { Vector3, Camera, LineBasicMaterial, BufferGeometry, Line } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { targets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
 
+            
 const GRAVITY = 30;
 const QuakeScale = 0.038;
+const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
 class Player {
 
@@ -19,6 +21,7 @@ class Player {
     railgun_audio;
     jump_audio;
     jumppad_audio;
+    
 
     clamp(num, min, max) {
         return num <= min ? min : num >= max ? max : num;
@@ -37,7 +40,7 @@ class Player {
      * @param {Octree} jumpPadsOctree
      * @param {Camera} camera
      */
-    constructor(worldOctree, jumpPadsOctree, camera) {
+    constructor(worldOctree, jumpPadsOctree, camera, clock, scene) {
         this.worldOctree = worldOctree;
         this.jumpPadsOctree = jumpPadsOctree;
         this.camera = camera;
@@ -47,8 +50,22 @@ class Player {
         document.addEventListener( 'mousedown', () => {
             if ( document.pointerLockElement !== document.body )
                 document.body.requestPointerLock();
-            else
+            else {
                 this.railgun_audio.play();
+                const points = [];
+                var start = new Vector3();
+                var end = new Vector3();
+                points.push( start );
+                points.push( end );
+                this.camera.getWorldDirection( this.playerDirection );
+                start.copy( this.playerCollider.end );
+                end.copy( this.playerCollider.end );
+                end.addScaledVector( this.playerDirection, 100 );
+                const geometry = new BufferGeometry().setFromPoints( points );
+                const line = new Line( geometry, lineMaterial );
+                scene.add( line );
+				
+            }
         }, false );
 
         document.body.addEventListener( 'mousemove', ( event ) => {
