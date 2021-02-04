@@ -12,8 +12,8 @@ camera.rotation.order = 'YXZ';
 /**
  * @type {Scene}
  */
-const scene = setupScene(camera);
 const renderer = setupRenderer();
+const scene = setupScene(camera, renderer);
 setupResizeListener( camera, renderer);
 
 const jumpPadsOctree = getTriggerOctree(scene);

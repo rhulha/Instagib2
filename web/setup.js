@@ -1,16 +1,52 @@
-import {WebGLRenderer, Scene, Color, AmbientLight, DirectionalLight} from './three/build/three.module.js';
-    
+import {sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, Color, AmbientLight, DirectionalLight, Vector3} from './three/build/three.module.js';
+import { Sky } from './three/examples/jsm/objects/Sky.js';
+
 /**
  * @returns {Scene}
  */
-function setupScene() {
+function setupScene(camera, renderer) {
     var scene = new Scene();
-    scene.background = new Color( 0x88ccff );
-    scene.add( new AmbientLight( 0x6688cc ) );
+    //scene.background = new Color( 0x88ccff );
+    //scene.add( new AmbientLight( 0x6688cc ) );
     
     const fillLight1 = new DirectionalLight( 0xff9999, 5.5 );
     fillLight1.position.set( - 1, 1, 2 );
     scene.add( fillLight1 );
+
+    // https://threejs.org/examples/#webgl_shaders_sky
+    // https://github.com/mrdoob/three.js/blob/master/examples/webgl_shaders_sky.html
+    var sky = new Sky();
+    sky.scale.setScalar( 450000 );
+    scene.add( sky );
+
+    const effectController = {
+        turbidity: 0,
+        rayleigh: 0.035,
+        mieCoefficient: 0.005,
+        mieDirectionalG: 0.7,
+        inclination: 0.3555, // elevation / inclination
+        azimuth: 0.25, // Facing front,
+        exposure: renderer.toneMappingExposure
+    };
+
+    var sun = new Vector3();
+
+    const uniforms = sky.material.uniforms;
+    uniforms[ "turbidity" ].value = effectController.turbidity;
+    uniforms[ "rayleigh" ].value = effectController.rayleigh;
+    uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
+    uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
+
+    const theta = Math.PI * ( effectController.inclination - 0.5 );
+    const phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+
+    sun.x = Math.cos( phi );
+    sun.y = Math.sin( phi ) * Math.sin( theta );
+    sun.z = Math.sin( phi ) * Math.cos( theta );
+
+    uniforms[ "sunPosition" ].value.copy( sun );
+
+    renderer.toneMappingExposure = effectController.exposure;
     
     //const hemiLight = new HemisphereLight( 0xffffff, 0x444444 );
     //hemiLight.position.set( 0, 20, 0 );
@@ -35,6 +71,9 @@ function setupRenderer() {
     var renderer = new WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.outputEncoding = sRGBEncoding;
+    renderer.toneMapping = ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.5;
     const container = document.getElementById( 'container' );
     container.appendChild( renderer.domElement );
     return renderer;

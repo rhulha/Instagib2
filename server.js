@@ -23,8 +23,10 @@ function setStuffSlowly(client) {
     var line = lines[lines_pos++%lines.length];
     if(line === undefined)
       clearInterval(interval);
-    console.log(line);
-    client.send(line);
+    //console.log(line);
+    try {
+      client.send(line);
+    } catch (error) {}
   }, 16);
 }
 
