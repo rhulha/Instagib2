@@ -1,9 +1,8 @@
-import { Vector3, Camera, LineBasicMaterial, BufferGeometry, Line } from './three/build/three.module.js';
+import { Vector3, Camera, LineBasicMaterial, BufferGeometry, Line, Scene, Clock, Raycaster } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { targets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
-
             
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -39,6 +38,8 @@ class Player {
      * @param {Octree} worldOctree
      * @param {Octree} jumpPadsOctree
      * @param {Camera} camera
+     * @param {Clock} clock
+     * @param {Scene} scene
      */
     constructor(worldOctree, jumpPadsOctree, camera, clock, scene) {
         this.worldOctree = worldOctree;
@@ -51,7 +52,8 @@ class Player {
             if ( document.pointerLockElement !== document.body )
                 document.body.requestPointerLock();
             else {
-                this.railgun_audio.play();
+                this.railgun_audio.volume = 0.2;
+                //this.railgun_audio.play();
                 const points = [];
                 var start = new Vector3();
                 var end = new Vector3();
@@ -63,8 +65,13 @@ class Player {
                 end.addScaledVector( this.playerDirection, 100 );
                 const geometry = new BufferGeometry().setFromPoints( points );
                 const line = new Line( geometry, lineMaterial );
+                line.time = clock.getElapsedTime();
                 scene.add( line );
-				
+                const raycaster = new Raycaster(start, this.playerDirection);
+                var char = scene.getObjectByName( "Character");
+                if(raycaster.intersectObject( char, true ).length > 0) {
+                    console.log(char);
+                }
             }
         }, false );
 
