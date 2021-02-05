@@ -62,8 +62,13 @@ process.on('SIGINT', function() {
     if (err) return console.log(err);
     console.log('writing player_log.');
   });*/
-  clearInterval(interval);
-  wss.close();
-  server.close();
+  try {
+    clearInterval(interval);
+  } catch (error) {}
+  try {
+    wss.close();
+    server.close();
+  } catch (error) {}
+  process.exit(1)
 });
 

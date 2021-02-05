@@ -1,6 +1,6 @@
 import {Vector3, Plane, Geometry, Face3, Group, Mesh, BufferGeometry} from './three/build/three.module.js';
 import { Brush } from './Brush.js';
-import { addDebugPoints, addDebugBox } from './addPoints.js';
+import { addDebugPoints, addDebugBox } from './debug.js';
 import { CustomOctree } from './CustomOctree.js';
 
 var t93 = [

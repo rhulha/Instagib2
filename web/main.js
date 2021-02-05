@@ -55,6 +55,7 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 	});
 	setupModelAnimations();
 	scene.add( soldier_glb.scene );
+
 	loader.load( 'q3dm17.gltf', ( gltf ) => {
 		scene.add( gltf.scene );
 		worldOctree.fromGraphNode( gltf.scene );
@@ -68,7 +69,7 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 			}
 		} );
 		animate();
-	})
+	});
 });
 
 webSocket.pos = function(msg) {
@@ -100,5 +101,17 @@ function animate() {
 	//console.log({pos: player.getPosAsString()})
 	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
 	requestAnimationFrame( animate );
+	// TODO: don't do this every frame, don't cache scene.children.length as it changes due to the remove call
+	// call i--; after a removal.
+	for ( let i = 0, l = scene.children.length; i < l; i ++ ) {
+		var obj = scene.children[i]
+		if ( obj && obj.type === 'Line' ) {
+			if(obj.time + 1.5 < clock.getElapsedTime()) {
+				scene.remove(obj);
+				obj.geometry.dispose();
+				console.log("removed line.")
+			}
+		}
+	}
 }
 

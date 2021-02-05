@@ -46,6 +46,8 @@ try {
 	};
 	
 	webSocket.connection.onmessage = function(messageEvent) {
+		if( messageEvent.data === undefined || messageEvent.data.length < 10)
+			return;
 		var msgData = JSON.parse(messageEvent.data);
 		var fn = webSocket[msgData.cmd];
 	    if(typeof fn !== 'function') {
