@@ -50,33 +50,47 @@ class Player {
         this.playerCollider.translate(new Vector3( 0, 11, 0 ));
         document.addEventListener( 'keydown', ( event ) => { if( !event.repeat ) this.keyStates[ event.code ] = true;}, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
-        document.addEventListener( 'mousedown', () => {
-            if ( document.pointerLockElement !== document.body )
+        document.addEventListener( 'mousedown', (e) => {
+            if (e.button == 2) {
+                camera.zoom = 4;
+                camera.updateProjectionMatrix();
+            }
+        });
+        document.addEventListener( 'mouseup', (e) => {
+            if (e.button == 2) { 
+                camera.zoom = 1;
+                camera.updateProjectionMatrix();
+            }
+        });
+        
+        document.addEventListener( 'mousedown', (e) => {
+            if ( document.pointerLockElement !== document.body ) {
                 document.body.requestPointerLock();
-            else {
-                this.railgun_audio.volume = 0.2;
-                //this.railgun_audio.play();
-                const points = [];
-                var start = new Vector3();
-                var end = new Vector3();
-                points.push( start );
-                points.push( end );
-                this.camera.getWorldDirection( this.playerDirection );
-                start.copy( this.playerCollider.end );
-                end.copy( this.playerCollider.end );
-                end.addScaledVector( this.playerDirection, 100 );
-                const geometry = new BufferGeometry().setFromPoints( points );
-                const line = new Line( geometry, lineMaterial );
-                line.time = clock.getElapsedTime();
-                scene.add( line );
-                const raycaster = new Raycaster(start, this.playerDirection);
-                var char = scene.getObjectByName( "Character");
-                if(raycaster.intersectObject( char, true ).length > 0) {
-                    console.log(char);
-                    char.getWorldPosition(this.enemyPos);
-                    this.enemyPos.y+=1.8;
-                    scene.add(explosion(this.enemyPos, clock.getElapsedTime()));
-                }
+                return;
+            }
+            if (e.button != 0)
+                return;
+            this.railgun_audio.play();
+            const points = [];
+            var start = new Vector3();
+            var end = new Vector3();
+            points.push( start );
+            points.push( end );
+            this.camera.getWorldDirection( this.playerDirection );
+            start.copy( this.playerCollider.end );
+            end.copy( this.playerCollider.end );
+            end.addScaledVector( this.playerDirection, 100 );
+            const geometry = new BufferGeometry().setFromPoints( points );
+            const line = new Line( geometry, lineMaterial );
+            line.time = clock.getElapsedTime();
+            scene.add( line );
+            const raycaster = new Raycaster(start, this.playerDirection);
+            var char = scene.getObjectByName( "Character");
+            if(raycaster.intersectObject( char, true ).length > 0) {
+                console.log(char);
+                char.getWorldPosition(this.enemyPos);
+                this.enemyPos.y+=1.8;
+                scene.add(explosion(this.enemyPos, clock.getElapsedTime()));
             }
         }, false );
 
