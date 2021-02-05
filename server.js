@@ -27,7 +27,7 @@ function setStuffSlowly(client) {
     try {
       client.send(line);
     } catch (error) {}
-  }, 16);
+  }, 36); // original 16
 }
 
 wss.on('connection', function connection(ws, request, client) {

@@ -3,6 +3,7 @@ import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { targets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
+import { explosion } from './explosion.js';
             
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -12,6 +13,7 @@ class Player {
 
     playerCollider = new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 );
     playerVelocity = new Vector3();
+    enemyPos = new Vector3();
     wishdir = new Vector3(); // Quake
     wishJump=false;
     playerDirection = new Vector3();
@@ -71,6 +73,9 @@ class Player {
                 var char = scene.getObjectByName( "Character");
                 if(raycaster.intersectObject( char, true ).length > 0) {
                     console.log(char);
+                    char.getWorldPosition(this.enemyPos);
+                    this.enemyPos.y+=1.8;
+                    scene.add(explosion(this.enemyPos, clock.getElapsedTime()));
                 }
             }
         }, false );

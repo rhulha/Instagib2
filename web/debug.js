@@ -1,5 +1,9 @@
 import {Points, PointsMaterial, Float32BufferAttribute, Face3, Geometry, BufferGeometry, Mesh, MeshNormalMaterial, TextureLoader, Vector3} from './three/build/three.module.js';
     
+function log(str) {
+	$("#log").prepend($("<span>"+str+"</span></br>"))
+}
+
 function addDebugPoints(scene, vertices) {
     const bg = new BufferGeometry();
     const sprite = new TextureLoader().load( 'disc.png' );
@@ -30,6 +34,14 @@ function printSceneGraph( obj ) {
     obj.children.forEach( printSceneGraph );
     console.groupEnd();
 }
+
+/*
+(function printGraph( obj ) {
+    console.group( ' <%o> ' + obj.name, obj );
+    obj.children.forEach( printGraph );
+    console.groupEnd();
+} ( scene ) );
+*/
 
 function addRandomPoints(scene) {
     const bg = new BufferGeometry();

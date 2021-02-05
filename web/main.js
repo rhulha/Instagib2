@@ -1,7 +1,7 @@
-import {PerspectiveCamera, Clock, Scene, AnimationMixer} from './three/build/three.module.js';
+import {PerspectiveCamera, Clock, Scene} from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { CustomOctree } from './CustomOctree.js';
-import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
+import { setupScene, setupRenderer, setupResizeListener, setupModelAnimations } from './setup.js';
 import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
 import webSocket from './webSocket.js';
@@ -25,24 +25,6 @@ var soldier_obj3d;
 var soldier_actions;
 var soldier_mixer;
 
-function setupModelAnimations(){ 
-	soldier_mixer = new AnimationMixer( soldier.scene );
-	soldier_mixer.timeScale = 11.0;
-	var idleAction = soldier_mixer.clipAction( soldier.animations[ 0 ] );
-	var walkAction = soldier_mixer.clipAction( soldier.animations[ 3 ] );
-	var runAction = soldier_mixer.clipAction( soldier.animations[ 1 ] );
-	soldier_actions = [ idleAction, walkAction, runAction ];
-	soldier_actions.forEach( function ( action ) {
-		action.play();
-	} );
-	idleAction.setEffectiveTimeScale( 31 );
-	idleAction.setEffectiveWeight( 0 );
-	walkAction.setEffectiveWeight( 0 );
-	runAction.setEffectiveWeight( 1 );
-	runAction.setEffectiveTimeScale( 31 );
-
-}
-
 const loader = new GLTFLoader().setPath( './models/' );
 loader.load( 'soldier.glb', function ( soldier_glb ) {
 	soldier=soldier_glb;
@@ -53,7 +35,7 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 			obj.scale.set(0.017,0.017,0.017);
 		}
 	});
-	setupModelAnimations();
+	[soldier_mixer, soldier_actions] = setupModelAnimations(soldier);
 	scene.add( soldier_glb.scene );
 
 	loader.load( 'q3dm17.gltf', ( gltf ) => {
@@ -73,24 +55,28 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 });
 
 webSocket.pos = function(msg) {
-	document.getElementById("info").innerText = "pos: "+ msg.pos;
+	//document.getElementById("info").innerText = "pos: "+ msg.pos;
 	var [x,y,z] = msg.pos.split(",");
 	var [rx,ry] = msg.rot.split(",");
 	soldier.scene.position.set(x,y,z);
 	soldier.scene.rotation.x = rx;
 	soldier.scene.rotation.y = ry;
-	//soldier.scene.onRotationChange();
-	//soldier_obj3d.updateMatrix();
 }
 
-function log(str) {
-	$("#log").prepend($("<span>"+str+"</span></br>"))
-}
-
-setTimeout(function() {
-	//soldier.scene.position.set(5,5,5);
-	//soldier.scene.updateMatrix();
-}, 3000);
+// remove rail trails
+setInterval(function() {
+	for ( var i = 0; i < scene.children.length; i++ ) {
+		var obj = scene.children[i]
+		if ( obj && (obj.type === 'Line' || obj.type === 'Points') ) {
+			if(obj.time + 1.5 < clock.getElapsedTime()) {
+				scene.remove(obj);
+				i--;
+				obj.geometry.dispose();
+				//console.log("removed line.")
+			}
+		}
+	}
+}, 1000);
 
 function animate() {
 	var deltaTime = Math.min( 0.1, clock.getDelta() );
@@ -98,20 +84,12 @@ function animate() {
 	player.update( deltaTime );
 	soldier_mixer.update( clock.getDelta() );
 	renderer.render( scene, camera );
-	//console.log({pos: player.getPosAsString()})
 	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
 	requestAnimationFrame( animate );
-	// TODO: don't do this every frame, don't cache scene.children.length as it changes due to the remove call
-	// call i--; after a removal.
-	for ( let i = 0, l = scene.children.length; i < l; i ++ ) {
-		var obj = scene.children[i]
-		if ( obj && obj.type === 'Line' ) {
-			if(obj.time + 1.5 < clock.getElapsedTime()) {
-				scene.remove(obj);
-				obj.geometry.dispose();
-				console.log("removed line.")
-			}
+	scene.traverse((obj)=>{
+		if( obj.update ) {
+			obj.update(deltaTime);
 		}
-	}
+	})
 }
 
