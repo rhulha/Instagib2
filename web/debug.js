@@ -10,6 +10,27 @@ function addDebugPoints(scene, vertices) {
     scene.add( particles );
 }
 
+function raycastScene(scene) {
+    scene.traverse((obj)=>{
+        if ( obj.type === 'SkinnedMesh' ) {
+            if(obj.material.name != "SkyShader" && obj.constructor.name != "Line") {
+                if(raycaster.intersectObject( obj )) {
+                    if(obj.material.name != "SkyShader" && obj.constructor.name != "Line") {
+                        console.log(obj.constructor.name);
+                        console.log(obj);
+                    }
+                }
+            }
+        }
+    })
+}
+
+function printSceneGraph( obj ) {
+    console.group( ' <%o> ' + obj.name, obj );
+    obj.children.forEach( printSceneGraph );
+    console.groupEnd();
+}
+
 function addRandomPoints(scene) {
     const bg = new BufferGeometry();
     const vertices = [];
@@ -43,4 +64,4 @@ function addDebugBox(scene, geometry) {
 }
 // https://threejsfundamentals.org/threejs/lessons/threejs-custom-geometry.html
 
-export { addDebugPoints, addDebugBox };
+export { addDebugPoints, addDebugBox, printSceneGraph };
