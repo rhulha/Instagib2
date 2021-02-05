@@ -1,9 +1,9 @@
-import { PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Geometry, Vector3, Face3, BackSide} from './three/build/three.module.js';
-import { FirstPersonControls } from './three/examples/jsm/controls/FirstPersonControls.js';
-import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
-import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
-import { addDebugPoints, addDebugBox } from './addPoints.js';
-import { getBrushes, getBrushFromMapDef } from './trigger.js';
+import { PerspectiveCamera, Mesh, MeshNormalMaterial, Clock, Geometry, Vector3, Face3, BackSide} from '../three/build/three.module.js';
+import { FirstPersonControls } from '../three/examples/jsm/controls/FirstPersonControls.js';
+import { GLTFLoader } from '../three/examples/jsm/loaders/GLTFLoader.js';
+import { setupScene, setupRenderer, setupResizeListener } from '../setup.js';
+import { addDebugPoints, addDebugBox } from '../debug.js';
+import { getBrushes, getBrushFromMapDef } from '../trigger.js';
 
 const clock = new Clock();
 const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
