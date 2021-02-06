@@ -68,6 +68,12 @@ webSocket.pos = function(msg) {
 	soldier.scene.rotation.y = ry;
 }
 
+document.addEventListener("keydown", (event)=>{
+    if (event.key === "Enter") {
+		webSocket.send({cmd: "sendTestData"});
+    }
+})
+
 function animate() {
 	var deltaTime = Math.min( 0.1, scene.clock.getDelta() );
 	player.controls( deltaTime );

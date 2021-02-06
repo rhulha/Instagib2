@@ -17,7 +17,7 @@ fs.readFile('player_log.txt', 'utf8', function(err, contents) {
 var player_log = "";
 var interval;
 
-function setStuffSlowly(client) {
+function setStuffSlowly(ws) {
   console.log('SetTimeout, setStuffSlowly');
   interval = setInterval(()=>{
     var line = lines[lines_pos++%lines.length];
@@ -25,27 +25,39 @@ function setStuffSlowly(client) {
       clearInterval(interval);
     //console.log(line);
     try {
-      client.send(line);
+      ws.send(line);
     } catch (error) {}
   }, 36); // original 16
 }
 
-wss.on('connection', function connection(ws, request, client) {
-  //const ip = request.socket.remoteAddress;
-  console.log('client connected');
-
-  for (let clnt of wss.clients) 
-    setTimeout(()=>setStuffSlowly(clnt), 5000);
-
-    ws.on('message', function incoming(message) {
-    // console.log('received: %s', message);
-    // player_log += message + "\r\n";
-    wss.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+function handleMsg(msg) {
+  // console.log('received: %s', message);
+  // player_log += message + "\r\n";
+  var jsn = JSON.parse(msg);
+  if( jsn.cmd ) {
+    if( jsn.cmd === "sendTestData") {
+      console.log('received: %s', "sendTestData");
+      clearInterval(interval);
+      lines_pos=0;
+      setStuffSlowly(this);
+    }
+  }
+  wss.clients.forEach((client) => {
+    if (client !== this && client.readyState === WebSocket.OPEN) {
+      client.send(msg);
+    }
   });
+}
+
+function setupWS(ws) {
+  ws.on('message', handleMsg.bind(ws));
+}
+
+
+wss.on('connection', (ws, request) => {
+  //const ip = request.socket.remoteAddress;
+  console.log('client connected', ws);
+  setupWS(ws);
 });
 
 app.use(express.static('web'));
