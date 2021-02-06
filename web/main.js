@@ -62,21 +62,6 @@ webSocket.pos = function(msg) {
 	soldier.scene.rotation.y = ry;
 }
 
-// remove rail trails
-setInterval(function() {
-	for ( var i = 0; i < scene.children.length; i++ ) {
-		var obj = scene.children[i]
-		if ( obj && (obj.type === 'Line' || obj.type === 'Points') ) {
-			if(obj.time + 1.5 < scene.clock.getElapsedTime()) {
-				scene.remove(obj);
-				i--;
-				obj.geometry.dispose();
-				//console.log("removed line.")
-			}
-		}
-	}
-}, 1000);
-
 function animate() {
 	var deltaTime = Math.min( 0.1, scene.clock.getDelta() );
 	player.controls( deltaTime );
@@ -87,8 +72,16 @@ function animate() {
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{
 		if( obj.update ) {
-			obj.update(deltaTime);
+			obj.update.call(obj, deltaTime);
 		}
-	})
+	});
+	if(scene.remove_me && scene.remove_me.length>0) {
+		for(var i=0; i<scene.remove_me.length; i++) {
+			scene.remove(scene.remove_me[i]);
+			if(scene.remove_me[i].geometry)
+				scene.remove_me[i].geometry.dispose();
+		}
+		scene.remove_me.length=0;
+	}
 }
 

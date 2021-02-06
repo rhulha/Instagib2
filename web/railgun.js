@@ -27,6 +27,11 @@ function explosion(pos, elapsedTime)
     particles.time = elapsedTime;
 
     particles.update = function(elapsed) {
+        if(this.time + 1.5 < scene.clock.getElapsedTime()) {
+            if(!scene.remove_me)
+                scene.remove_me=[];
+            scene.remove_me.push(this);
+        }
         //var pos = geometry.getAttribute('position');
         var pos = particles.geometry.attributes.position.array
         for ( let i = 0; i < count*3; i+=3 ) {
@@ -57,6 +62,11 @@ function shoot(scene, player) {
     const line = new Line( geometry, lineMaterial );
     line.time = scene.clock.getElapsedTime();
     line.update = function(elapsed) {
+        if(this.time + 1.5 < scene.clock.getElapsedTime()) {
+            if(!scene.remove_me)
+                scene.remove_me=[];
+            scene.remove_me.push(this);
+        }
     }
     scene.add( line );
     const raycaster = new Raycaster(start, player.playerDirection);
