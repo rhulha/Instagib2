@@ -48,9 +48,8 @@ wss.on('connection', function connection(ws, request, client) {
   });
 });
 
-
-
 app.use(express.static('web'));
+app.use(express.static('icons'));
 
 server.listen(8080, function() {
   console.log('Listening on %d', server.address().port);
