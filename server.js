@@ -56,7 +56,7 @@ function setupWS(ws) {
 
 wss.on('connection', (ws, request) => {
   //const ip = request.socket.remoteAddress;
-  console.log('client connected', ws);
+  console.log('client connected');
   setupWS(ws);
 });
 

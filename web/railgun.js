@@ -1,12 +1,16 @@
 import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 
+import webSocket from './webSocket.js';
+
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
-const material = new PointsMaterial( { size: 1,  color: "red", map: sprite, alphaTest: 0.5, transparent: true });
-const count = 300;
-const speed = 30;
+const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
+const count = 200;
+const speed = 10;
+
+const gib_audio = new Audio('sounds/gibsplt1.wav');
 
 /**
 * @param {Vector3} pos
@@ -17,7 +21,7 @@ function explosion(scene, pos, elapsedTime)
     const vertices = [];
     for ( let i = 0; i < count; i ++ ) {
         vertices.push( pos.x, pos.y, pos.z );
-        dirs.push(new Vector3((Math.random() * speed)-(speed/2),(Math.random() * speed)-(speed/2),(Math.random() * speed)-(speed/2)));
+        dirs.push(new Vector3((Math.random() * speed)-(speed/2),(Math.random() * speed*2)-(speed/2),(Math.random() * speed)-(speed/2)));
     }
 
     var geometry = new BufferGeometry();
@@ -77,7 +81,11 @@ function shoot(scene, player) {
         //console.log(char);
         char.getWorldPosition(player.enemyPos);
         player.enemyPos.y+=1.8;
+
+        webSocket.send({cmd: "sendTestData"});
         scene.add(explosion(scene, player.enemyPos, scene.clock.getElapsedTime()));
+
+        gib_audio.play();
     }
 }
 
