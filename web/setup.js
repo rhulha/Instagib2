@@ -1,11 +1,12 @@
-import {sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, AnimationMixer, DirectionalLight, Vector3} from './three/build/three.module.js';
+import {sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, AnimationMixer, DirectionalLight, Vector3, Clock} from './three/build/three.module.js';
 import { Sky } from './three/examples/jsm/objects/Sky.js';
 
 /**
  * @returns {Scene}
  */
-function setupScene(camera, renderer) {
+function setupScene(renderer) {
     var scene = new Scene();
+    scene.clock = new Clock();
     //scene.background = new Color( 0x88ccff );
     //scene.add( new AmbientLight( 0x6688cc ) );
     

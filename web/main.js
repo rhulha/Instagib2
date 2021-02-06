@@ -6,19 +6,18 @@ import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
 import webSocket from './webSocket.js';
 
-const clock = new Clock();
 const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.rotation.order = 'YXZ';
+const renderer = setupRenderer();
 /**
  * @type {Scene}
  */
-const renderer = setupRenderer();
-const scene = setupScene(camera, renderer);
+const scene = setupScene(renderer);
 setupResizeListener( camera, renderer);
 
 const jumpPadsOctree = getTriggerOctree(scene);
 const worldOctree = new CustomOctree();
-var player = new Player(worldOctree, jumpPadsOctree, camera, clock, scene);
+var player = new Player(worldOctree, jumpPadsOctree, camera, scene);
 
 var soldier;
 var soldier_obj3d;
@@ -68,7 +67,7 @@ setInterval(function() {
 	for ( var i = 0; i < scene.children.length; i++ ) {
 		var obj = scene.children[i]
 		if ( obj && (obj.type === 'Line' || obj.type === 'Points') ) {
-			if(obj.time + 1.5 < clock.getElapsedTime()) {
+			if(obj.time + 1.5 < scene.clock.getElapsedTime()) {
 				scene.remove(obj);
 				i--;
 				obj.geometry.dispose();
@@ -79,10 +78,10 @@ setInterval(function() {
 }, 1000);
 
 function animate() {
-	var deltaTime = Math.min( 0.1, clock.getDelta() );
+	var deltaTime = Math.min( 0.1, scene.clock.getDelta() );
 	player.controls( deltaTime );
 	player.update( deltaTime );
-	soldier_mixer.update( clock.getDelta() );
+	soldier_mixer.update( scene.clock.getDelta() );
 	renderer.render( scene, camera );
 	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
 	requestAnimationFrame( animate );

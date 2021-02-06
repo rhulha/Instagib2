@@ -1,13 +1,12 @@
-import { Vector3, Camera, LineBasicMaterial, BufferGeometry, Line, Scene, Clock, Raycaster } from './three/build/three.module.js';
+import { Vector3, Camera, Scene} from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { targets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
-import { explosion } from './explosion.js';
+import { shoot } from './explosion.js';
             
 const GRAVITY = 30;
 const QuakeScale = 0.038;
-const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
 class Player {
 
@@ -40,10 +39,9 @@ class Player {
      * @param {Octree} worldOctree
      * @param {Octree} jumpPadsOctree
      * @param {Camera} camera
-     * @param {Clock} clock
      * @param {Scene} scene
      */
-    constructor(worldOctree, jumpPadsOctree, camera, clock, scene) {
+    constructor(worldOctree, jumpPadsOctree, camera, scene) {
         this.worldOctree = worldOctree;
         this.jumpPadsOctree = jumpPadsOctree;
         this.camera = camera;
@@ -70,28 +68,7 @@ class Player {
             }
             if (e.button != 0)
                 return;
-            this.railgun_audio.play();
-            const points = [];
-            var start = new Vector3();
-            var end = new Vector3();
-            points.push( start );
-            points.push( end );
-            this.camera.getWorldDirection( this.playerDirection );
-            start.copy( this.playerCollider.end );
-            end.copy( this.playerCollider.end );
-            end.addScaledVector( this.playerDirection, 100 );
-            const geometry = new BufferGeometry().setFromPoints( points );
-            const line = new Line( geometry, lineMaterial );
-            line.time = clock.getElapsedTime();
-            scene.add( line );
-            const raycaster = new Raycaster(start, this.playerDirection);
-            var char = scene.getObjectByName( "Character");
-            if(raycaster.intersectObject( char, true ).length > 0) {
-                console.log(char);
-                char.getWorldPosition(this.enemyPos);
-                this.enemyPos.y+=1.8;
-                scene.add(explosion(this.enemyPos, clock.getElapsedTime()));
-            }
+            shoot(scene, this);
         }, false );
 
         document.body.addEventListener( 'mousemove', ( event ) => {
