@@ -21,6 +21,7 @@ class Player {
     railgun_audio;
     jump_audio;
     jumppad_audio;
+    sensitivity=500;
     
 
     clamp(num, min, max) {
@@ -51,12 +52,14 @@ class Player {
         document.addEventListener( 'mousedown', (e) => {
             if (e.button == 2) {
                 camera.zoom = 4;
+                this.sensitivity *= 3;
                 camera.updateProjectionMatrix();
             }
         });
         document.addEventListener( 'mouseup', (e) => {
             if (e.button == 2) { 
                 camera.zoom = 1;
+                this.sensitivity /= 3;
                 camera.updateProjectionMatrix();
             }
         });
@@ -66,15 +69,14 @@ class Player {
                 document.body.requestPointerLock();
                 return;
             }
-            if (e.button != 0)
-                return;
-            shoot(scene, this);
+            if (e.button == 0)
+                shoot(scene, this);
         }, false );
 
         document.body.addEventListener( 'mousemove', ( event ) => {
             if ( document.pointerLockElement === document.body ) {
-                camera.rotation.y -= event.movementX / 500;
-                camera.rotation.x -= event.movementY / 500;
+                camera.rotation.y -= event.movementX / this.sensitivity;
+                camera.rotation.x -= event.movementY / this.sensitivity;
                 camera.rotation.x = this.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
             }
         }, false );
