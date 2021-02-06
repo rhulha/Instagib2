@@ -11,7 +11,7 @@ const speed = 30;
 /**
 * @param {Vector3} pos
 */
-function explosion(pos, elapsedTime)
+function explosion(scene, pos, elapsedTime)
 {
     const dirs = [];
     const vertices = [];
@@ -77,7 +77,7 @@ function shoot(scene, player) {
         //console.log(char);
         char.getWorldPosition(player.enemyPos);
         player.enemyPos.y+=1.8;
-        scene.add(explosion(player.enemyPos, scene.clock.getElapsedTime()));
+        scene.add(explosion(scene, player.enemyPos, scene.clock.getElapsedTime()));
     }
 }
 
