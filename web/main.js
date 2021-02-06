@@ -5,6 +5,12 @@ import { setupScene, setupRenderer, setupResizeListener, setupModelAnimations } 
 import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
 import webSocket from './webSocket.js';
+import Stats from './three/examples/jsm/libs/stats.module.js';
+
+const stats = new Stats();
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.top = '0px';
+container.appendChild( stats.domElement );
 
 const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.rotation.order = 'YXZ';
@@ -68,6 +74,7 @@ function animate() {
 	player.update( deltaTime );
 	soldier_mixer.update( scene.clock.getDelta() );
 	renderer.render( scene, camera );
+	stats.update();
 	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{

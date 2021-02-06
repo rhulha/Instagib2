@@ -1,7 +1,7 @@
 import { Vector3, Camera, Scene} from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
-import { targets } from './trigger.js';
+import { getTargets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
 import { shoot } from './railgun.js';
             
@@ -10,7 +10,7 @@ const QuakeScale = 0.038;
 
 class Player {
 
-    playerCollider = new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 );
+    playerCollider = new Capsule( new Vector3( 0, 0.7, 0 ), new Vector3( 0, 2.13+0.7, 0 ), 0.7 );
     playerVelocity = new Vector3();
     enemyPos = new Vector3();
     wishdir = new Vector3(); // Quake
@@ -100,8 +100,8 @@ class Player {
 
         const result2 = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
         if ( result2 ) {
-            console.log( targets[result2.name] )
-            var [x,z,y] = targets[result2.name].split(" ");
+            console.log( getTargets()[result2.name] )
+            var [x,z,y] = getTargets()[result2.name].split(" ");
             var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             this.playerVelocity.copy(vel);
             this.jumppad_audio.play();
