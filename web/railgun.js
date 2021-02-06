@@ -58,6 +58,7 @@ function shoot(scene, player) {
     start.copy( player.playerCollider.end );
     end.copy( player.playerCollider.end );
     end.addScaledVector( player.playerDirection, 100 );
+    
     const geometry = new BufferGeometry().setFromPoints( points );
     const line = new Line( geometry, lineMaterial );
     line.time = scene.clock.getElapsedTime();
@@ -69,10 +70,11 @@ function shoot(scene, player) {
         }
     }
     scene.add( line );
+
     const raycaster = new Raycaster(start, player.playerDirection);
     var char = scene.getObjectByName( "Character");
     if(raycaster.intersectObject( char, true ).length > 0) {
-        console.log(char);
+        //console.log(char);
         char.getWorldPosition(player.enemyPos);
         player.enemyPos.y+=1.8;
         scene.add(explosion(player.enemyPos, scene.clock.getElapsedTime()));
