@@ -51,18 +51,10 @@ function explosion(scene, pos, elapsedTime)
     return particles;
 }
 
-function shoot(scene, player) {
-    //player.railgun_audio.play();
+function getLine(scene, start, end) {
     const points = [];
-    var start = new Vector3();
-    var end = new Vector3();
     points.push( start );
     points.push( end );
-    player.camera.getWorldDirection( player.playerDirection );
-    start.copy( player.playerCollider.end );
-    end.copy( player.playerCollider.end );
-    end.addScaledVector( player.playerDirection, 100 );
-    
     const geometry = new BufferGeometry().setFromPoints( points );
     const line = new Line( geometry, lineMaterial );
     line.time = scene.clock.getElapsedTime();
@@ -73,7 +65,27 @@ function shoot(scene, player) {
             scene.remove_me.push(this);
         }
     }
-    scene.add( line );
+    return line;
+}
+
+function getLinePositionsFromPlayer(player) {
+    var start = new Vector3();
+    var end = new Vector3();
+    player.camera.getWorldDirection( player.playerDirection );
+    start.copy( player.playerCollider.end );
+    end.copy( player.playerCollider.end );
+    end.addScaledVector( player.playerDirection, 100 );
+    return [start, end];
+}
+
+function shoot(scene, player) {
+    //player.railgun_audio.play();
+    var [start, end] = getLinePositionsFromPlayer(player);
+    scene.add( getLine(scene, start, end) );
+
+    var dir = player.playerDirection;
+    // webSocket.send({cmd: "rail", origin: {x: start.x, y: start.y, z: start.z}, dir: {x: dir.x, y: dir.y, z: dir.z}});
+    webSocket.send({cmd: "line", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
     const raycaster = new Raycaster(start, player.playerDirection);
     var char = scene.getObjectByName( "Character");
@@ -82,12 +94,14 @@ function shoot(scene, player) {
         char.getWorldPosition(player.enemyPos);
         player.enemyPos.y+=1.8;
 
-        webSocket.send({cmd: "sendTestData"});
+        webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}});
+
+        // webSocket.send({cmd: "sendTestData"});
         scene.add(explosion(scene, player.enemyPos, scene.clock.getElapsedTime()));
 
         gib_audio.play();
     }
 }
 
-export {shoot, explosion};
+export {shoot, explosion, getLine, gib_audio};
 

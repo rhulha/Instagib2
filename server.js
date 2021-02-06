@@ -58,6 +58,12 @@ wss.on('connection', (ws, request) => {
   //const ip = request.socket.remoteAddress;
   console.log('client connected');
   setupWS(ws);
+
+  wss.clients.forEach((client) => {
+    if (client !== this && client.readyState === WebSocket.OPEN) {
+      client.send({cmd:"newCon"});
+    }
+  });
 });
 
 app.use(express.static('web'));

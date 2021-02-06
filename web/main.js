@@ -1,4 +1,4 @@
-import {PerspectiveCamera, Clock, Scene} from './three/build/three.module.js';
+import {PerspectiveCamera, Vector3, Clock, Scene} from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { CustomOctree } from './CustomOctree.js';
 import { setupScene, setupRenderer, setupResizeListener, setupModelAnimations } from './setup.js';
@@ -6,6 +6,7 @@ import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
 import webSocket from './webSocket.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
+import { getLine, explosion, gib_audio } from './railgun.js';
 
 const stats = new Stats();
 stats.domElement.style.position = 'absolute';
@@ -66,6 +67,18 @@ webSocket.pos = function(msg) {
 	soldier.scene.position.set(x,y,z);
 	soldier.scene.rotation.x = rx;
 	soldier.scene.rotation.y = ry;
+}
+
+webSocket.line = function(msg) {
+	var start = new Vector3().copy(msg.start);
+	var end = new Vector3().copy(msg.end);
+	scene.add(getLine(scene, start, end));
+}
+
+webSocket.hit = function(msg) {
+	var pos = new Vector3().copy(msg.pos);
+	scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
+    gib_audio.play();
 }
 
 document.addEventListener("keydown", (event)=>{
