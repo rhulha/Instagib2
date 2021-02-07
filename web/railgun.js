@@ -65,7 +65,7 @@ class HelixCurve extends Curve {
     getPoint(t, optionalTarget ) {
         var point = optionalTarget || new Vector3();
         var a = 0.2; // radius
-        var b = 25; // height
+        var b = 125; // length
         var t2 = 2 * Math.PI * t * b / 3;
         var x = Math.cos( t2 ) * a;
         var y = Math.sin( t2 ) * a;
@@ -80,7 +80,7 @@ function getLine(scene, start, end) {
     points.push( end );
     
     var helix = new HelixCurve();
-    var helixGeometry = new TubeGeometry( helix, 300, 0.1, 12, false, true );
+    var helixGeometry = new TubeGeometry( helix, 300, 0.1, 12, false );
     var helixMesh = new Mesh( helixGeometry, helixMaterial );
     helixMesh.position.copy(start);
     helixMesh.lookAt(end);
@@ -115,7 +115,8 @@ function shoot(scene, player) {
     webSocket.send({cmd: "line", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
     const raycaster = new Raycaster(start, player.playerDirection);
-    var char = scene.getObjectByName( "Character");
+    var char = scene.getObjectByName( "Character" );
+    // TODO: check if we hit level first...
     if(raycaster.intersectObject( char, true ).length > 0) {
         //console.log(char);
         char.getWorldPosition(player.enemyPos);
