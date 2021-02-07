@@ -6,7 +6,8 @@ import { Player } from './ThreePlayer.js';
 import { getTriggerOctree } from './trigger.js';
 import webSocket from './webSocket.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
-import { getLine, explosion, gib_audio } from './railgun.js';
+import { getLine, explosion } from './railgun.js';
+import audio from './audio.js';
 
 const stats = new Stats();
 stats.domElement.style.position = 'absolute';
@@ -82,7 +83,7 @@ webSocket.newCon = function(msg) {
 webSocket.hit = function(msg) {
 	var pos = new Vector3().copy(msg.pos);
 	scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
-    gib_audio.play();
+    audio.gib.play();
 }
 
 document.addEventListener("keydown", (event)=>{

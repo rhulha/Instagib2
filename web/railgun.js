@@ -2,6 +2,7 @@ import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import { Curves } from './three/examples/jsm/curves/CurveExtras.js';
 import webSocket from './webSocket.js';
+import audio from './audio.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 const helixMaterial = new MeshLambertMaterial( { color: 0xff0000, opacity: 0.3, transparent: true } );
@@ -11,7 +12,6 @@ const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, 
 const count = 200;
 const speed = 10;
 
-const gib_audio = new Audio('sounds/gibsplt1.wav');
 
 /**
 * @param {Vector3} pos
@@ -90,7 +90,7 @@ function getLinePositionsFromPlayer(player) {
 }
 
 function shoot(scene, player) {
-    player.railgun_audio.play();
+    audio.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     scene.add( getLine(scene, start, end) );
 
@@ -110,9 +110,9 @@ function shoot(scene, player) {
         // webSocket.send({cmd: "sendTestData"});
         scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
-        gib_audio.play();
+        audio.gib.play();
     }
 }
 
-export {shoot, explosion, getLine, gib_audio};
+export {shoot, explosion, getLine};
 

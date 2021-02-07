@@ -4,6 +4,7 @@ import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets } from './trigger.js';
 import { AimAtTarget } from './AimAtTarget.js';
 import { shoot } from './railgun.js';
+import audio from './audio.js';
             
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -18,9 +19,6 @@ class Player {
     playerDirection = new Vector3();
     playerOnFloor = false;
     keyStates = {};
-    railgun_audio;
-    jump_audio;
-    jumppad_audio;
     sensitivity=500;
     
 
@@ -81,12 +79,6 @@ class Player {
             }
         }, false );
      
-        this.railgun_audio = new Audio('sounds/railgf1a.wav');
-        this.jump_audio = new Audio('sounds/sarge/jump1.wav');
-        this.jumppad_audio = new Audio('sounds/jumppad.wav');
-        this.railgun_audio.volume=0.1;
-        this.jump_audio.volume=0.2;
-        this.jumppad_audio.volume=0.5;
     }
     
     playerCollisions() {
@@ -108,7 +100,7 @@ class Player {
             var [x,z,y] = getTargets()[result2.name].split(" ");
             var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             this.playerVelocity.copy(vel);
-            this.jumppad_audio.play();
+            audio.jumppad.play();
         }
     }
 
@@ -136,7 +128,7 @@ class Player {
             if(this.wishJump) {
                 this.playerVelocity.y = 9;
                 this.wishJump = false;
-                this.jump_audio.play();
+                audio.jump.play();
             }
         } else {
             // AIR MOVE
