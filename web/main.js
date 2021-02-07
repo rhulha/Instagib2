@@ -2,7 +2,7 @@ import {PerspectiveCamera, Vector3, Clock, Scene} from './three/build/three.modu
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import { CustomOctree } from './CustomOctree.js';
 import { setupScene, setupRenderer, setupResizeListener, setupModelAnimations } from './setup.js';
-import { Player } from './ThreePlayer.js';
+import { Player } from './Player.js';
 import { getTriggerOctree } from './trigger.js';
 import webSocket from './webSocket.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
