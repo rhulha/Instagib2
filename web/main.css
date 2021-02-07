@@ -41,10 +41,9 @@ button {
 	position: absolute;
 	height: 32px;
 	width: 32px;
-	position: absolute;
 	left: 50%;
-	margin-left: -16px;
 	top: 50%;
+	margin-left: -16px;
 	margin-top: -16px;
 	-moz-user-select: none;
 	-webkit-user-select: none;
@@ -52,6 +51,16 @@ button {
 	user-select: none;
 	pointer-events: none;
 	z-index: 1; /* TODO Solve this in HTML */
+}
+
+#player_setup {
+	position: absolute;
+	height: 720px;
+	width: 1280px;
+	left: 50%;
+	margin-left: -640px;
+	top: 50%;
+	margin-top: -360px;
 }
 
 #info {

@@ -13,9 +13,9 @@ var rooms = {}; // <name_str,Room>
 // var players_by_id = {};
 
 class Room {
-  constructor(name, private) {
+  constructor(name, private_) {
     this.name = name;
-    this.private = private;
+    this.private_ = private_;
     this.players = [];
   }
 }
@@ -49,11 +49,16 @@ class Player {
 var interval;
 
 function sendPlayerPositions() {
-  for( var room_name of rooms ) {
+  for( var room_name in rooms ) {
     var room = rooms[room_name];
-    for( var player in room.players ) {
+    for( var player of room.players ) {
       if( player.ws.readyState === WebSocket.OPEN ) {
-        player.ws.send(JSON.stringify(room.players));
+        var packet = {
+          cmd: "packet",
+          this_player_id:player.id,
+          players: room.players
+        }
+        player.ws.send(JSON.stringify(packet));
       }
     }
   }
@@ -64,11 +69,10 @@ interval = setInterval(sendPlayerPositions, 16);
 
 
 wss.on('connection', (ws, req) => {
-  console.log('client connected');
   const { query: { name, room } } = url.parse(req.url, true);
-
   var id = crypto.randomBytes(16).toString('hex');
-  var player = new Player(id, name?name:id, room, ws);
+  console.log('client connected', name, room, id);
+  var player = new Player(id, (name?name:id), room, ws);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
   }

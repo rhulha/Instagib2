@@ -116,6 +116,10 @@ function shoot(scene, player) {
 
     const raycaster = new Raycaster(start, player.playerDirection);
     var char = scene.getObjectByName( "Character" );
+    if( char === undefined) {
+        console.log("char === undefined");
+        return;
+    }
     // TODO: check if we hit level first...
     if(raycaster.intersectObject( char, true ).length > 0) {
         //console.log(char);
