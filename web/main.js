@@ -8,7 +8,8 @@ import webSocket from './webSocket.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
 import { getLine, explosion } from './railgun.js';
 import audio from './audio.js';
-import soldier from './soldier.js';
+import {soldier, Soldier, setupModelAnimations} from './soldier.js';
+import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 
 const stats = new Stats();
 stats.domElement.style.position = 'absolute';
@@ -48,15 +49,28 @@ loader.load( 'q3dm17.gltf', ( gltf ) => {
 
 class Enemy {
 	constructor(id, name, room) {
-	  this.id = id;
-	  this.name = name;
-	  this.room = room;
-	  this.x=0;
-	  this.y=0;
-	  this.z=0;
-	  this.rx=0;
-	  this.ry=0;
-	  this.soldier = soldier.glb.scene; // .clone();
+		this.id = id;
+		this.name = name;
+		this.room = room;
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.rx = 0;
+		this.ry = 0;
+		this.soldier = new Soldier();
+		this.soldier.glb = soldier.glb;
+		this.soldier.glb.scene = SkeletonUtils.clone(soldier.glb.scene);
+		 
+		/*this.soldier.traverse((obj) => {
+			if (obj.type === 'Object3D') {
+				obj.scale.set(0.017, 0.017, 0.017);
+				obj.updateMatrix();
+				console.log("scale");
+			}
+		});*/
+		//this.soldier.scale.set(0.017, 0.017, 0.017);
+		//this.soldier.updateMatrix();
+		setupModelAnimations(this.soldier);
 	}
 }
 
@@ -75,7 +89,7 @@ webSocket.packet = function(msg) {
 					console.log("creating new enemy: ", player.id);
 					var e = new Enemy(player.id, player.name, player.room);
 					enemies[player.id] = e;
-					scene.add(e.soldier)
+					scene.add(e.soldier.glb.scene)
 				}
 				var e = enemies[player.id];
 				e.x=player.x;
@@ -122,7 +136,11 @@ function animate() {
 	player.controls( deltaTime );
 	player.update( deltaTime );
 
-	//soldier_mixer.update( deltaTime );
+	for( var eid in enemies) {
+		var e = enemies[eid];
+		e.soldier.mixer.update( deltaTime );
+		e.soldier.glb.scene.position.add(new Vector3(Math.random()*0.1, 0,0));
+	}
 	
 	renderer.render( scene, camera );
 	stats.update();

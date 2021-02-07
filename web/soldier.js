@@ -41,4 +41,4 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
     soldier.ready=true;
 });
 
-export default soldier;
+export {soldier, Soldier, setupModelAnimations};
