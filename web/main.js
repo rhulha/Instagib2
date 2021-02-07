@@ -98,7 +98,7 @@ function animate() {
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{
 		if( obj.update ) {
-			obj.update.call(obj, deltaTime);
+			obj.update.call(obj, scene, deltaTime, scene.clock.getElapsedTime());
 		}
 	});
 	if(scene.remove_me && scene.remove_me.length>0) {

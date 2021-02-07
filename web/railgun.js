@@ -1,9 +1,10 @@
-import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute,
+import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, TubeGeometry, Mesh,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
-
+import { Curves } from './three/examples/jsm/curves/CurveExtras.js';
 import webSocket from './webSocket.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
+const helixMaterial = new MeshLambertMaterial( { color: 0xff0000, opacity: 0.3, transparent: true } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
@@ -30,8 +31,8 @@ function explosion(scene, pos, elapsedTime)
     
     particles.time = elapsedTime;
 
-    particles.update = function(elapsed) {
-        if(this.time + 1.5 < scene.clock.getElapsedTime()) {
+    particles.update = function(scene, delta, elapsed) {
+        if(this.time + 1.5 < elapsed) {
             if(!scene.remove_me)
                 scene.remove_me=[];
             scene.remove_me.push(this);
@@ -39,10 +40,10 @@ function explosion(scene, pos, elapsedTime)
         //var pos = geometry.getAttribute('position');
         var pos = particles.geometry.attributes.position.array
         for ( let i = 0; i < count*3; i+=3 ) {
-            pos[i]+=dirs[i/3].x*elapsed;
-            pos[i+1]+=dirs[i/3].y*elapsed;
-            pos[i+2]+=dirs[i/3].z*elapsed;
-            dirs[i/3].y-=30*elapsed; // gravity.
+            pos[i]+=dirs[i/3].x*delta;
+            pos[i+1]+=dirs[i/3].y*delta;
+            pos[i+2]+=dirs[i/3].z*delta;
+            dirs[i/3].y-=30*delta; // gravity.
         }
         //geometry.verticesNeedUpdate = true;
         geometry.attributes.position.needsUpdate = true;
@@ -51,20 +52,30 @@ function explosion(scene, pos, elapsedTime)
     return particles;
 }
 
+function delayedRemove(scene, delta, elapsed) {
+    if(this.time + 1.5 < elapsed) {
+        if(!scene.remove_me)
+            scene.remove_me=[];
+        scene.remove_me.push(this);
+    }
+}
+
 function getLine(scene, start, end) {
     const points = [];
     points.push( start );
     points.push( end );
+    
+    var helix = new Curves.HelixCurve();
+    var helixGeometry = new TubeGeometry( helix, 300, 2, 12, false );
+    var helixMesh = new Mesh( helixGeometry, helixMaterial );
+    helixMesh.time = scene.clock.getElapsedTime();
+    helixMesh.update = delayedRemove;
+    scene.add(helixMesh);
+
     const geometry = new BufferGeometry().setFromPoints( points );
     const line = new Line( geometry, lineMaterial );
     line.time = scene.clock.getElapsedTime();
-    line.update = function(elapsed) {
-        if(this.time + 1.5 < scene.clock.getElapsedTime()) {
-            if(!scene.remove_me)
-                scene.remove_me=[];
-            scene.remove_me.push(this);
-        }
-    }
+    line.update = delayedRemove;
     return line;
 }
 
@@ -79,7 +90,7 @@ function getLinePositionsFromPlayer(player) {
 }
 
 function shoot(scene, player) {
-    //player.railgun_audio.play();
+    player.railgun_audio.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     scene.add( getLine(scene, start, end) );
 
