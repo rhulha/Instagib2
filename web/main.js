@@ -56,20 +56,23 @@ class Enemy {
 	  this.z=0;
 	  this.rx=0;
 	  this.ry=0;
-	  this.soldier = soldier.glb.clone();
+	  this.soldier = soldier.glb.scene; // .clone();
 	}
 }
 
 var enemies = {};
 
 webSocket.packet = function(msg) {
+	if(!soldier.ready)
+		return;
 	if( msg.this_player_id && msg.players && msg.players.length && msg.players.length < 128 ) {
 		var this_player_id = msg.this_player_id;
-		console.log("this_player_id: ", this_player_id);
+		//console.log("this_player_id: ", this_player_id);
 		for( var player of msg.players) {
 			if( player.id !== this_player_id) {
-				console.log("enemies id: ", player.id);
+				//console.log("enemies id: ", player.id);
 				if (!enemies[player.id]) {
+					console.log("creating new enemy: ", player.id);
 					var e = new Enemy(player.id, player.name, player.room);
 					enemies[player.id] = e;
 					scene.add(e.soldier)

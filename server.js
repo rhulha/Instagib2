@@ -25,6 +25,7 @@ class Player {
     this.id = id;
     this.name = name;
     this.room = room;
+    Object.defineProperty(this, 'ws', {value: 'static', writable: true});
     this.ws = ws;
     this.x=0;
     this.y=0;
@@ -35,7 +36,7 @@ class Player {
 
   handleUpdate(update) {
     if( this.id !== update.id) {
-      console.log("this.id !== update.id");
+      //console.log("this.id !== update.id", this.id, update.id);
     } else {
       this.x = update.pos.x;
       this.y = update.pos.y;

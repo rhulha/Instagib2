@@ -21,6 +21,7 @@ class Soldier {
     obj3d;
     actions;
     mixer;
+    ready=false;
     constructor() {}
 }
 
@@ -36,7 +37,8 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 			obj.scale.set(0.017,0.017,0.017);
 		}
 	});
-	setupModelAnimations(soldier);
+    setupModelAnimations(soldier);
+    soldier.ready=true;
 });
 
 export default soldier;
