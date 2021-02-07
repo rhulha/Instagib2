@@ -31,7 +31,7 @@ var wsurl = ((window.location.protocol == 'http:') ? 'ws://' : 'wss://')
 		+ window.location.host
 		+ ((window.location.pathname.length == 0)
 				|| (window.location.pathname == '/') ? '' : '/'
-				+ window.location.pathname.split('/')[1]) + '/websocket';
+				+ window.location.pathname.split('/')[1]) + '/websocket' + window.location.search;
 
 try {
 	webSocket.connection = new WebSocket(wsurl);

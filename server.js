@@ -2,6 +2,8 @@ const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
+const crypto = require('crypto');
+const url = require('url');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,6 +11,11 @@ const wss = new WebSocket.Server({ server });
 
 var lines;
 var lines_pos=0;
+
+var rooms = [];
+var clients = [];
+
+
 
 fs.readFile('player_log.txt', 'utf8', function(err, contents) {
   lines = contents.split("\r\n");
@@ -33,35 +40,40 @@ function setStuffSlowly(ws) {
 function handleMsg(msg) {
   // console.log('received: %s', message);
   // player_log += message + "\r\n";
-  var jsn = JSON.parse(msg);
-  if( jsn.cmd ) {
-    if( jsn.cmd === "sendTestData") {
+  var json = JSON.parse(msg);
+  if( json.cmd ) {
+    if( json.cmd === "sendTestData") {
       console.log('received: %s', "sendTestData");
       clearInterval(interval);
       lines_pos=0;
       setStuffSlowly(this);
     }
   }
+  json.id = this.id;
+  json.name = this.name;
   wss.clients.forEach((client) => {
     if (client !== this && client.readyState === WebSocket.OPEN) {
-      client.send(msg);
+      client.send(JSON.stringify(json));
     }
   });
 }
 
-function setupWS(ws) {
+function setupWS(ws, name) {
+  ws.id = crypto.randomBytes(16).toString('hex');
+  ws.name = name ? name : ws.id;
   ws.on('message', handleMsg.bind(ws));
 }
 
 
-wss.on('connection', (ws, request) => {
-  //const ip = request.socket.remoteAddress;
+wss.on('connection', (ws, req) => {
   console.log('client connected');
-  setupWS(ws);
+
+  const { query: { name } } = url.parse(req.url, true);
+  setupWS(ws, name);
 
   wss.clients.forEach((client) => {
     if (client !== this && client.readyState === WebSocket.OPEN) {
-      client.send({cmd:"newCon"});
+      client.send('{"cmd":"newCon"}');
     }
   });
 });

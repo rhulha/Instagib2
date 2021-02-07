@@ -84,7 +84,9 @@ class Player {
         this.railgun_audio = new Audio('sounds/railgf1a.wav');
         this.jump_audio = new Audio('sounds/sarge/jump1.wav');
         this.jumppad_audio = new Audio('sounds/jumppad.wav');
-
+        this.railgun_audio.volume=0.1;
+        this.jump_audio.volume=0.2;
+        this.jumppad_audio.volume=0.5;
     }
     
     playerCollisions() {
