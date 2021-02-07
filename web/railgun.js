@@ -1,11 +1,10 @@
-import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, TubeGeometry, Mesh,
+import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, TubeGeometry, Curve, Mesh,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
-import { Curves } from './three/examples/jsm/curves/CurveExtras.js';
 import webSocket from './webSocket.js';
 import audio from './audio.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
-const helixMaterial = new MeshLambertMaterial( { color: 0xff0000, opacity: 0.3, transparent: true } );
+const helixMaterial = new MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
@@ -60,14 +59,31 @@ function delayedRemove(scene, delta, elapsed) {
     }
 }
 
+class HelixCurve extends Curve {
+    constructor() {super();}
+
+    getPoint(t, optionalTarget ) {
+        var point = optionalTarget || new Vector3();
+        var a = 0.2; // radius
+        var b = 25; // height
+        var t2 = 2 * Math.PI * t * b / 3;
+        var x = Math.cos( t2 ) * a;
+        var y = Math.sin( t2 ) * a;
+        var z = b * t;
+        return point.set( x, y, z );
+    }
+}
+
 function getLine(scene, start, end) {
     const points = [];
     points.push( start );
     points.push( end );
     
-    var helix = new Curves.HelixCurve();
-    var helixGeometry = new TubeGeometry( helix, 300, 2, 12, false );
+    var helix = new HelixCurve();
+    var helixGeometry = new TubeGeometry( helix, 300, 0.1, 12, false, true );
     var helixMesh = new Mesh( helixGeometry, helixMaterial );
+    helixMesh.position.copy(start);
+    helixMesh.lookAt(end);
     helixMesh.time = scene.elapsed;
     helixMesh.update = delayedRemove;
     scene.add(helixMesh);
