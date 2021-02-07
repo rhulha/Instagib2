@@ -1,10 +1,10 @@
-import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, TubeGeometry, Curve, Mesh,
+import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, MeshBasicMaterial, TubeGeometry, Curve, Mesh,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import webSocket from './webSocket.js';
 import audio from './audio.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
-const helixMaterial = new MeshLambertMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+const helixMaterial = new MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
