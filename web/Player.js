@@ -1,8 +1,7 @@
 import { Vector3, Camera, Scene} from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
-import { getTargets } from './trigger.js';
-import { AimAtTarget } from './AimAtTarget.js';
+import { getTargets, AimAtTarget } from './trigger.js';
 import { shoot } from './railgun.js';
 import audio from './audio.js';
             
