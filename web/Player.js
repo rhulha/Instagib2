@@ -25,12 +25,14 @@ class Player {
         return num <= min ? min : num >= max ? max : num;
     }
 
-    getPosAsString() {
-        return "" + this.playerCollider.start.x.toFixed(4) + "," + this.playerCollider.start.y.toFixed(4) + "," + this.playerCollider.start.z.toFixed(4);
+    getPos() {
+        var s=this.playerCollider.start;
+        return {x:s.x, y:s.y, z:s.z};
     }
 
-    getRotationAsString() {
-        return "" + this.camera.rotation.x.toFixed(4) + "," + this.camera.rotation.y.toFixed(4);
+    getRotation() {
+        var r=this.camera.rotation;
+        return {x:r.x, y:r.y};
     }
 
     /**

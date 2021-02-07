@@ -9,73 +9,72 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-var lines;
-var lines_pos=0;
+var rooms = {}; // <name_str,Room>
+// var players_by_id = {};
 
-var rooms = [];
-var clients = [];
-
-
-
-fs.readFile('player_log.txt', 'utf8', function(err, contents) {
-  lines = contents.split("\r\n");
-});
-
-var player_log = "";
-var interval;
-
-function setStuffSlowly(ws) {
-  console.log('SetTimeout, setStuffSlowly');
-  interval = setInterval(()=>{
-    var line = lines[lines_pos++%lines.length];
-    if(line === undefined)
-      clearInterval(interval);
-    //console.log(line);
-    try {
-      ws.send(line);
-    } catch (error) {}
-  }, 36); // original 16
+class Room {
+  constructor(name, private) {
+    this.name = name;
+    this.private = private;
+    this.players = [];
+  }
 }
 
-function handleMsg(msg) {
-  // console.log('received: %s', message);
-  // player_log += message + "\r\n";
-  var json = JSON.parse(msg);
-  if( json.cmd ) {
-    if( json.cmd === "sendTestData") {
-      console.log('received: %s', "sendTestData");
-      clearInterval(interval);
-      lines_pos=0;
-      setStuffSlowly(this);
+class Player {
+  constructor(id, name, room, ws) {
+    this.id = id;
+    this.name = name;
+    this.room = room;
+    this.ws = ws;
+    this.x=0;
+    this.y=0;
+    this.z=0;
+    this.rx=0;
+    this.ry=0;
+  }
+
+  handleUpdate(update) {
+    if( this.id !== update.id) {
+      console.log("this.id !== update.id");
+    } else {
+      this.x = update.pos.x;
+      this.y = update.pos.y;
+      this.z = update.pos.z;
+      this.rx = update.rot.x;
+      this.ry = update.rot.y;
     }
   }
-  json.id = this.id;
-  json.name = this.name;
-  wss.clients.forEach((client) => {
-    if (client !== this && client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(json));
-    }
-  });
 }
 
-function setupWS(ws, name) {
-  ws.id = crypto.randomBytes(16).toString('hex');
-  ws.name = name ? name : ws.id;
-  ws.on('message', handleMsg.bind(ws));
+var interval;
+
+function sendPlayerPositions() {
+  for( var room_name of rooms ) {
+    var room = rooms[room_name];
+    for( var player in room.players ) {
+      if( player.ws.readyState === WebSocket.OPEN ) {
+        player.ws.send(JSON.stringify(room.players));
+      }
+    }
+  }
 }
+// TODO: clean up empty rooms over time.
+
+interval = setInterval(sendPlayerPositions, 16);
 
 
 wss.on('connection', (ws, req) => {
   console.log('client connected');
+  const { query: { name, room } } = url.parse(req.url, true);
 
-  const { query: { name } } = url.parse(req.url, true);
-  setupWS(ws, name);
+  var id = crypto.randomBytes(16).toString('hex');
+  var player = new Player(id, name?name:id, room, ws);
+  if( !rooms[room] ) {
+    rooms[room] = new Room(room);
+  }
+  rooms[room].players.push(player);
+  ws.on('message', player.handleUpdate.bind(player));
 
-  wss.clients.forEach((client) => {
-    if (client !== this && client.readyState === WebSocket.OPEN) {
-      client.send('{"cmd":"newCon"}');
-    }
-  });
 });
 
 app.use(express.static('web'));
@@ -87,10 +86,6 @@ server.listen(8080, function() {
 
 process.on('SIGINT', function() {
   console.log('closing.');
-  /*fs.writeFile('player_log.txt', player_log, function (err) {
-    if (err) return console.log(err);
-    console.log('writing player_log.');
-  });*/
   try {
     clearInterval(interval);
   } catch (error) {}

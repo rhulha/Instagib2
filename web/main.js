@@ -102,7 +102,7 @@ function animate() {
 	soldier_mixer.update( deltaTime );
 	renderer.render( scene, camera );
 	stats.update();
-	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
+	webSocket.send({cmd: "pos", pos: player.getPos(), rot: player.getRotation()});
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{
 		if( obj.update ) {
