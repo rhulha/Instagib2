@@ -75,6 +75,10 @@ webSocket.line = function(msg) {
 	scene.add(getLine(scene, start, end));
 }
 
+webSocket.newCon = function(msg) {
+	console.log(msg);
+}
+
 webSocket.hit = function(msg) {
 	var pos = new Vector3().copy(msg.pos);
 	scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
@@ -87,27 +91,31 @@ document.addEventListener("keydown", (event)=>{
     }
 })
 
+const clock = new Clock();
 function animate() {
-	var deltaTime = Math.min( 0.1, scene.clock.getDelta() );
+	var deltaTime = Math.min( 0.1, clock.getDelta() );
+	var elapsed = clock.getElapsedTime(); // warning, this call resets getDelta()
+	scene.elapsed = elapsed;
 	player.controls( deltaTime );
 	player.update( deltaTime );
-	soldier_mixer.update( scene.clock.getDelta() );
+	soldier_mixer.update( deltaTime );
 	renderer.render( scene, camera );
 	stats.update();
 	webSocket.send({cmd: "pos", pos: player.getPosAsString(), rot: player.getRotationAsString()});
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{
 		if( obj.update ) {
-			obj.update.call(obj, scene, deltaTime, scene.clock.getElapsedTime());
+			obj.update.call(obj, scene, deltaTime, elapsed); 
 		}
 	});
-	if(scene.remove_me && scene.remove_me.length>0) {
-		for(var i=0; i<scene.remove_me.length; i++) {
-			scene.remove(scene.remove_me[i]);
-			if(scene.remove_me[i].geometry)
-				scene.remove_me[i].geometry.dispose();
+	let rm = scene.remove_me;
+	if(rm && rm.length>0) {
+		for(var i=0; i<rm.length; i++) {
+			scene.remove(rm[i]);
+			if(rm[i].geometry)
+				rm[i].geometry.dispose();
 		}
-		scene.remove_me.length=0;
+		rm.length=0;
 	}
 }
 

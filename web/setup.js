@@ -1,4 +1,4 @@
-import {sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, AnimationMixer, DirectionalLight, Vector3, Clock} from './three/build/three.module.js';
+import {sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, AnimationMixer, DirectionalLight, Vector3} from './three/build/three.module.js';
 import { Sky } from './three/examples/jsm/objects/Sky.js';
 
 /**
@@ -6,7 +6,6 @@ import { Sky } from './three/examples/jsm/objects/Sky.js';
  */
 function setupScene(renderer) {
     var scene = new Scene();
-    scene.clock = new Clock();
     //scene.background = new Color( 0x88ccff );
     //scene.add( new AmbientLight( 0x6688cc ) );
     
@@ -82,7 +81,7 @@ function setupRenderer() {
 
 function setupModelAnimations(soldier){ 
 	var soldier_mixer = new AnimationMixer( soldier.scene );
-	soldier_mixer.timeScale = 11.0;
+	soldier_mixer.timeScale = 1;
 	var idleAction = soldier_mixer.clipAction( soldier.animations[ 0 ] );
 	var walkAction = soldier_mixer.clipAction( soldier.animations[ 3 ] );
 	var runAction = soldier_mixer.clipAction( soldier.animations[ 1 ] );
@@ -90,11 +89,11 @@ function setupModelAnimations(soldier){
 	soldier_actions.forEach( function ( action ) {
 		action.play();
 	} );
-	idleAction.setEffectiveTimeScale( 31 );
+	idleAction.setEffectiveTimeScale( 1 );
 	idleAction.setEffectiveWeight( 0 );
 	walkAction.setEffectiveWeight( 0 );
 	runAction.setEffectiveWeight( 1 );
-	runAction.setEffectiveTimeScale( 31 );
+	runAction.setEffectiveTimeScale( 1 );
     return [soldier_mixer, soldier_actions];
 }
 

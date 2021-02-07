@@ -68,13 +68,13 @@ function getLine(scene, start, end) {
     var helix = new Curves.HelixCurve();
     var helixGeometry = new TubeGeometry( helix, 300, 2, 12, false );
     var helixMesh = new Mesh( helixGeometry, helixMaterial );
-    helixMesh.time = scene.clock.getElapsedTime();
+    helixMesh.time = scene.elapsed;
     helixMesh.update = delayedRemove;
     scene.add(helixMesh);
 
     const geometry = new BufferGeometry().setFromPoints( points );
     const line = new Line( geometry, lineMaterial );
-    line.time = scene.clock.getElapsedTime();
+    line.time = scene.elapsed;
     line.update = delayedRemove;
     return line;
 }
@@ -108,7 +108,7 @@ function shoot(scene, player) {
         webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}});
 
         // webSocket.send({cmd: "sendTestData"});
-        scene.add(explosion(scene, player.enemyPos, scene.clock.getElapsedTime()));
+        scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
         gib_audio.play();
     }
