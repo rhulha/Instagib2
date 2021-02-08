@@ -3,7 +3,7 @@ import { Sky } from './three/examples/jsm/objects/Sky.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
 import { Player } from './Player.js';
-import { CustomOctree } from './CustomOctree.js';
+import { CustomOctree } from './lib/CustomOctree.js';
 import { getTriggerOctree } from './trigger.js';
 
 /**

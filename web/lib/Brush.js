@@ -1,4 +1,4 @@
-import {Vector3, Plane} from './three/build/three.module.js';
+import {Vector3, Plane} from '../three/build/three.module.js';
 
 
 class Brush {
@@ -121,4 +121,4 @@ class Brush {
 	}
 }
 
-export {Plane, Brush};
+export {Brush};

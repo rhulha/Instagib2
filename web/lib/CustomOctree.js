@@ -1,5 +1,5 @@
-import {Box3,Line3,Plane,Sphere,Triangle,Vector3} from './three/build/three.module.js';;
-import { Capsule } from './three/examples/jsm/math/Capsule.js';
+import {Box3,Line3,Plane,Sphere,Triangle,Vector3} from '../three/build/three.module.js';;
+import { Capsule } from '../three/examples/jsm/math/Capsule.js';
 
 var CustomOctree = ( function () {
 	var _v1 = new Vector3();

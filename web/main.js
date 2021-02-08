@@ -1,6 +1,6 @@
 import {Vector3} from './three/build/three.module.js';
 import {Game} from './setup.js';
-import webSocket from './webSocket.js';
+import webSocket from './lib/webSocket.js';
 import {getLine, explosion} from './railgun.js';
 import {soldier, Soldier, setupModelAnimations} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';

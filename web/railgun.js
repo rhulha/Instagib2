@@ -1,6 +1,6 @@
 import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, MeshBasicMaterial, TubeGeometry, Curve, Mesh,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
-import webSocket from './webSocket.js';
+import webSocket from './lib/webSocket.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 const helixMaterial = new MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
