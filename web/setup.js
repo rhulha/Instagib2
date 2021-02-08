@@ -102,6 +102,16 @@ class Game {
         this.jumpPadsOctree = getTriggerOctree(this.scene);
         this.worldOctree = new CustomOctree();
         this.player = new Player(this);
+        this.audio = {
+            railgun: new Audio('sounds/railgf1a.wav'),
+            jump: new Audio('sounds/sarge/jump1.wav'),
+            jumppad: new Audio('sounds/jumppad.wav'),
+            gib: new Audio('sounds/gibsplt1.wav')
+        }
+        this.audio.railgun.volume=0.1;
+        this.audio.jump.volume=0.2;
+        this.audio.jumppad.volume=0.5;
+        this.audio.gib.volume=0.3;
     }
     
     loadMap(callback) {

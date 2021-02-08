@@ -2,7 +2,6 @@ import {Vector3} from './three/build/three.module.js';
 import {Game} from './setup.js';
 import webSocket from './webSocket.js';
 import {getLine, explosion} from './railgun.js';
-import audio from './audio.js';
 import {soldier, Soldier, setupModelAnimations} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 
@@ -81,7 +80,7 @@ webSocket.newCon = function(msg) {
 webSocket.hit = function(msg) {
 	var pos = new Vector3().copy(msg.pos);
 	game.scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
-    audio.gib.play();
+    game.audio.gib.play();
 }
 
 document.addEventListener("keydown", (event)=>{

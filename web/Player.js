@@ -3,7 +3,6 @@ import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets, AimAtTarget } from './trigger.js';
 import { shoot } from './railgun.js';
-import audio from './audio.js';
             
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -42,6 +41,7 @@ class Player {
      * @param {Scene} scene
      */
     constructor(game) {
+        this.game = game;
         this.worldOctree = game.worldOctree;
         this.jumpPadsOctree = game.jumpPadsOctree;
         this.camera = game.camera;
@@ -101,7 +101,7 @@ class Player {
             var [x,z,y] = getTargets()[result2.name].split(" ");
             var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             this.playerVelocity.copy(vel);
-            audio.jumppad.play();
+            this.game.audio.jumppad.play();
         }
     }
 
@@ -129,7 +129,7 @@ class Player {
             if(this.wishJump) {
                 this.playerVelocity.y = 9;
                 this.wishJump = false;
-                audio.jump.play();
+                this.game.audio.jump.play();
             }
         } else {
             // AIR MOVE

@@ -1,7 +1,6 @@
 import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, MeshBasicMaterial, TubeGeometry, Curve, Mesh,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import webSocket from './webSocket.js';
-import audio from './audio.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 const helixMaterial = new MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
@@ -106,7 +105,7 @@ function getLinePositionsFromPlayer(player) {
 }
 
 function shoot(scene, player) {
-    audio.railgun.play();
+    player.game.audio.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     scene.add( getLine(scene, start, end) );
 
@@ -131,7 +130,7 @@ function shoot(scene, player) {
         // webSocket.send({cmd: "sendTestData"});
         scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
-        audio.gib.play();
+        player.game.audio.gib.play();
     }
 }
 
