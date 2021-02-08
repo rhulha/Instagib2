@@ -1,3 +1,5 @@
+// Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+
 import {Vector3, Plane, Geometry, Face3, Group, Mesh, BufferGeometry} from './three/build/three.module.js';
 import { Brush } from './lib/Brush.js';
 import { CustomOctree } from './lib/CustomOctree.js';

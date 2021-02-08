@@ -1,3 +1,5 @@
+// Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+
 const fs = require('fs');
 const express = require('express');
 const http = require('http');
