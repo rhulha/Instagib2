@@ -111,7 +111,7 @@ function shoot(scene, player) {
 
     var dir = player.playerDirection;
     // webSocket.send({cmd: "rail", origin: {x: start.x, y: start.y, z: start.z}, dir: {x: dir.x, y: dir.y, z: dir.z}});
-    webSocket.send({cmd: "line", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
+    webSocket.send({cmd: "rail", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
     const raycaster = new Raycaster(start, player.playerDirection);
     var char = scene.getObjectByName( "Character" );

@@ -20,6 +20,14 @@ class Room {
   }
 }
 
+function broadcast(msg, skipClientWS) {
+  wss.clients.forEach(function each(client) {
+    if (client !== skipClientWS && client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  });
+}
+
 class Player {
   constructor(id, name, room, ws) {
     this.id = id;
@@ -36,14 +44,19 @@ class Player {
 
   handleUpdate(update) {
     update = JSON.parse(update);
-    if( update.cmd == "pos") {
-        this.x = update.pos.x;
-        this.y = update.pos.y;
-        this.z = update.pos.z;
-        this.rx = update.rot.x;
-        this.ry = update.rot.y;
+    if (update.cmd == "pos") {
+      this.x = update.pos.x;
+      this.y = update.pos.y;
+      this.z = update.pos.z;
+      this.rx = update.rot.x;
+      this.ry = update.rot.y;
+    } else if (update.cmd == "rail") {
+      broadcast(update, this.ws);
+    } else if (update.cmd == "hit") {
+      broadcast(update, this.ws);
     }
   }
+
 }
 
 var interval;
@@ -66,7 +79,6 @@ function sendPlayerPositions() {
 // TODO: clean up empty rooms over time.
 
 interval = setInterval(sendPlayerPositions, 16);
-
 
 wss.on('connection', (ws, req) => {
   const { query: { name, room } } = url.parse(req.url, true);

@@ -55,7 +55,7 @@ webSocket.packet = function(msg) {
 	}
 }
 
-webSocket.line = function(msg) {
+webSocket.rail = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
 	game.scene.add(getLine(game.scene, start, end));
