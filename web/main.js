@@ -15,7 +15,7 @@ function animate() {
 	for( var eid in enemies) {
 		var e = enemies[eid];
 		e.soldier.mixer.update( deltaTime );
-		e.soldier.glb.scene.position.add(new Vector3(Math.random()*0.1, 0,0));
+		//e.soldier.glb.scene.position.add(new Vector3(Math.random()*0.1, 0,0));
 	}
 	game.render();
 	webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
