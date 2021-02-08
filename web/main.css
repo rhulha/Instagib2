@@ -34,7 +34,7 @@ button {
 	-ms-user-select: none;
 	user-select: none;
 	pointer-events: none;
-	z-index: 1; /* TODO Solve this in HTML */
+	z-index: 1;
 }
 
 #crosshair {
@@ -50,7 +50,43 @@ button {
 	-ms-user-select: none;
 	user-select: none;
 	pointer-events: none;
-	z-index: 1; /* TODO Solve this in HTML */
+	z-index: 1;
+}
+
+#topkills {
+	position: absolute;
+	border: 3px solid #FFF;
+	border-radius: 5px;
+	color: #FFF;
+	font-family: arial;
+	display: block;
+	top: 10px;
+	left: 10px;
+	background: #AA3333;
+	font-size: 20pt;
+	font-weight: bold;
+	padding: 5px;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1;
+}
+
+#kills {
+	position: absolute;
+	border: 3px solid #FFF;
+	border-radius: 5px;
+	color: #FFF;
+	font-family: arial;
+	display: block;
+	bottom: 10px;
+	left: 10px;
+	background: #3333AA;
+	font-size: 20pt;
+	font-weight: bold;
+	padding: 5px;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1;
 }
 
 #player_setup {

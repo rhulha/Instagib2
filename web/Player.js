@@ -44,6 +44,8 @@ class Player {
      */
     constructor(game) {
         this.game = game;
+        this.kills=0;
+        this.dead=false;
         this.worldOctree = game.worldOctree;
         this.jumpPadsOctree = game.jumpPadsOctree;
         this.camera = game.camera;

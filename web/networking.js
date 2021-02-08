@@ -36,10 +36,13 @@ class Enemy {
 webSocket.packet = function(msg) {
 	if(!soldier.ready)
 		return;
+	var playerWithMostKills;
 	if( msg.this_player_id && msg.players && msg.players.length && msg.players.length < 128 ) {
 		var this_player_id = msg.this_player_id;
 		//console.log("this_player_id: ", this_player_id);
 		for( var player of msg.players) {
+			if( !playerWithMostKills || playerWithMostKills.kills <= player.kills)
+				playerWithMostKills = player;
 			if( player.id !== this_player_id) {
 				//console.log("enemies id: ", player.id);
 				if (!enemies[player.id]) {
@@ -52,8 +55,8 @@ webSocket.packet = function(msg) {
 				e.p.set(player.x,player.y,player.z);
 				e.r.x=player.rx;
 				e.r.y=player.ry;
-				document.getElementById("info").innerText = "pos: "+ e.p.x;
 			}
+			document.getElementById("topkills").innerText = "top score: "+ playerWithMostKills.name + " " + playerWithMostKills.kills;
 		}
 	}
 }

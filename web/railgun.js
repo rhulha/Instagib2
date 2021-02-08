@@ -4,6 +4,7 @@ import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies, Enemy} from './networking.js';
+import { game } from './setup.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 const helixMaterial = new MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
@@ -133,6 +134,8 @@ function shoot(scene, player) {
             webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}});
             scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
+            game.player.kills++;
+            document.getElementById("kills").innerText = ""+ (game.player.kills) + " Kills"; 
             player.game.audio.gib.play();
         }
 

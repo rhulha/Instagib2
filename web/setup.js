@@ -90,8 +90,7 @@ class Game {
         console.log("Game initialized.")
         this.container = document.getElementById( 'container' );
         this.stats = new Stats();
-        this.stats.domElement.style.position = 'absolute';
-        this.stats.domElement.style.top = '0px';
+        this.stats.domElement.style.cssText  = 'position:fixed;top:0;right:0;cursor:pointer;opacity:0.8;z-index:10000'
         this.container.appendChild( this.stats.domElement );
 
         this.camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );

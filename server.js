@@ -34,6 +34,7 @@ class Player {
   constructor(id, name, room, ws) {
     this.id = id;
     this.name = name;
+    this.kills=0;
     Object.defineProperty(this, 'room', {value: 'static', writable: true});
     this.room = room;
     Object.defineProperty(this, 'ws', {value: 'static', writable: true});
@@ -56,6 +57,7 @@ class Player {
     } else if (update.cmd == "rail") {
       broadcast(update, this.ws);
     } else if (update.cmd == "hit") {
+      this.kills++;
       broadcast(update, this.ws);
     }
   }
