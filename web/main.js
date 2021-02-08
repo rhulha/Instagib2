@@ -1,51 +1,13 @@
-import {PerspectiveCamera, Vector3, Clock, Scene} from './three/build/three.module.js';
-import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
-import { CustomOctree } from './CustomOctree.js';
-import { setupScene, setupRenderer, setupResizeListener } from './setup.js';
-import { Player } from './Player.js';
-import { getTriggerOctree } from './trigger.js';
+import {Vector3} from './three/build/three.module.js';
+import {Game} from './setup.js';
 import webSocket from './webSocket.js';
-import Stats from './three/examples/jsm/libs/stats.module.js';
-import { getLine, explosion } from './railgun.js';
+import {getLine, explosion} from './railgun.js';
 import audio from './audio.js';
 import {soldier, Soldier, setupModelAnimations} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 
-const stats = new Stats();
-stats.domElement.style.position = 'absolute';
-stats.domElement.style.top = '0px';
-container.appendChild( stats.domElement );
-
-const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.rotation.order = 'YXZ';
-const renderer = setupRenderer();
-/**
- * @type {Scene}
- */
-const scene = setupScene(renderer);
-setupResizeListener( camera, renderer);
-
-const jumpPadsOctree = getTriggerOctree(scene);
-const worldOctree = new CustomOctree();
-var player = new Player(worldOctree, jumpPadsOctree, camera, scene);
-
-//	scene.add( soldier_glb.scene );
-
-const loader = new GLTFLoader().setPath( './models/' );
-loader.load( 'q3dm17.gltf', ( gltf ) => {
-	scene.add( gltf.scene );
-	worldOctree.fromGraphNode( gltf.scene );
-	gltf.scene.traverse( child => {
-		if ( child.isMesh ) {
-			child.castShadow = true;
-			child.receiveShadow = true;
-			if ( child.material.map ) {
-				child.material.map.anisotropy = 8;
-			}
-		}
-	} );
-	animate();
-});
+const game = new Game();
+game.loadMap(animate);
 
 class Enemy {
 	constructor(id, name, room) {
@@ -89,7 +51,7 @@ webSocket.packet = function(msg) {
 					console.log("creating new enemy: ", player.id);
 					var e = new Enemy(player.id, player.name, player.room);
 					enemies[player.id] = e;
-					scene.add(e.soldier.glb.scene)
+					game.scene.add(e.soldier.glb.scene)
 				}
 				var e = enemies[player.id];
 				e.x=player.x;
@@ -109,7 +71,7 @@ webSocket.packet = function(msg) {
 webSocket.line = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
-	scene.add(getLine(scene, start, end));
+	game.scene.add(getLine(scene, start, end));
 }
 
 webSocket.newCon = function(msg) {
@@ -118,7 +80,7 @@ webSocket.newCon = function(msg) {
 
 webSocket.hit = function(msg) {
 	var pos = new Vector3().copy(msg.pos);
-	scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
+	game.scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
     audio.gib.play();
 }
 
@@ -128,33 +90,30 @@ document.addEventListener("keydown", (event)=>{
     }
 })
 
-const clock = new Clock();
 function animate() {
-	var deltaTime = Math.min( 0.1, clock.getDelta() );
-	var elapsed = clock.getElapsedTime(); // warning, this call resets getDelta()
-	scene.elapsed = elapsed;
-	player.controls( deltaTime );
-	player.update( deltaTime );
+	var deltaTime = Math.min( 0.1, game.clock.getDelta() );
+	var elapsed = game.clock.getElapsedTime(); // warning, this call resets getDelta()
+	game.scene.elapsed = elapsed;
+	game.player.controls( deltaTime );
+	game.player.update( deltaTime );
 
 	for( var eid in enemies) {
 		var e = enemies[eid];
 		e.soldier.mixer.update( deltaTime );
 		e.soldier.glb.scene.position.add(new Vector3(Math.random()*0.1, 0,0));
 	}
-	
-	renderer.render( scene, camera );
-	stats.update();
-	webSocket.send({cmd: "pos", pos: player.getPos(), rot: player.getRotation()});
+	game.render();
+	webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
 	requestAnimationFrame( animate );
-	scene.traverse((obj)=>{
+	game.scene.traverse((obj)=>{
 		if( obj.update ) {
-			obj.update.call(obj, scene, deltaTime, elapsed); 
+			obj.update.call(obj, game.scene, deltaTime, elapsed); 
 		}
 	});
-	let rm = scene.remove_me;
+	let rm = game.scene.remove_me;
 	if(rm && rm.length>0) {
 		for(var i=0; i<rm.length; i++) {
-			scene.remove(rm[i]);
+			game.scene.remove(rm[i]);
 			if(rm[i].geometry)
 				rm[i].geometry.dispose();
 		}

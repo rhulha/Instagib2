@@ -1,5 +1,10 @@
-import {sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, DirectionalLight, Vector3} from './three/build/three.module.js';
+import {Clock, PerspectiveCamera, sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, DirectionalLight, Vector3} from './three/build/three.module.js';
 import { Sky } from './three/examples/jsm/objects/Sky.js';
+import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
+import Stats from './three/examples/jsm/libs/stats.module.js';
+import { Player } from './Player.js';
+import { CustomOctree } from './CustomOctree.js';
+import { getTriggerOctree } from './trigger.js';
 
 /**
  * @returns {Scene}
@@ -67,16 +72,61 @@ function setupResizeListener(camera, renderer) {
     }, false );
 }
 
-function setupRenderer() {
+function setupRenderer(container) {
     var renderer = new WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.outputEncoding = sRGBEncoding;
     renderer.toneMapping = ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.5;
-    const container = document.getElementById( 'container' );
     container.appendChild( renderer.domElement );
     return renderer;
 }
 
-export { setupScene, setupRenderer, setupResizeListener };
+class Game {
+    constructor() {
+        this.clock = new Clock();
+        this.container = document.getElementById( 'container' );
+        this.stats = new Stats();
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.top = '0px';
+        this.container.appendChild( this.stats.domElement );
+
+        this.camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        this.camera.rotation.order = 'YXZ';
+        this.renderer = setupRenderer(this.container);
+
+        this.scene = setupScene(this.renderer);
+        setupResizeListener( this.camera, this.renderer);
+
+        this.jumpPadsOctree = getTriggerOctree(this.scene);
+        this.worldOctree = new CustomOctree();
+        this.player = new Player(this);
+    }
+    
+    loadMap(callback) {
+        new GLTFLoader().load( './models/q3dm17.gltf', ( gltf ) => {
+            this.scene.add( gltf.scene );
+            this.worldOctree.fromGraphNode( gltf.scene );
+            /*
+            gltf.scene.traverse( child => {
+                if ( child.isMesh ) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    if ( child.material.map ) {
+                        child.material.map.anisotropy = 8;
+                    }
+                }
+            } );
+            */
+            callback();
+        });
+    }
+
+    render() {
+        this.renderer.render( this.scene, this.camera );
+        this.stats.update();
+    }
+}
+
+export { Game };

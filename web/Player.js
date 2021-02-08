@@ -41,25 +41,25 @@ class Player {
      * @param {Camera} camera
      * @param {Scene} scene
      */
-    constructor(worldOctree, jumpPadsOctree, camera, scene) {
-        this.worldOctree = worldOctree;
-        this.jumpPadsOctree = jumpPadsOctree;
-        this.camera = camera;
+    constructor(game) {
+        this.worldOctree = game.worldOctree;
+        this.jumpPadsOctree = game.jumpPadsOctree;
+        this.camera = game.camera;
         this.playerCollider.translate(new Vector3( 0, 11, 0 ));
         document.addEventListener( 'keydown', ( event ) => { if( !event.repeat ) this.keyStates[ event.code ] = true;}, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
         document.addEventListener( 'mousedown', (e) => {
             if (e.button == 2) {
-                camera.zoom = 4;
+                game.camera.zoom = 4;
                 this.sensitivity *= 3;
-                camera.updateProjectionMatrix();
+                game.camera.updateProjectionMatrix();
             }
         });
         document.addEventListener( 'mouseup', (e) => {
             if (e.button == 2) { 
-                camera.zoom = 1;
+                game.camera.zoom = 1;
                 this.sensitivity /= 3;
-                camera.updateProjectionMatrix();
+                game.camera.updateProjectionMatrix();
             }
         });
         
@@ -69,14 +69,14 @@ class Player {
                 return;
             }
             if (e.button == 0)
-                shoot(scene, this);
+                shoot(game.scene, this);
         }, false );
 
         document.body.addEventListener( 'mousemove', ( event ) => {
             if ( document.pointerLockElement === document.body ) {
-                camera.rotation.y -= event.movementX / this.sensitivity;
-                camera.rotation.x -= event.movementY / this.sensitivity;
-                camera.rotation.x = this.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
+                game.camera.rotation.y -= event.movementX / this.sensitivity;
+                game.camera.rotation.x -= event.movementY / this.sensitivity;
+                game.camera.rotation.x = this.clamp(game.camera.rotation.x, -Math.PI/2, Math.PI/2)
             }
         }, false );
      
