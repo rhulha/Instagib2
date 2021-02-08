@@ -85,6 +85,7 @@ function setupRenderer(container) {
 
 class Game {
     constructor() {
+        console.log("Game initialized.")
         this.clock = new Clock();
         this.container = document.getElementById( 'container' );
         this.stats = new Stats();
@@ -139,4 +140,6 @@ class Game {
     }
 }
 
-export { Game };
+const game = new Game();
+
+export { game };
