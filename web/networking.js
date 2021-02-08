@@ -11,14 +11,11 @@ class Enemy {
 		this.id = id;
 		this.name = name;
 		this.room = room;
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
-		this.rx = 0;
-		this.ry = 0;
 		this.soldier = new Soldier();
 		this.soldier.glb = soldier.glb;
 		this.soldier.glb.scene = SkeletonUtils.clone(soldier.glb.scene);
+		this.p = this.soldier.glb.scene.position;
+		this.r = this.soldier.glb.scene.rotation;
 		 
 		/*this.soldier.traverse((obj) => {
 			if (obj.type === 'Object3D') {
@@ -49,24 +46,19 @@ webSocket.packet = function(msg) {
 					game.scene.add(e.soldier.glb.scene)
 				}
 				var e = enemies[player.id];
-				e.x=player.x;
-				e.y=player.y;
-				e.z=player.z;
-				e.rx=player.rx;
-				e.ry=player.ry;
+				e.p.set(player.x,player.y,player.z);
+				e.r.x=player.rx;
+				e.r.y=player.ry;
 			}
 		}
 	}
 	//document.getElementById("info").innerText = "pos: "+ msg.pos;
-	//soldier.scene.position.set(x,y,z);
-	//soldier.scene.rotation.x = rx;
-	//soldier.scene.rotation.y = ry;
 }
 
 webSocket.line = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
-	game.scene.add(getLine(scene, start, end));
+	game.scene.add(getLine(game.scene, start, end));
 }
 
 webSocket.newCon = function(msg) {
@@ -74,8 +66,7 @@ webSocket.newCon = function(msg) {
 }
 
 webSocket.hit = function(msg) {
-	var pos = new Vector3().copy(msg.pos);
-	game.scene.add(explosion(scene, pos, scene.clock.getElapsedTime()));
+	game.scene.add(explosion(game.scene, msg.pos, game.scene.clock.getElapsedTime()));
     game.audio.gib.play();
 }
 
