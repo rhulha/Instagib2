@@ -80,7 +80,7 @@ var targetsInit=false;
 function getTargets() {
     if( !targetsInit ) {
         for( var tp of q3dm17.target_position) {
-            console.log(tp.targetname);
+            //console.log(tp.targetname);
             targets[tp.targetname] = tp.origin;
         }
         targetsInit=true;

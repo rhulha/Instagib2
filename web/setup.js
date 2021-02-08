@@ -1,4 +1,4 @@
-import {Clock, PerspectiveCamera, sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, DirectionalLight, Vector3} from './three/build/three.module.js';
+import {PerspectiveCamera, sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, DirectionalLight, Vector3} from './three/build/three.module.js';
 import { Sky } from './three/examples/jsm/objects/Sky.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
@@ -86,7 +86,6 @@ function setupRenderer(container) {
 class Game {
     constructor() {
         console.log("Game initialized.")
-        this.clock = new Clock();
         this.container = document.getElementById( 'container' );
         this.stats = new Stats();
         this.stats.domElement.style.position = 'absolute';

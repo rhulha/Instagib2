@@ -1,13 +1,16 @@
-import {Vector3} from './three/build/three.module.js';
+import {Clock} from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies} from './networking.js';
 import {game} from './setup.js';
 
 game.loadMap(animate);
 
+// make sure no one else has access to this clock, so we don't get accidential getElapsedTime() calls.
+const clock = new Clock();
+
 function animate() {
-	var deltaTime = Math.min( 0.1, game.clock.getDelta() );
-	var elapsed = game.clock.getElapsedTime(); // warning, this call resets getDelta()
+	var deltaTime = Math.min( 0.1, clock.getDelta() );
+	var elapsed = clock.getElapsedTime(); // warning, this call resets getDelta()
 	game.scene.elapsed = elapsed;
 	game.player.controls( deltaTime );
 	game.player.update( deltaTime );

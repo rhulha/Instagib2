@@ -1,3 +1,4 @@
+import {Vector3} from './three/build/three.module.js';
 import {soldier, Soldier, setupModelAnimations} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 import webSocket from './lib/webSocket.js';
@@ -58,15 +59,24 @@ webSocket.packet = function(msg) {
 webSocket.rail = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
-	game.scene.add(getLine(game.scene, start, end));
+	game.scene.add(getLine(game.scene, start, end)); // TODO: it looks like getLine does not alter start and end.
+	game.audio.railgun.play();
 }
 
 webSocket.newCon = function(msg) {
 	console.log(msg);
 }
 
+webSocket.disconnect = function(msg) {
+	console.log(msg);
+	var e = enemies[msg.id];
+	e.soldier.mixer.stopAllAction();
+	game.scene.remove(e.soldier.glb.scene); // TODO: clean up animations and geometry ?
+	delete enemies[msg.id];
+}
+
 webSocket.hit = function(msg) {
-	game.scene.add(explosion(game.scene, msg.pos, game.scene.clock.getElapsedTime()));
+	game.scene.add(explosion(game.scene, msg.pos, game.scene.elapsed));
     game.audio.gib.play();
 }
 
@@ -76,4 +86,4 @@ document.addEventListener("keydown", (event)=>{
     }
 })
 
-export {enemies};
+export {enemies, Enemy};

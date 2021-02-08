@@ -1,6 +1,7 @@
 import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, MeshBasicMaterial, TubeGeometry, Curve, Mesh,
     LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
+import {enemies, Enemy} from './networking.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 const helixMaterial = new MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
@@ -114,23 +115,25 @@ function shoot(scene, player) {
     webSocket.send({cmd: "rail", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
     const raycaster = new Raycaster(start, player.playerDirection);
-    var char = scene.getObjectByName( "Character" );
-    if( char === undefined) {
-        console.log("char === undefined");
-        return;
-    }
-    // TODO: check if we hit level first...
-    if(raycaster.intersectObject( char, true ).length > 0) {
-        //console.log(char);
-        char.getWorldPosition(player.enemyPos);
-        player.enemyPos.y+=1.8;
+    for( var enemy_id in enemies) {
+        //var char = scene.getObjectByName( "Character" );
+        // TODO: check if we hit level first...
+        /**
+         * @Type {Enemy} enemy
+         */
+        var enemy = enemies[enemy_id];
+        var char = enemy.soldier.glb.scene.children[0];
+        if(raycaster.intersectObject(char, true ).length > 0) {
+            //console.log(char);
+            char.getWorldPosition(player.enemyPos);
+            player.enemyPos.y+=1.8;
 
-        webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}});
+            webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}});
+            scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
-        // webSocket.send({cmd: "sendTestData"});
-        scene.add(explosion(scene, player.enemyPos, scene.elapsed));
+            player.game.audio.gib.play();
+        }
 
-        player.game.audio.gib.play();
     }
 }
 

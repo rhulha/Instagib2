@@ -23,7 +23,7 @@ class Room {
 function broadcast(msg, skipClientWS) {
   wss.clients.forEach(function each(client) {
     if (client !== skipClientWS && client.readyState === WebSocket.OPEN) {
-      client.send(data);
+      client.send(JSON.stringify(msg));
     }
   });
 }
@@ -32,6 +32,7 @@ class Player {
   constructor(id, name, room, ws) {
     this.id = id;
     this.name = name;
+    Object.defineProperty(this, 'room', {value: 'static', writable: true});
     this.room = room;
     Object.defineProperty(this, 'ws', {value: 'static', writable: true});
     this.ws = ws;
@@ -57,6 +58,14 @@ class Player {
     }
   }
 
+  handleDisconnect() {
+    console.log("player disconnected: ", this.name, this.room.name, this.id)
+    broadcast({cmd:"disconnect", id: this.id}, this.ws);
+    var index = this.room.players.indexOf(this);
+    if (index > -1) {
+      this.room.players.splice(index, 1);
+    }
+  }
 }
 
 var interval;
@@ -84,12 +93,13 @@ wss.on('connection', (ws, req) => {
   const { query: { name, room } } = url.parse(req.url, true);
   var id = crypto.randomBytes(16).toString('hex');
   console.log('client connected', name, room, id);
-  var player = new Player(id, (name?name:id), room, ws);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
   }
+  var player = new Player(id, (name?name:id), rooms[room], ws);
   rooms[room].players.push(player);
   ws.on('message', player.handleUpdate.bind(player));
+  ws.on('close', player.handleDisconnect.bind(player));
 
 });
 
