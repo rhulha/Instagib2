@@ -35,14 +35,13 @@ class Player {
   }
 
   handleUpdate(update) {
-    if( this.id !== update.id) {
-      //console.log("this.id !== update.id", this.id, update.id);
-    } else {
-      this.x = update.pos.x;
-      this.y = update.pos.y;
-      this.z = update.pos.z;
-      this.rx = update.rot.x;
-      this.ry = update.rot.y;
+    update = JSON.parse(update);
+    if( update.cmd == "pos") {
+        this.x = update.pos.x;
+        this.y = update.pos.y;
+        this.z = update.pos.z;
+        this.rx = update.rot.x;
+        this.ry = update.rot.y;
     }
   }
 }

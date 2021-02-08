@@ -49,10 +49,10 @@ webSocket.packet = function(msg) {
 				e.p.set(player.x,player.y,player.z);
 				e.r.x=player.rx;
 				e.r.y=player.ry;
+				document.getElementById("info").innerText = "pos: "+ e.p.x;
 			}
 		}
 	}
-	//document.getElementById("info").innerText = "pos: "+ msg.pos;
 }
 
 webSocket.line = function(msg) {
