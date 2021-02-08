@@ -1,6 +1,5 @@
 import {Vector3, Plane, Geometry, Face3, Group, Mesh, BufferGeometry} from './three/build/three.module.js';
 import { Brush } from './Brush.js';
-import { addDebugPoints, addDebugBox } from './debug.js';
 import { CustomOctree } from './CustomOctree.js';
 // important: the map json data must include brushes
 // important: the map json data brushes must be in order: x,z,y
