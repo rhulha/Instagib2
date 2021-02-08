@@ -46,19 +46,19 @@ class Player {
     this.ry=0;
   }
 
-  handleUpdate(update) {
-    update = JSON.parse(update);
-    if (update.cmd == "pos") {
-      this.x = update.pos.x;
-      this.y = update.pos.y;
-      this.z = update.pos.z;
-      this.rx = update.rot.x;
-      this.ry = update.rot.y;
-    } else if (update.cmd == "rail") {
-      broadcast(update, this.ws);
-    } else if (update.cmd == "hit") {
+  handleUpdate(msg) {
+    msg = JSON.parse(msg);
+    if (msg.cmd == "pos") {
+      this.x = msg.pos.x;
+      this.y = msg.pos.y;
+      this.z = msg.pos.z;
+      this.rx = msg.rot.x;
+      this.ry = msg.rot.y;
+    } else if (msg.cmd == "rail") {
+      broadcast(msg, this.ws);
+    } else if (msg.cmd == "hit") {
       this.kills++;
-      broadcast(update, this.ws);
+      broadcast(msg, this.ws);
     }
   }
 

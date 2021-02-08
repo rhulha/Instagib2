@@ -131,7 +131,7 @@ function shoot(scene, player) {
             char.getWorldPosition(player.enemyPos);
             player.enemyPos.y+=1.8;
 
-            webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}});
+            webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}, id: enemy_id});
             scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
             game.player.kills++;

@@ -5,7 +5,8 @@ import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets, AimAtTarget } from './trigger.js';
 import { shoot } from './railgun.js';
-            
+import q3dm17 from './models/q3dm17.js';
+
 const GRAVITY = 30;
 const QuakeScale = 0.038;
 
@@ -176,11 +177,23 @@ class Player {
             this.keyStates[ 'Space' ] = false;
         }
         if ( this.keyStates[ 'KeyK' ] ) {
-            this.playerCollider.copy(new Capsule( new Vector3( 0, 0.35, 0 ), new Vector3( 0, 2.13+0.35, 0 ), 0.35 ));
-            this.playerCollider.translate(new Vector3( 0, 11, 0 ));
-            this.playerVelocity = new Vector3();
+            this.respawn();
         }
     }
+
+    respawn() {
+        var ipd = q3dm17.info_player_deathmatch;
+        var rnd_ipd = ipd[Math.floor((Math.random()*ipd.length))];
+        var [x,z,y] = rnd_ipd.origin.split(" ");
+        var origin = new Vector3(x,y,z).multiplyScalar(0.038);
+        origin.y+=0.2;
+        var end = this.playerCollider.end.clone();
+        end.multiplyScalar(-1);
+        end.add(origin);
+        this.playerCollider.translate(end);
+        this.playerVelocity.multiplyScalar(0);
+    }
+    
 }
 
 export {Player};

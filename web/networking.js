@@ -8,6 +8,7 @@ import {getLine, explosion} from './railgun.js';
 import {game} from './setup.js';
 
 var enemies = {};
+var this_player_id;
 
 class Enemy {
 	constructor(id, name, room) {
@@ -38,7 +39,7 @@ webSocket.packet = function(msg) {
 		return;
 	var playerWithMostKills;
 	if( msg.this_player_id && msg.players && msg.players.length && msg.players.length < 128 ) {
-		var this_player_id = msg.this_player_id;
+		this_player_id = msg.this_player_id;
 		//console.log("this_player_id: ", this_player_id);
 		for( var player of msg.players) {
 			if( !playerWithMostKills || playerWithMostKills.kills <= player.kills)
@@ -81,8 +82,16 @@ webSocket.disconnect = function(msg) {
 }
 
 webSocket.hit = function(msg) {
+	if( msg.id == this_player_id) {
+		game.player.respawn();
+		game.audio.gib.play();
+	} else {
+		var old = game.audio.gib.volume;
+		game.audio.gib.volume = 0.1;
+		game.audio.gib.play();
+		game.audio.gib.volume = old;
+	}
 	game.scene.add(explosion(game.scene, msg.pos, game.scene.elapsed));
-    game.audio.gib.play();
 }
 
 document.addEventListener("keydown", (event)=>{
