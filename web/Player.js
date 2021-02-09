@@ -45,7 +45,7 @@ class Player {
         this.worldOctree = game.worldOctree;
         this.jumpPadsOctree = game.jumpPadsOctree;
         this.camera = game.camera;
-        this.playerCollider.translate(new Vector3( 0, 11, 0 ));
+        this.respawn();
         document.addEventListener( 'keydown', ( event ) => { if( !event.repeat ) this.keyStates[ event.code ] = true;}, false );
         document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
         document.addEventListener( 'mousedown', (e) => {
@@ -108,7 +108,10 @@ class Player {
                 this.game.audio.gib.play();
                 this.respawn();
             } else if( triggerResult.userData.classname == "trigger_teleport") {
-                this.spawn(q3dm17.misc_teleporter_dest[0].origin); // there is only one misc_teleporter_dest for all teleporters. TODO: fix this for other maps
+                // there is only one misc_teleporter_dest for all teleporters.
+                // TODO: fix this for other maps
+                var mtd = q3dm17.misc_teleporter_dest[0];
+                this.spawn(mtd.origin, mtd.angle); 
             }
         }
     }
@@ -186,16 +189,17 @@ class Player {
         }
         if ( this.keyStates[ 'KeyK' ] ) {
             this.respawn();
+            this.keyStates[ 'KeyK' ] = false;
         }
     }
 
     respawn() {
         var ipd = q3dm17.info_player_deathmatch;
         var rnd_ipd = ipd[Math.floor((Math.random()*ipd.length))];
-        this.spawn(rnd_ipd.origin);
+        this.spawn(rnd_ipd.origin, rnd_ipd.angle);
     }
 
-    spawn(originString) {
+    spawn(originString, quake_angle) {
         var [x,z,y] = originString.split(" ");
         var origin = new Vector3(x,y,z).multiplyScalar(QuakeScale);
         origin.y-=0.2; // without this line, the player sinks down a bit after spawning...
@@ -204,6 +208,10 @@ class Player {
         feetPos.add(origin);
         this.playerCollider.translate(feetPos);
         this.playerVelocity.multiplyScalar(0);
+
+        this.game.camera.rotation.x=(-Math.PI / 2.0)*0; // look up 90° from floor
+        // to convert from quake angle to our angle, I figured out this formula must be used: y=-x+270
+        this.game.camera.rotation.y=(Math.PI * (-quake_angle+270) / 180.0);
     }
     
 }
