@@ -187,18 +187,18 @@ var CustomOctree = ( function () {
 			_capsule.copy( capsule );
 			var triangles = [], result, hit = false;
 			this.getCapsuleTriangles( _capsule, triangles );
-			var name = '';
+			var userData;
 			for ( var i = 0; i < triangles.length; i ++ ) {
 				if ( result = this.triangleCapsuleIntersect( _capsule, triangles[ i ] ) ) {
 					hit = true;
-					name=triangles[i].name;
+					userData=triangles[i].userData;
 					_capsule.translate( result.normal.multiplyScalar( result.depth ) );
 				}
 			}
 			if ( hit ) {
 				var collisionVector = _capsule.getCenter( new Vector3() ).sub( capsule.getCenter( _v1 ) );
 				var depth = collisionVector.length();
-				return { normal: collisionVector.normalize(), depth: depth, name: name };
+				return { normal: collisionVector.normalize(), depth: depth, userData: userData };
 			}
 			return false;
 		},
@@ -243,7 +243,7 @@ var CustomOctree = ( function () {
 						v2.applyMatrix4( transform );
 						v3.applyMatrix4( transform );
 						var triangle = new Triangle( v1, v2, v3 )
-						triangle.name = obj.name;
+						triangle.userData = obj.userData;
 						this.addTriangle( triangle );
 					}
 					if ( isTemp ) {

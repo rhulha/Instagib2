@@ -13,7 +13,7 @@ import q3dm17 from './models/q3dm17.js';
  * @param {string[]} mapDef 
  * @returns {Brush}
  */
-function getBrushFromMapDef(mapDef, name) {
+function getBrushFromMapDef(mapDef, userData) {
     var planes = [];
     mapDef.plane_count |= 0; // turn to int
     for(var i=0; i<mapDef.plane_count; i++) {
@@ -22,24 +22,29 @@ function getBrushFromMapDef(mapDef, name) {
         var p = new Plane().setFromCoplanarPoints(new Vector3(p1x,p1y,p1z).multiplyScalar(0.038), new Vector3(p2x,p2y,p2z).multiplyScalar(0.038), new Vector3(p3x,p3y,p3z).multiplyScalar(0.038))
         planes.push(p);
     }
-    return new Brush(planes, name);
+    return new Brush(planes, userData);
 }
 
+function getTriggerBrushes(brushes, classname) {
+    for( var t=0; t<q3dm17[classname].length; t++) {
+        var mapDef = q3dm17[classname][t];
+        brushes.push( getBrushFromMapDef(mapDef, mapDef)); // store mapDef also as userData, so we can get targetnames etc. later.
+    }
+}
 /**
  * @returns {Brush[]}
  */
-function getTriggerBrushes() {
+function getAllTriggerBrushes() {
     var brushes = [];
-    for( var t=0; t<q3dm17.trigger_push.length; t++) {
-        var mapDef = q3dm17.trigger_push[t];
-        brushes.push( getBrushFromMapDef(mapDef, mapDef.target));
-    }
+    getTriggerBrushes(brushes, 'trigger_push');
+    getTriggerBrushes(brushes, 'trigger_hurt');
+    getTriggerBrushes(brushes, 'trigger_teleport');
     return brushes;
 }
 
 function getTriggerOctree(scene) {
     const jumpPadsGroup = new Group();
-    var brushes = getTriggerBrushes()
+    var brushes = getAllTriggerBrushes()
     for(var brush of brushes) {
         var geometry = new Geometry();
         var counter=0;
@@ -65,11 +70,8 @@ function getTriggerOctree(scene) {
         }
         //var box = addDebugBox( scene, geometry)
         var m = new Mesh(new BufferGeometry().fromGeometry(geometry));
-        m.name = brush.name;
-        if( m.name.length < 3 )
-            throw "! m.name";
+        m.userData = brush.userData;
         jumpPadsGroup.add( m );
-
     }
 
     const jumpPadsOctree = new CustomOctree();

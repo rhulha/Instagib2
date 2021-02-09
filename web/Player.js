@@ -100,13 +100,19 @@ class Player {
         
         //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
 
-        const result2 = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
-        if ( result2 ) {
-            console.log( getTargets()[result2.name] )
-            var [x,z,y] = getTargets()[result2.name].split(" ");
-            var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
-            this.playerVelocity.copy(vel);
-            this.game.audio.jumppad.play();
+        const triggerResult = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
+        if ( triggerResult ) {
+            if( triggerResult.userData.classname == "trigger_push") {
+                var [x,z,y] = getTargets()[triggerResult.userData.target].split(" ");
+                var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
+                this.playerVelocity.copy(vel);
+                this.game.audio.jumppad.play();
+            } else if( triggerResult.userData.classname == "trigger_hurt") {
+                this.game.audio.gib.play();
+                this.respawn();
+            } else if( triggerResult.userData.classname == "trigger_teleport") {
+                this.spawn(q3dm17.misc_teleporter_dest[0].origin); // there is only one misc_teleporter_dest for all teleporters. TODO: fix this for other maps
+            }
         }
     }
 
@@ -184,9 +190,13 @@ class Player {
     respawn() {
         var ipd = q3dm17.info_player_deathmatch;
         var rnd_ipd = ipd[Math.floor((Math.random()*ipd.length))];
-        var [x,z,y] = rnd_ipd.origin.split(" ");
-        var origin = new Vector3(x,y,z).multiplyScalar(0.038);
-        origin.y+=0.2;
+        this.spawn(rnd_ipd.origin);
+    }
+
+    spawn(originString) {
+        var [x,z,y] = originString.split(" ");
+        var origin = new Vector3(x,y,z).multiplyScalar(QuakeScale);
+        origin.y+=0.7;
         var end = this.playerCollider.end.clone();
         end.multiplyScalar(-1);
         end.add(origin);
