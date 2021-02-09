@@ -1,6 +1,6 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 
-import { Vector3, Camera, Scene} from './three/build/three.module.js';
+import { Vector3, Camera, Scene, MathUtils} from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets, AimAtTarget } from './trigger.js';
@@ -21,11 +21,6 @@ class Player {
     playerOnFloor = false;
     keyStates = {};
     sensitivity=500;
-    
-
-    clamp(num, min, max) {
-        return num <= min ? min : num >= max ? max : num;
-    }
 
     getPos() {
         var s=this.playerCollider.start;
@@ -81,7 +76,7 @@ class Player {
             if ( document.pointerLockElement === document.body ) {
                 game.camera.rotation.y -= event.movementX / this.sensitivity;
                 game.camera.rotation.x -= event.movementY / this.sensitivity;
-                game.camera.rotation.x = this.clamp(game.camera.rotation.x, -Math.PI/2, Math.PI/2)
+                game.camera.rotation.x = MathUtils.clamp(game.camera.rotation.x, -Math.PI/2, Math.PI/2)
             }
         }, false );
      
@@ -104,6 +99,7 @@ class Player {
         if ( triggerResult ) {
             if( triggerResult.userData.classname == "trigger_push") {
                 var [x,z,y] = getTargets()[triggerResult.userData.target].split(" ");
+                // TODO: I think this should be this.playerCollider.start. start is where the feet are...
                 var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
                 this.playerVelocity.copy(vel);
                 this.game.audio.jumppad.play();
@@ -196,11 +192,11 @@ class Player {
     spawn(originString) {
         var [x,z,y] = originString.split(" ");
         var origin = new Vector3(x,y,z).multiplyScalar(QuakeScale);
-        origin.y+=0.7;
-        var end = this.playerCollider.end.clone();
-        end.multiplyScalar(-1);
-        end.add(origin);
-        this.playerCollider.translate(end);
+        origin.y-=0.2; // without this line, the player sinks down a bit after spawning...
+        var feetPos = this.playerCollider.start.clone();
+        feetPos.multiplyScalar(-1);
+        feetPos.add(origin);
+        this.playerCollider.translate(feetPos);
         this.playerVelocity.multiplyScalar(0);
     }
     
