@@ -103,6 +103,7 @@ class Player {
                 var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
                 this.playerVelocity.copy(vel);
                 this.game.audio.jumppad.play();
+                this.playerOnFloor=false;
             } else if( triggerResult.userData.classname == "trigger_hurt") {
                 this.game.audio.gib.play();
                 this.respawn();
@@ -114,7 +115,7 @@ class Player {
 
     update( deltaTime ) {
 
-        if ( this.playerOnFloor ) {
+        if ( this.playerOnFloor && this.playerVelocity.y <= 0) {
             // GROUND MOVE
             /*
             if(!this.wishJump)
@@ -128,8 +129,8 @@ class Player {
             } else {
                 this.wishdir.normalize();
                 this.wishdir.multiplyScalar(2*25*deltaTime); // CHANGED: 2 * 
-                document.getElementById("info").innerText = "this.wishdir.dot(this.playerVelocity): "+ this.wishdir.dot(this.playerVelocity).toFixed(2);
-                if( this.wishdir.dot(this.playerVelocity) <= 0 ) {
+                //document.getElementById("info").innerText = "this.wishdir.dot(this.playerVelocity): "+ this.wishdir.dot(this.playerVelocity).toFixed(2);
+                if( this.wishdir.dot(this.playerVelocity) < 0 ) {
                     // user is trying to change direction, let's make it feel quick by increasing the wishdir
                     this.wishdir.multiplyScalar(10); // CHANGED: 2 * 
                 }
