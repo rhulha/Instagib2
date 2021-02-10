@@ -109,6 +109,8 @@ function getLinePositionsFromPlayer(player) {
 }
 
 function shoot(scene, player) {
+    if( ! player.game.audio.railgun.paused )
+        return;
     player.game.audio.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     scene.add( getLine(scene, start, end) );
