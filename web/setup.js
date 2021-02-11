@@ -1,13 +1,12 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 
-import {PerspectiveCamera, sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, DirectionalLight, Vector3} from './three/build/three.module.js';
+import {PerspectiveCamera, sRGBEncoding, ACESFilmicToneMapping, WebGLRenderer, Scene, DirectionalLight, Vector3, MeshBasicMaterial} from './three/build/three.module.js';
 import { Sky } from './three/examples/jsm/objects/Sky.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import Stats from './three/examples/jsm/libs/stats.module.js';
 import { Player } from './Player.js';
 import { CustomOctree } from './lib/CustomOctree.js';
 import { getTriggerOctree } from './trigger.js';
-
 /**
  * @returns {Scene}
  */
@@ -16,7 +15,7 @@ function setupScene(renderer) {
     //scene.background = new Color( 0x88ccff );
     //scene.add( new AmbientLight( 0x6688cc ) );
     
-    const fillLight1 = new DirectionalLight( 0xff9999, 5.5 );
+    const fillLight1 = new DirectionalLight( 0x9999ff, 5.5 );
     fillLight1.position.set( - 1, 1, 2 );
     scene.add( fillLight1 );
 
@@ -114,22 +113,55 @@ class Game {
         this.audio.jumppad.volume=0.5;
         this.audio.gib.volume=0.3;
     }
+
+    modifyModel1(model) {
+        model.traverse( child => {
+            if ( child.isMesh ) {
+                child.geometry.computeVertexNormals();
+                child.material.color.setHex( 0x000000 );
+                //child.material = new MeshBasicMaterial({vertexColors: true});
+                //child.castShadow = true;
+                //child.receiveShadow = true;
+                if ( child.material.map ) {
+                    child.material.map.anisotropy = 8;
+                }
+            }
+        } );
+    }
+    modifyModel2(model) {
+        model.traverse( child => {
+            if ( child.isMesh ) {
+                child.geometry.computeVertexNormals();
+                //child.material.color.setHex( 0x000000 );
+                child.material = new MeshBasicMaterial({vertexColors: true});
+                //child.castShadow = true;
+                //child.receiveShadow = true;
+                if ( child.material.map ) {
+                    child.material.map.anisotropy = 8;
+                }
+            }
+        } );
+    }
     
     loadMap(callback) {
-        new GLTFLoader().load( './models/q3dm17.gltf', ( gltf ) => {
-            this.scene.add( gltf.scene );
-            this.worldOctree.fromGraphNode( gltf.scene );
-            /*
-            gltf.scene.traverse( child => {
-                if ( child.isMesh ) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                    if ( child.material.map ) {
-                        child.material.map.anisotropy = 8;
-                    }
-                }
-            } );
-            */
+        var startTime = Date.now()/1000;
+        var loader = new GLTFLoader();
+        loader.load( './models/q3dm17.gltf', ( q3dm17 ) => {
+            var endTime = Date.now()/1000;
+            console.log("level was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
+            startTime = Date.now()/1000;
+            this.modifyModel1(q3dm17.scene.children[0]);
+            this.modifyModel2(q3dm17.scene.children[1]);
+            this.scene.add( q3dm17.scene.children[0] ); // this.scene.add removes the mesh from q3dm17.scene
+            this.scene.add( q3dm17.scene.children[0] );
+            //q3dm17.scene.children.shift(); // Octree only likes complete scenes to travers.
+            //q3dm17.scene.children.shift(); // so we remove the display meshes. The third mesh is the collision mesh.
+            //update: shift not needed since this.scene.add removes the mesh from q3dm17.scene
+            console.log("level was added in: " + (endTime-startTime).toFixed(2) + " seconds.")
+            startTime = Date.now()/1000;
+            this.worldOctree.fromGraphNode( q3dm17.scene, false );
+            endTime = Date.now()/1000;
+            console.log("level was octreed in: " + (endTime-startTime).toFixed(2) + " seconds.")
             callback();
         });
     }

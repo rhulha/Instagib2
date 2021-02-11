@@ -221,7 +221,7 @@ var CustomOctree = ( function () {
 			}
 			return distance < 1e100 ? { distance: distance, triangle: triangle, position: position } : false;
 		},
-		fromGraphNode: function ( group ) {
+		fromGraphNode: function ( group, doTransform ) {
 			group.traverse( ( obj ) => {
 				if ( obj.type === 'Mesh' ) {
 					obj.updateMatrix();
@@ -239,9 +239,11 @@ var CustomOctree = ( function () {
 						var v1 = new Vector3( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 						var v2 = new Vector3( positions[ i + 3 ], positions[ i + 4 ], positions[ i + 5 ] );
 						var v3 = new Vector3( positions[ i + 6 ], positions[ i + 7 ], positions[ i + 8 ] );
-						v1.applyMatrix4( transform );
-						v2.applyMatrix4( transform );
-						v3.applyMatrix4( transform );
+						if( doTransform) {
+							v1.applyMatrix4( transform );
+							v2.applyMatrix4( transform );
+							v3.applyMatrix4( transform );
+						}
 						var triangle = new Triangle( v1, v2, v3 )
 						triangle.userData = obj.userData;
 						this.addTriangle( triangle );
