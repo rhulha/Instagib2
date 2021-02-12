@@ -104,12 +104,14 @@ class Game {
         this.player = new Player(this);
         this.audio = {
             railgun: new Audio('sounds/railgf1a.wav'),
+            railgun_enemy: new Audio('sounds/railgf1a.wav'),
             jump: new Audio('sounds/sarge/jump1.wav'),
             jumppad: new Audio('sounds/jumppad.wav'),
             gib: new Audio('sounds/gibsplt1.wav'),
             teleport: new Audio('sounds/telein.wav')
         }
         this.audio.railgun.volume=0.1;
+        this.audio.railgun_enemy.volume=0.08;
         this.audio.jump.volume=0.2;
         this.audio.jumppad.volume=0.5;
         this.audio.gib.volume=0.3;
@@ -152,8 +154,8 @@ class Game {
             var endTime = Date.now()/1000;
             console.log("level was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
             startTime = Date.now()/1000;
-            this.modifyModel1(q3dm17.scene.children[0]);
-            this.modifyModel2(q3dm17.scene.children[1]);
+            //this.modifyModel1(q3dm17.scene.children[0]);
+            //this.modifyModel2(q3dm17.scene.children[1]);
             this.scene.add( q3dm17.scene.children[0] ); // this.scene.add removes the mesh from q3dm17.scene
             this.scene.add( q3dm17.scene.children[0] );
             //q3dm17.scene.children.shift(); // Octree only likes complete scenes to travers.

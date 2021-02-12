@@ -1,13 +1,12 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 
-import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, MeshLambertMaterial, MeshBasicMaterial, TubeGeometry, Curve, Mesh,
-    LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
+import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies, Enemy} from './networking.js';
 import { game } from './setup.js';
+import { getRail } from './rail.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
-const helixMaterial = new MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
@@ -62,34 +61,18 @@ function delayedRemove(scene, delta, elapsed) {
     }
 }
 
-class HelixCurve extends Curve {
-    constructor() {super();}
 
-    getPoint(t, optionalTarget ) {
-        var point = optionalTarget || new Vector3();
-        var a = 0.2; // radius
-        var b = 125; // length
-        var t2 = 2 * Math.PI * t * b / 3;
-        var x = Math.cos( t2 ) * a;
-        var y = Math.sin( t2 ) * a;
-        var z = b * t;
-        return point.set( x, y, z );
-    }
-}
 
 function getLine(scene, start, end) {
     const points = [];
     points.push( start );
     points.push( end );
-    
-    var helix = new HelixCurve();
-    var helixGeometry = new TubeGeometry( helix, 300, 0.1, 12, false );
-    var helixMesh = new Mesh( helixGeometry, helixMaterial );
-    helixMesh.position.copy(start);
-    helixMesh.lookAt(end);
-    helixMesh.time = scene.elapsed;
-    helixMesh.update = delayedRemove;
-    scene.add(helixMesh);
+
+    var rail = getRail();
+    rail.position.copy(start);
+    rail.lookAt(end);
+    rail.time = scene.elapsed;
+    scene.add(rail);
 
     const geometry = new BufferGeometry().setFromPoints( points );
     const line = new Line( geometry, lineMaterial );
@@ -109,7 +92,7 @@ function getLinePositionsFromPlayer(player) {
 }
 
 function shoot(scene, player) {
-    if( ! player.game.audio.railgun.paused )
+    if( ! player.game.audio.railgun.paused)
         return;
     player.game.audio.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);

@@ -53,16 +53,15 @@ webSocket.packet = function(msg) {
 					game.scene.add(e.soldier.glb.scene)
 				}
 				var e = enemies[player.id];
-				if( e.p.distanceTo(player) < 0.2) {
-					e.soldier.actions[0].setEffectiveWeight(1); // idle animation
-					e.soldier.actions[2].setEffectiveWeight(0); // idle animation
-				} else {
-					// TODO use e.p.distanceTo directly as weight maybe.
-					e.soldier.actions[0].setEffectiveWeight(0); // idle animation
-					e.soldier.actions[2].setEffectiveWeight(1); // idle animation
-				}
-				e.p.set(player.x,player.y,player.z);
-				e.r.x=player.rx;
+				e.p.y=player.y; // ignore movement in the up/down direction for the speed measurement.
+				var speed = e.p.distanceTo(player);
+				if( speed > e.lastSpeed)
+					e.lastSpeed = speed;
+				var normalizedSpeed = e.lastSpeed>0 ? speed/e.lastSpeed : 0;
+				e.soldier.actions[0].setEffectiveWeight(1-normalizedSpeed); // idle animation
+				e.soldier.actions[2].setEffectiveWeight(normalizedSpeed); // run animation
+				e.p.copy(player);
+				//e.r.x=player.rx;
 				e.r.y=player.ry;
 			}
 			document.getElementById("topkills").innerText = "top score: "+ playerWithMostKills.name + " " + playerWithMostKills.kills;
@@ -74,7 +73,7 @@ webSocket.rail = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
 	game.scene.add(getLine(game.scene, start, end)); // TODO: it looks like getLine does not alter start and end.
-	game.audio.railgun.play();
+	game.audio.railgun_enemy.play();
 }
 
 webSocket.newCon = function(msg) {
