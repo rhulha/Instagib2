@@ -3,7 +3,7 @@
 import { AnimationMixer } from './three/build/three.module.js';
 import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 
-function setupModelAnimations(soldier){ 
+function setupModelAnimations(soldier) { 
 	soldier.mixer = new AnimationMixer( soldier.glb.scene );
 	soldier.mixer.timeScale = 1;
 	var idleAction = soldier.mixer.clipAction( soldier.glb.animations[ 0 ] );

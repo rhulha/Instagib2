@@ -7,7 +7,7 @@ import {enemies, Enemy} from './networking.js';
 import { game } from './setup.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
-const helixMaterial = new MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
+const helixMaterial = new MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });

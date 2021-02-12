@@ -22,7 +22,9 @@ function animate() {
 		e.soldier.mixer.update( deltaTime );
 	}
 	game.render();
-	webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
+	if( webSocket.connection.readyState == 1) {
+		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
+	}
 	requestAnimationFrame( animate );
 	game.scene.traverse((obj)=>{
 		if( obj.update ) {

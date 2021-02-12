@@ -53,6 +53,14 @@ webSocket.packet = function(msg) {
 					game.scene.add(e.soldier.glb.scene)
 				}
 				var e = enemies[player.id];
+				if( e.p.distanceTo(player) < 0.2) {
+					e.soldier.actions[0].setEffectiveWeight(1); // idle animation
+					e.soldier.actions[2].setEffectiveWeight(0); // idle animation
+				} else {
+					// TODO use e.p.distanceTo directly as weight maybe.
+					e.soldier.actions[0].setEffectiveWeight(0); // idle animation
+					e.soldier.actions[2].setEffectiveWeight(1); // idle animation
+				}
 				e.p.set(player.x,player.y,player.z);
 				e.r.x=player.rx;
 				e.r.y=player.ry;

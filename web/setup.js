@@ -106,12 +106,14 @@ class Game {
             railgun: new Audio('sounds/railgf1a.wav'),
             jump: new Audio('sounds/sarge/jump1.wav'),
             jumppad: new Audio('sounds/jumppad.wav'),
-            gib: new Audio('sounds/gibsplt1.wav')
+            gib: new Audio('sounds/gibsplt1.wav'),
+            teleport: new Audio('sounds/telein.wav')
         }
         this.audio.railgun.volume=0.1;
         this.audio.jump.volume=0.2;
         this.audio.jumppad.volume=0.5;
         this.audio.gib.volume=0.3;
+        this.audio.teleport.volume=0.4;
     }
 
     modifyModel1(model) {

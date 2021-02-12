@@ -80,6 +80,38 @@ class Player {
             }
         }, false );
      
+        this.touchPageXStart=0;
+        this.touchPageYStart=0;
+        this.touchPageX=0;
+        this.touchPageY=0;
+        this.touchRotate = false;
+        document.body.addEventListener( 'touchstart', (e)=>{
+            if( e.touches.length > 1) {
+                shoot(game.scene, this);
+            }
+            this.touchPageXStart = e.touches[0].pageX;
+            this.touchPageYStart = e.touches[0].pageY;
+            this.touchRotate = true;
+        }, false);
+
+        document.body.addEventListener('touchmove', (e) => {
+            this.touchPageX = e.touches[0].pageX;
+            if( e.touches[0].pageY - this.touchPageYStart > 30) {
+                this.keyStates[ 'KeyW' ] = false;
+                this.keyStates[ 'KeyS' ] = true;
+            } else if( e.touches[0].pageY - this.touchPageYStart < -30) {
+                this.keyStates[ 'KeyW' ] = true;
+                this.keyStates[ 'KeyS' ] = false;
+            } else {
+                this.keyStates[ 'KeyW' ] = false;
+                this.keyStates[ 'KeyS' ] = false;
+            }
+        }, false);
+        document.body.addEventListener('touchend', (e)=>{
+            this.keyStates[ 'KeyW' ] = false;
+            this.keyStates[ 'KeyS' ] = false;
+            this.touchRotate = false;
+        }, false);
     }
     
     playerCollisions() {
@@ -110,6 +142,7 @@ class Player {
             } else if( triggerResult.userData.classname == "trigger_teleport") {
                 // there is only one misc_teleporter_dest for all teleporters.
                 // TODO: fix this for other maps
+                this.game.audio.teleport.play();
                 var mtd = q3dm17.misc_teleporter_dest[0];
                 this.spawn(mtd.origin, mtd.angle); 
             }
@@ -171,6 +204,10 @@ class Player {
 
     controls( deltaTime ) {
         this.wishdir.set(0,0,0);
+
+        if( this.touchRotate )
+            this.game.camera.rotation.y -= (this.touchPageX - this.touchPageXStart) * 0.01 * deltaTime;
+
         if ( this.keyStates[ 'KeyW' ] ) {
             this.wishdir.add( this.getPlayerRelativeVector(false) )
         }
@@ -188,6 +225,7 @@ class Player {
             this.keyStates[ 'Space' ] = false;
         }
         if ( this.keyStates[ 'KeyK' ] ) {
+            this.game.audio.gib.play();
             this.respawn();
             this.keyStates[ 'KeyK' ] = false;
         }
