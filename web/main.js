@@ -1,4 +1,5 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
 
 import {Clock} from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';

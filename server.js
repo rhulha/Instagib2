@@ -56,6 +56,8 @@ class Player {
       this.ry = msg.rot.y;
     } else if (msg.cmd == "rail") {
       broadcast(msg, this.ws);
+    } else if (msg.cmd == "selfkill") {
+      this.kills--;
     } else if (msg.cmd == "hit") {
       this.kills++;
       broadcast(msg, this.ws);

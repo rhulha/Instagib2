@@ -1,4 +1,5 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
 
 import { Vector3, MeshBasicMaterial, TubeGeometry, Curve, Mesh, Object3D } from './three/build/three.module.js';
 

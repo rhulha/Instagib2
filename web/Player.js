@@ -1,4 +1,5 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
 
 import { Vector3, Camera, Scene, MathUtils} from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
@@ -6,6 +7,7 @@ import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets, AimAtTarget } from './trigger.js';
 import { shoot } from './railgun.js';
 import q3dm17 from './models/q3dm17.js';
+import webSocket from './lib/webSocket.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -127,6 +129,13 @@ class Player {
         
         //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
 
+        if( this.playerCollider.end.y < -40) {
+            this.game.audio.gib.play();
+            webSocket.send({cmd: "selfkill"});
+            this.respawn();
+            return;
+        }
+
         const triggerResult = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
         if ( triggerResult ) {
             if( triggerResult.userData.classname == "trigger_push") {
@@ -138,6 +147,7 @@ class Player {
                 this.playerOnFloor=false;
             } else if( triggerResult.userData.classname == "trigger_hurt") {
                 this.game.audio.gib.play();
+                webSocket.send({cmd: "selfkill"});
                 this.respawn();
             } else if( triggerResult.userData.classname == "trigger_teleport") {
                 // there is only one misc_teleporter_dest for all teleporters.
@@ -225,8 +235,11 @@ class Player {
             this.keyStates[ 'Space' ] = false;
         }
         if ( this.keyStates[ 'KeyK' ] ) {
+            if( ! this.game.audio.gib.paused)
+                return;
             this.game.audio.gib.play();
             this.respawn();
+            webSocket.send({cmd: "selfkill"});
             this.keyStates[ 'KeyK' ] = false;
         }
     }
