@@ -1,13 +1,14 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import { Vector3, Camera, Scene, MathUtils} from './three/build/three.module.js';
+import { Vector3, Camera, Scene} from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets, AimAtTarget } from './trigger.js';
-import { shoot } from './railgun.js';
 import q3dm17 from './models/q3dm17.js';
 import webSocket from './lib/webSocket.js';
+import camera from './camera.js';
+import {keyStates} from './input.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -21,8 +22,7 @@ class Player {
     wishJump=false;
     playerDirection = new Vector3();
     playerOnFloor = false;
-    keyStates = {};
-    sensitivity=500;
+    
 
     getPos() {
         var s=this.playerCollider.start;
@@ -30,7 +30,7 @@ class Player {
     }
 
     getRotation() {
-        var r=this.camera.rotation;
+        var r=camera.rotation;
         return {x:r.x, y:r.y};
     }
 
@@ -46,74 +46,15 @@ class Player {
         this.dead=false;
         this.worldOctree = game.worldOctree;
         this.jumpPadsOctree = game.jumpPadsOctree;
-        this.camera = game.camera;
         this.respawn();
-        document.addEventListener( 'keydown', ( event ) => { if( !event.repeat ) this.keyStates[ event.code ] = true;}, false );
-        document.addEventListener( 'keyup', ( event ) => this.keyStates[ event.code ] = false, false );
-        document.addEventListener( 'mousedown', (e) => {
-            if (e.button == 2) {
-                game.camera.zoom = 4;
-                this.sensitivity *= 3;
-                game.camera.updateProjectionMatrix();
-            }
-        });
-        document.addEventListener( 'mouseup', (e) => {
-            if (e.button == 2) { 
-                game.camera.zoom = 1;
-                this.sensitivity /= 3;
-                game.camera.updateProjectionMatrix();
-            }
-        });
-        
-        document.addEventListener( 'mousedown', (e) => {
-            if ( document.pointerLockElement !== document.body ) {
-                document.body.requestPointerLock();
-                return;
-            }
-            if (e.button == 0)
-                shoot(game.scene, this);
-        }, false );
+    }
 
-        document.body.addEventListener( 'mousemove', ( event ) => {
-            if ( document.pointerLockElement === document.body ) {
-                game.camera.rotation.y -= event.movementX / this.sensitivity;
-                game.camera.rotation.x -= event.movementY / this.sensitivity;
-                game.camera.rotation.x = MathUtils.clamp(game.camera.rotation.x, -Math.PI/2, Math.PI/2)
-            }
-        }, false );
-     
-        this.touchPageXStart=0;
-        this.touchPageYStart=0;
-        this.touchPageX=0;
-        this.touchPageY=0;
-        this.touchRotate = false;
-        document.body.addEventListener( 'touchstart', (e)=>{
-            if( e.touches.length > 1) {
-                shoot(game.scene, this);
-            }
-            this.touchPageXStart = e.touches[0].pageX;
-            this.touchPageYStart = e.touches[0].pageY;
-            this.touchRotate = true;
-        }, false);
-
-        document.body.addEventListener('touchmove', (e) => {
-            this.touchPageX = e.touches[0].pageX;
-            if( e.touches[0].pageY - this.touchPageYStart > 30) {
-                this.keyStates[ 'KeyW' ] = false;
-                this.keyStates[ 'KeyS' ] = true;
-            } else if( e.touches[0].pageY - this.touchPageYStart < -30) {
-                this.keyStates[ 'KeyW' ] = true;
-                this.keyStates[ 'KeyS' ] = false;
-            } else {
-                this.keyStates[ 'KeyW' ] = false;
-                this.keyStates[ 'KeyS' ] = false;
-            }
-        }, false);
-        document.body.addEventListener('touchend', (e)=>{
-            this.keyStates[ 'KeyW' ] = false;
-            this.keyStates[ 'KeyS' ] = false;
-            this.touchRotate = false;
-        }, false);
+    selfKill() {
+        this.game.audio.gib.play();
+        webSocket.send({cmd: "selfkill"});
+        this.kills--;
+        document.getElementById("kills").innerText = ""+ (this.kills) + " Kills"; 
+        this.respawn();
     }
     
     playerCollisions() {
@@ -130,9 +71,7 @@ class Player {
         //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
 
         if( this.playerCollider.end.y < -40) {
-            this.game.audio.gib.play();
-            webSocket.send({cmd: "selfkill"});
-            this.respawn();
+            this.selfKill();
             return;
         }
 
@@ -146,9 +85,7 @@ class Player {
                 this.game.audio.jumppad.play();
                 this.playerOnFloor=false;
             } else if( triggerResult.userData.classname == "trigger_hurt") {
-                this.game.audio.gib.play();
-                webSocket.send({cmd: "selfkill"});
-                this.respawn();
+                selfKill();
             } else if( triggerResult.userData.classname == "trigger_teleport") {
                 // there is only one misc_teleporter_dest for all teleporters.
                 // TODO: fix this for other maps
@@ -200,15 +137,15 @@ class Player {
         const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
         this.playerCollider.translate( deltaPosition );
         this.playerCollisions();
-        this.camera.position.copy( this.playerCollider.end );
+        camera.position.copy( this.playerCollider.end );
     }
 
     getPlayerRelativeVector(side) {
-        this.camera.getWorldDirection( this.playerDirection );
+        camera.getWorldDirection( this.playerDirection );
         this.playerDirection.y = 0;
         this.playerDirection.normalize();
         if( side)
-            this.playerDirection.cross( this.camera.up );
+            this.playerDirection.cross( camera.up );
         return this.playerDirection;
     }
 
@@ -216,31 +153,29 @@ class Player {
         this.wishdir.set(0,0,0);
 
         if( this.touchRotate )
-            this.game.camera.rotation.y -= (this.touchPageX - this.touchPageXStart) * 0.01 * deltaTime;
+            camera.rotation.y -= (this.touchPageX - this.touchPageXStart) * 0.01 * deltaTime;
 
-        if ( this.keyStates[ 'KeyW' ] ) {
+        if ( keyStates[ 'KeyW' ] ) {
             this.wishdir.add( this.getPlayerRelativeVector(false) )
         }
-        if ( this.keyStates[ 'KeyS' ] ) {
+        if ( keyStates[ 'KeyS' ] ) {
             this.wishdir.sub( this.getPlayerRelativeVector(false) )
         }
-        if ( this.keyStates[ 'KeyA' ] ) {
+        if ( keyStates[ 'KeyA' ] ) {
             this.wishdir.sub( this.getPlayerRelativeVector(true) )
         }
-        if ( this.keyStates[ 'KeyD' ] ) {
+        if ( keyStates[ 'KeyD' ] ) {
             this.wishdir.add( this.getPlayerRelativeVector(true) )
         }
-        if ( this.keyStates[ 'Space' ] ) {
+        if ( keyStates[ 'Space' ] ) {
             this.wishJump=true;
-            this.keyStates[ 'Space' ] = false;
+            keyStates[ 'Space' ] = false;
         }
-        if ( this.keyStates[ 'KeyK' ] ) {
+        if ( keyStates[ 'KeyK' ] ) {
             if( ! this.game.audio.gib.paused)
                 return;
-            this.game.audio.gib.play();
-            this.respawn();
-            webSocket.send({cmd: "selfkill"});
-            this.keyStates[ 'KeyK' ] = false;
+            this.selfKill();
+            keyStates[ 'KeyK' ] = false;
         }
     }
 
@@ -260,9 +195,9 @@ class Player {
         this.playerCollider.translate(feetPos);
         this.playerVelocity.multiplyScalar(0);
 
-        this.game.camera.rotation.x=(-Math.PI / 2.0)*0; // look up 90° from floor
+        camera.rotation.x=(-Math.PI / 2.0)*0; // look up 90° from floor
         // to convert from quake angle to our angle, I figured out this formula must be used: y=-x+270
-        this.game.camera.rotation.y=(Math.PI * (-quake_angle+270) / 180.0);
+        camera.rotation.y=(Math.PI * (-quake_angle+270) / 180.0);
     }
     
 }

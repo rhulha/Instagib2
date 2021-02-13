@@ -1,12 +1,13 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import {Vector3} from './three/build/three.module.js';
+import {Vector3, MathUtils} from './three/build/three.module.js';
 import {soldier, Soldier, setupModelAnimations} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 import webSocket from './lib/webSocket.js';
 import {getLine, explosion} from './railgun.js';
 import {game} from './setup.js';
+import scene from './scene.js';
 
 var enemies = {};
 var this_player_id;
@@ -35,6 +36,7 @@ class Enemy {
 	}
 }
 
+var packetCounter=0;
 webSocket.packet = function(msg) {
 	if(!soldier.ready)
 		return;
@@ -51,21 +53,29 @@ webSocket.packet = function(msg) {
 					console.log("creating new enemy: ", player.id);
 					var e = new Enemy(player.id, player.name, player.room);
 					enemies[player.id] = e;
-					game.scene.add(e.soldier.glb.scene)
+					scene.add(e.soldier.glb.scene)
 				}
 				var e = enemies[player.id];
-				e.p.y=player.y; // ignore movement in the up/down direction for the speed measurement.
-				var speed = e.p.distanceTo(player);
-				if( speed > e.lastSpeed)
-					e.lastSpeed = speed;
-				var normalizedSpeed = e.lastSpeed>0 ? speed/e.lastSpeed : 0;
+				var normalizedSpeed = 0;
+				if( e.p.y < player.y ) {
+					// player is flying upwards
+				} else {
+					e.p.y=player.y; // ignore movement in the up/down direction for the speed measurement.
+					var speed = e.p.distanceTo(player);
+					normalizedSpeed = MathUtils.clamp(speed/0.3, 0, 1);
+				}
+				//console.log(normalizedSpeed);
 				e.soldier.actions[0].setEffectiveWeight(1-normalizedSpeed); // idle animation
 				e.soldier.actions[2].setEffectiveWeight(normalizedSpeed); // run animation
 				e.p.copy(player);
 				//e.r.x=player.rx;
 				e.r.y=player.ry;
 			}
+		}
+		packetCounter++;
+		if(packetCounter%60) {
 			document.getElementById("topkills").innerText = "top score: "+ playerWithMostKills.name + " " + playerWithMostKills.kills;
+			packetCounter=MathUtils.randInt(2,7); // don't set topkills every frame and randomize it a bit.
 		}
 	}
 }
@@ -73,7 +83,7 @@ webSocket.packet = function(msg) {
 webSocket.rail = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
-	game.scene.add(getLine(game.scene, start, end)); // TODO: it looks like getLine does not alter start and end.
+	scene.add(getLine(scene, start, end)); // TODO: it looks like getLine does not alter start and end.
 	game.audio.railgun_enemy.play();
 }
 
@@ -85,7 +95,7 @@ webSocket.disconnect = function(msg) {
 	console.log(msg);
 	var e = enemies[msg.id];
 	e.soldier.mixer.stopAllAction();
-	game.scene.remove(e.soldier.glb.scene); // TODO: clean up animations and geometry ?
+	scene.remove(e.soldier.glb.scene); // TODO: clean up animations and geometry ?
 	delete enemies[msg.id];
 }
 
@@ -99,7 +109,7 @@ webSocket.hit = function(msg) {
 		game.audio.gib.play();
 		game.audio.gib.volume = old;
 	}
-	game.scene.add(explosion(game.scene, msg.pos, game.scene.elapsed));
+	scene.add(explosion(scene, msg.pos, scene.elapsed));
 }
 
 document.addEventListener("keydown", (event)=>{

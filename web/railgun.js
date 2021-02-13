@@ -6,6 +6,7 @@ import webSocket from './lib/webSocket.js';
 import {enemies, Enemy} from './networking.js';
 import { game } from './setup.js';
 import { getRail } from './rail.js';
+import camera from './camera.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
@@ -85,7 +86,7 @@ function getLine(scene, start, end) {
 function getLinePositionsFromPlayer(player) {
     var start = new Vector3();
     var end = new Vector3();
-    player.camera.getWorldDirection( player.playerDirection );
+    camera.getWorldDirection( player.playerDirection );
     start.copy( player.playerCollider.end );
     end.copy( player.playerCollider.end );
     end.addScaledVector( player.playerDirection, 100 );
