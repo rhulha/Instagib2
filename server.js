@@ -1,6 +1,6 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
 
-const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -47,6 +47,9 @@ class Player {
   }
 
   handleUpdate(msg) {
+    if( !msg.startsWith("{")) {
+      return;
+    }
     msg = JSON.parse(msg);
     if (msg.cmd == "pos") {
       this.x = msg.pos.x;
@@ -97,7 +100,7 @@ interval = setInterval(sendPlayerPositions, 16);
 
 wss.on('connection', (ws, req) => {
   const { query: { name, room } } = url.parse(req.url, true);
-  var id = crypto.randomBytes(16).toString('hex');
+  var id = crypto.randomBytes(6).toString('hex');
   console.log('client connected', name, room, id);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);

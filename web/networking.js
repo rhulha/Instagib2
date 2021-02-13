@@ -112,10 +112,14 @@ webSocket.hit = function(msg) {
 	scene.add(explosion(scene, msg.pos, scene.elapsed));
 }
 
-document.addEventListener("keydown", (event)=>{
-    if (event.key === "Enter") {
-		webSocket.send({cmd: "sendTestData"});
-    }
-})
+function sendCommand(command) {
+	webSocket.send({cmd: command});
+}
 
-export {enemies, Enemy};
+function sendPlayerPositionToServer() {
+	if( webSocket.connection.readyState == 1) {
+		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
+	}
+}
+
+export {enemies, Enemy, sendCommand, sendPlayerPositionToServer};

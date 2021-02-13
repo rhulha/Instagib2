@@ -2,8 +2,7 @@
 // https://github.com/rhulha/Instagib2
 
 import {Clock} from './three/build/three.module.js';
-import webSocket from './lib/webSocket.js';
-import {enemies} from './networking.js';
+import {enemies, sendPlayerPositionToServer} from './networking.js';
 import game from './setup.js';
 import scene from './scene.js';
 
@@ -25,9 +24,7 @@ function animate() {
 		e.soldier.mixer.update( deltaTime );
 	}
 	game.render();
-	if( webSocket.connection.readyState == 1) {
-		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
-	}
+	sendPlayerPositionToServer();
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{
 		if( obj.update ) {

@@ -8,7 +8,7 @@ import { getTargets, AimAtTarget } from './trigger.js';
 import q3dm17 from './models/q3dm17.js';
 import webSocket from './lib/webSocket.js';
 import camera from './camera.js';
-import {keyStatesm, touchStates} from './input.js';
+import {keyStates, touchStates} from './input.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;

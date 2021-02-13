@@ -1,8 +1,12 @@
+// Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
+
 import { MathUtils} from './three/build/three.module.js';
 import { shoot } from './railgun.js';
 import camera from './camera.js';
 import scene from './scene.js';
 import game from './setup.js';
+import {sendCommand} from './networking.js';
 
 var sensitivity=500;
 var keyStates = {};
@@ -83,6 +87,12 @@ document.body.addEventListener('touchend', (e)=>{
     keyStates[ 'KeyS' ] = false;
     touchStates.rotate = false;
 }, false);
+
+document.addEventListener("keydown", (event)=>{	
+    if (event.key === "Enter") {	
+        sendCommand("sendTestData");
+    }	
+});
 
 export {keyStates, touchStates};
 
