@@ -2,7 +2,7 @@ import { MathUtils} from './three/build/three.module.js';
 import { shoot } from './railgun.js';
 import camera from './camera.js';
 import scene from './scene.js';
-import {game} from './setup.js';
+import game from './setup.js';
 
 var sensitivity=500;
 var keyStates = {};

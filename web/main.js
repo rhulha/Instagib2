@@ -4,12 +4,13 @@
 import {Clock} from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies} from './networking.js';
-import {game} from './setup.js';
+import game from './setup.js';
 import scene from './scene.js';
 
 game.loadMap(animate);
 
 // make sure no one else has access to this clock, so we don't get accidential getElapsedTime() calls.
+// Because they reset the getDelta and lead to crazy bugs.
 const clock = new Clock();
 
 function animate() {

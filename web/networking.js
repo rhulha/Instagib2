@@ -6,7 +6,7 @@ import {soldier, Soldier, setupModelAnimations} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 import webSocket from './lib/webSocket.js';
 import {getLine, explosion} from './railgun.js';
-import {game} from './setup.js';
+import game from './setup.js';
 import scene from './scene.js';
 
 var enemies = {};

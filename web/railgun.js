@@ -4,7 +4,7 @@
 import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies, Enemy} from './networking.js';
-import { game } from './setup.js';
+import game from './setup.js';
 import { getRail } from './rail.js';
 import camera from './camera.js';
 
@@ -106,7 +106,7 @@ function shoot(scene, player) {
 
     const raycaster = new Raycaster(start, player.playerDirection);
     for( var enemy_id in enemies) {
-        //var char = scene.getObjectByName( "Character" );
+        // var char = scene.getObjectByName( "Character" );
         // TODO: check if we hit level first...
         /**
          * @Type {Enemy} enemy
