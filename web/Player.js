@@ -8,7 +8,7 @@ import { getTargets, AimAtTarget } from './trigger.js';
 import q3dm17 from './models/q3dm17.js';
 import webSocket from './lib/webSocket.js';
 import camera from './camera.js';
-import {keyStates} from './input.js';
+import {keyStatesm, touchStates} from './input.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -152,8 +152,8 @@ class Player {
     controls( deltaTime ) {
         this.wishdir.set(0,0,0);
 
-        if( this.touchRotate )
-            camera.rotation.y -= (this.touchPageX - this.touchPageXStart) * 0.01 * deltaTime;
+        if( touchStates.rotate )
+            camera.rotation.y -= (touchStates.pageX - touchStates.pageXStart) * 0.01 * deltaTime;
 
         if ( keyStates[ 'KeyW' ] ) {
             this.wishdir.add( this.getPlayerRelativeVector(false) )

@@ -57,7 +57,7 @@ touchStates.rotate = false;
 
 document.body.addEventListener( 'touchstart', (e)=>{
     if( e.touches.length > 1) {
-        shoot(game.scene, this);
+        shoot(game.scene, game.player);
     }
     touchStates.pageXStart = e.touches[0].pageX;
     touchStates.pageYStart = e.touches[0].pageY;
@@ -77,6 +77,7 @@ document.body.addEventListener('touchmove', (e) => {
         keyStates[ 'KeyS' ] = false;
     }
 }, false);
+
 document.body.addEventListener('touchend', (e)=>{
     keyStates[ 'KeyW' ] = false;
     keyStates[ 'KeyS' ] = false;
