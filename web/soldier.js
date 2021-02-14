@@ -20,6 +20,7 @@ loader.load( 'soldier.glb', function ( soldier_glb ) {
 		if ( obj.type === 'Object3D' ) {
 			soldierSingleton.obj3d=obj;
 			obj.scale.set(0.017,0.017,0.017);
+			// obj.castShadow = true;
 		}
 	});
     //setupModelAnimations(soldierSingleton);

@@ -22,8 +22,8 @@ class Enemy {
 		this.obj3d.traverse( ( obj ) => {
 			if ( obj.isMesh ) {
 			  obj.material.color.r=1;
-              obj.material.color.b=0.2;
-              obj.material.color.g=0.2;
+              obj.material.color.b=0.4;
+              obj.material.color.g=0.4;
 			}
 		});
 		this.p = this.obj3d.position;
