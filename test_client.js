@@ -13,7 +13,7 @@ class TestClient {
     constructor(name, lines) {
         this.name=name||"Bot";
         this.lines=lines;
-        this.lines_pos = 0;
+        this.lines_pos = Math.floor(Math.random() * lines.length-1) + 1;
         this.ws = new WebSocket('ws://localhost:8080/websocket?name='+name+'&room=Test');
         this.ws.on('open', this.sendPosToServer.bind(this) );
         this.ws.on('message', function incoming(data) {
@@ -28,13 +28,15 @@ class TestClient {
             if (line === undefined)
                 return;
             this.ws.send(line);
-        }).bind(this), 36);
+        }).bind(this), 16);
     }
 
     // clearInterval(interval)    
 }
 
 new TestClient("Bot1", lines1);
-//new TestClient("Bot2", lines2);
-//new TestClient("Bot3", lines3);
+new TestClient("Bot2", lines1);
+new TestClient("Bot3", lines1);
+new TestClient("Bot4", lines1);
+new TestClient("Bot5", lines1);
 
