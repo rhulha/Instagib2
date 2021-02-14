@@ -69,7 +69,8 @@ class Game {
             if ( child.isMesh ) {
                 //child.geometry.computeVertexNormals();
                 child.material.metalness = 0;
-                // child.material.color.setHex( 0xffffff );
+                child.material.color.setHex( 0x009DFF );
+                console.log(child.material.vertexColors)
                 //child.material = new MeshBasicMaterial({vertexColors: true});
                 //child.castShadow = true;
                 //child.receiveShadow = true;
@@ -84,7 +85,7 @@ class Game {
             if ( child.isMesh ) {
                 // child.geometry.computeVertexNormals();
                 child.material = new MeshBasicMaterial({vertexColors: false});
-                child.material.color.setHex( 0x0000ff );
+                child.material.color.setHex( 0xffffff );
                 //child.castShadow = true;
                 //child.receiveShadow = true;
                 if ( child.material.map ) {
