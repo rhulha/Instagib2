@@ -43,7 +43,7 @@ function getAllTriggerBrushes() {
 }
 
 function getTriggerOctree(scene) {
-    const jumpPadsGroup = new Group();
+    const triggerBrushes = new Group();
     var brushes = getAllTriggerBrushes()
     for(var brush of brushes) {
         var geometry = new Geometry();
@@ -71,12 +71,12 @@ function getTriggerOctree(scene) {
         //var box = addDebugBox( scene, geometry)
         var m = new Mesh(new BufferGeometry().fromGeometry(geometry));
         m.userData = brush.userData;
-        jumpPadsGroup.add( m );
+        triggerBrushes.add( m );
     }
 
-    const jumpPadsOctree = new CustomOctree();
-    jumpPadsOctree.fromGraphNode(jumpPadsGroup);
-    return jumpPadsOctree;
+    const triggerOctree = new CustomOctree();
+    triggerOctree.fromGraphNode(triggerBrushes);
+    return triggerOctree;
 }
 
 var targets = {};

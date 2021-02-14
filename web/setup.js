@@ -41,7 +41,11 @@ class Game {
 
         setupResizeListener( camera, this.renderer);
 
-        this.jumpPadsOctree = getTriggerOctree(scene);
+        var startTime = Date.now()/1000;
+        this.triggerOctree = getTriggerOctree(scene);
+        var endTime = Date.now()/1000;
+        console.log("triggerOctree was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
+
         this.worldOctree = new CustomOctree();
         this.player = new Player(this);
         this.audio = {

@@ -36,7 +36,7 @@ class Player {
 
     /**
      * @param {Octree} worldOctree
-     * @param {Octree} jumpPadsOctree
+     * @param {Octree} triggerOctree
      * @param {Camera} camera
      * @param {Scene} scene
      */
@@ -45,7 +45,7 @@ class Player {
         this.kills=0;
         this.dead=false;
         this.worldOctree = game.worldOctree;
-        this.jumpPadsOctree = game.jumpPadsOctree;
+        this.triggerOctree = game.triggerOctree;
         this.respawn();
     }
 
@@ -75,7 +75,7 @@ class Player {
             return;
         }
 
-        const triggerResult = this.jumpPadsOctree.capsuleIntersect( this.playerCollider );
+        const triggerResult = this.triggerOctree.capsuleIntersect( this.playerCollider );
         if ( triggerResult ) {
             if( triggerResult.userData.classname == "trigger_push") {
                 var [x,z,y] = getTargets()[triggerResult.userData.target].split(" ");
