@@ -98,7 +98,8 @@ webSocket.packet = function(msg) {
 			}
 		}
 		packetCounter++;
-		if(packetCounter%60) {
+		if(packetCounter%60==0) {
+			//console.log("setting topkills");
 			document.getElementById("topkills").innerText = "top score: "+ playerWithMostKills.name + " " + playerWithMostKills.kills;
 			packetCounter=MathUtils.randInt(2,7); // don't set topkills every frame and randomize it a bit.
 		}

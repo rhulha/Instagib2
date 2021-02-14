@@ -14,8 +14,7 @@ const clock = new Clock();
 
 function animate() {
 	var deltaTime = Math.min( 0.1, clock.getDelta() );
-	var elapsed = clock.getElapsedTime(); // warning, this call resets getDelta()
-	scene.elapsed = elapsed;
+	scene.elapsed = clock.getElapsedTime(); // warning, this call resets getDelta()
 	game.player.controls( deltaTime );
 	game.player.update( deltaTime );
 	Object.values(enemies).forEach(e=>e.mixer.update( deltaTime ));
@@ -24,7 +23,7 @@ function animate() {
 	requestAnimationFrame( animate );
 	scene.traverse((obj)=>{
 		if( obj.update ) {
-			obj.update.call(obj, scene, deltaTime, elapsed); 
+			obj.update.call(obj, scene, deltaTime, scene.elapsed); 
 		}
 	});
 	let rm = scene.remove_me;

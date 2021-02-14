@@ -23,8 +23,8 @@ class Player {
     wishJump=false;
     playerDirection = new Vector3();
     playerOnFloor = false;
+    aliveSince = 0;
     
-
     getPos() {
         var s=this.playerCollider.start;
         return {x:s.x, y:s.y, z:s.z};
@@ -195,6 +195,8 @@ class Player {
         feetPos.add(origin);
         this.playerCollider.translate(feetPos);
         this.playerVelocity.multiplyScalar(0);
+        this.aliveSince = scene.elapsed; // the idea is to make the player invul for three seconds. And to change the model color for the duration.
+        // But it is harder than I thought.
 
         camera.rotation.x=(-Math.PI / 2.0)*0; // look up 90° from floor
         // to convert from quake angle to our angle, I figured out this formula must be used: y=-x+270

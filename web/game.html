@@ -7,12 +7,16 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<div id="info">WASD to move, space to jump, left mouse shoots, right mouse zooms, F11 to go fullscreen.</div>
+		<div id="info">WASD to move, space to jump, left mouse shoots, right mouse zooms, F11 to go fullscreen.<br/>
+		Use the Browser console to change mouse sensitivity. write sensitivity(500) press enter. Higher values are slower.</div>
 		<div id="topkills">top score</div>
 		<div id="kills">0 Kills</div>
 		<div id="container"></div>
 		<img src="images/gun.png" id="gun">
 		<img src="images/ch.png" id="crosshair">
 		<script type="module" src="main.js"></script>
+		<script>
+			setTimeout(e=>document.getElementById("info").innerText = "", 10000);
+		</script>
 	</body>
 </html>

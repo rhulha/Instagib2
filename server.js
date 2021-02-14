@@ -31,9 +31,10 @@ function broadcast(msg, skipClientWS) {
 }
 
 class Player {
-  constructor(id, name, room, ws) {
+  constructor(id, name, room, color, ws) {
     this.id = id;
     this.name = name;
+    this.color = color;
     this.kills=0;
     Object.defineProperty(this, 'room', {value: 'static', writable: true});
     this.room = room;
@@ -52,11 +53,11 @@ class Player {
     }
     msg = JSON.parse(msg);
     if (msg.cmd == "pos") {
-      this.x = msg.pos.x;
-      this.y = msg.pos.y;
-      this.z = msg.pos.z;
-      this.rx = msg.rot.x;
-      this.ry = msg.rot.y;
+      this.x = parseFloat(msg.pos.x); // parseFloat to sanitize user data.
+      this.y = parseFloat(msg.pos.y);
+      this.z = parseFloat(msg.pos.z);
+      this.rx = parseFloat(msg.rot.x);
+      this.ry = parseFloat(msg.rot.y);
     } else if (msg.cmd == "rail") {
       broadcast(msg, this.ws);
     } else if (msg.cmd == "selfkill") {
@@ -99,8 +100,10 @@ function sendPlayerPositions() {
 interval = setInterval(sendPlayerPositions, 16);
 
 wss.on('connection', (ws, req) => {
-  const { query: { name, room } } = url.parse(req.url, true);
+  const { query: { name, room } } = req.url.length > 512 ? {query:{name:'hacker', room:'hacker'}}: url.parse(req.url, true);
   var id = crypto.randomBytes(6).toString('hex');
+  name = name.replace(/[^A-Za-z0-9]/g, '');
+  room = room.replace(/[^A-Za-z0-9]/g, '');
   console.log('client connected', name, room, id);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);

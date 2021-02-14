@@ -7,21 +7,21 @@ import camera from './camera.js';
 import game from './setup.js';
 import {sendCommand} from './networking.js';
 
-var sensitivity=500;
 var keyStates = {};
 var touchStates = {};
 var mouseStates = {};
+mouseStates.sensitivity = 500; // higher values are slower
 
 window.sensitivity = (val) => {
-    console.log("old sensitivity: " + sensitivity);
+    console.log("old sensitivity: " + mouseStates.sensitivity);
     if( val > 0 || val < 0 )
-        sensitivity = val;
+        mouseStates.sensitivity = val;
 }
 
 document.body.addEventListener( 'mousemove', ( event ) => {
     if ( document.pointerLockElement === document.body ) {
-        camera.rotation.y -= event.movementX / sensitivity;
-        camera.rotation.x -= event.movementY / sensitivity;
+        camera.rotation.y -= event.movementX / mouseStates.sensitivity;
+        camera.rotation.x -= event.movementY / mouseStates.sensitivity;
         camera.rotation.x = MathUtils.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
     }
 }, false );
@@ -34,7 +34,7 @@ document.addEventListener( 'mousedown', (e) => {
     mouseStates[e.button]=true;
     if (e.button == 2) {
         camera.zoom = 4;
-        sensitivity *= 3;
+        mouseStates.sensitivity *= 3;
         camera.updateProjectionMatrix();
     }
 });
@@ -42,7 +42,7 @@ document.addEventListener( 'mouseup', (e) => {
     mouseStates[e.button]=false;
     if (e.button == 2) { 
         camera.zoom = 1;
-        sensitivity /= 3;
+        mouseStates.sensitivity /= 3;
         camera.updateProjectionMatrix();
     }
 });
