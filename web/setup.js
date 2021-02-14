@@ -63,8 +63,9 @@ class Game {
     modifyModel1(model) {
         model.traverse( child => {
             if ( child.isMesh ) {
-                child.geometry.computeVertexNormals();
-                child.material.color.setHex( 0x000000 );
+                //child.geometry.computeVertexNormals();
+                child.material.metalness = 0;
+                //child.material.color.setHex( 0x000000 );
                 //child.material = new MeshBasicMaterial({vertexColors: true});
                 //child.castShadow = true;
                 //child.receiveShadow = true;
@@ -77,9 +78,9 @@ class Game {
     modifyModel2(model) {
         model.traverse( child => {
             if ( child.isMesh ) {
-                child.geometry.computeVertexNormals();
-                //child.material.color.setHex( 0x000000 );
-                child.material = new MeshBasicMaterial({vertexColors: true});
+                // child.geometry.computeVertexNormals();
+                child.material = new MeshBasicMaterial({vertexColors: false});
+                child.material.color.setHex( 0x0000ff );
                 //child.castShadow = true;
                 //child.receiveShadow = true;
                 if ( child.material.map ) {
@@ -96,8 +97,8 @@ class Game {
             var endTime = Date.now()/1000;
             console.log("level was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
             startTime = Date.now()/1000;
-            //this.modifyModel1(q3dm17.scene.children[0]);
-            //this.modifyModel2(q3dm17.scene.children[1]);
+            this.modifyModel1(q3dm17.scene.children[0]);
+            this.modifyModel2(q3dm17.scene.children[1]);
             scene.add( q3dm17.scene.children[0] ); // scene.add removes the mesh from q3dm17.scene
             scene.add( q3dm17.scene.children[0] );
             //q3dm17.scene.children.shift(); // Octree only likes complete scenes to travers.

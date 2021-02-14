@@ -1,13 +1,20 @@
-import {Scene, DirectionalLight, Vector3} from './three/build/three.module.js';
+import {Scene, AmbientLight, Vector3} from './three/build/three.module.js';
 import { Sky } from './three/examples/jsm/objects/Sky.js';
 
 var scene = new Scene();
 //scene.background = new Color( 0x88ccff );
 //scene.add( new AmbientLight( 0x6688cc ) );
 
-const fillLight1 = new DirectionalLight( 0x9999ff, 5.5 );
-fillLight1.position.set( - 1, 1, 2 );
-scene.add( fillLight1 );
+// const fillLight1 = new DirectionalLight( 0x9999ff, 5.5 );
+// fillLight1.position.set( - 1, 1, 2 );
+// scene.add( fillLight1 );
+
+// const pl = new PointLight( 0x9999ff, 5.5 );
+// pl.position.set( 0, 70, 0 );
+// scene.add( pl );
+
+scene.add( new AmbientLight( 0x9999ff, 1 ) );
+
 
 // https://threejs.org/examples/#webgl_shaders_sky
 // https://github.com/mrdoob/three.js/blob/master/examples/webgl_shaders_sky.html

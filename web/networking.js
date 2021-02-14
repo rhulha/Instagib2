@@ -74,6 +74,7 @@ webSocket.packet = function(msg) {
 				}
 				var e = enemies[player.id];
 				var normalizedSpeed = 0;
+				player.y -= 0.35; // move model down a bit. Otherwise it looked like it was floating. Todo: Do this in a parent node instead...
 				if( e.p.y < player.y ) {
 					// player is flying upwards
 				} else {
