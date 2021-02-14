@@ -1,7 +1,7 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import { Vector3 } from './three/build/three.module.js';
+import { Box3, Vector3 } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import { getTargets, AimAtTarget } from './trigger.js';
 import q3dm17 from './models/q3dm17.js';
@@ -10,6 +10,9 @@ import webSocket from './lib/webSocket.js';
 import camera from './camera.js';
 import scene from './scene.js';
 import {keyStates, mouseStates, touchStates} from './input.js';
+import powerups from './powerups.js';
+import game from './setup.js';
+import {updateFragCounter} from './hud.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -24,6 +27,7 @@ class Player {
     playerDirection = new Vector3();
     playerOnFloor = false;
     aliveSince = 0;
+    tempBox = new Box3();
     
     getPos() {
         var s=this.playerCollider.start;
@@ -51,7 +55,7 @@ class Player {
         this.game.audio.gib.play();
         webSocket.send({cmd: "selfkill"});
         this.kills--;
-        document.getElementById("kills").innerText = ""+ (this.kills) + " Kills"; 
+        updateFragCounter();
         this.respawn();
     }
     
@@ -66,6 +70,19 @@ class Player {
             this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
         }
         
+        for(var pu_name in powerups) {
+            var pu = powerups[pu_name];
+            //pu.updateMatrixWorld( true );
+            this.tempBox.copy( pu.geometry.boundingBox ).applyMatrix4( pu.matrixWorld );
+            if( pu.visible && this.playerCollider.intersectsBox( this.tempBox )) {
+                game.audio.powerup.play();
+                pu.hideStart=scene.elapsed;
+                pu.visible=false;
+                this.kills += 5;
+                webSocket.send({cmd: "powerup", "name": pu.name});
+                updateFragCounter();
+            }
+        }
         //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
 
         if( this.playerCollider.end.y < -40) {

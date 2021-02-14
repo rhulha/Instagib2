@@ -54,7 +54,8 @@ class Game {
             jump: new Audio('sounds/sarge/jump1.wav'),
             jumppad: new Audio('sounds/jumppad.wav'),
             gib: new Audio('sounds/gibsplt1.wav'),
-            teleport: new Audio('sounds/telein.wav')
+            teleport: new Audio('sounds/telein.wav'),
+            powerup: new Audio('sounds/holdable.wav')
         }
         this.audio.railgun.volume=0.1;
         this.audio.railgun_enemy.volume=0.08;

@@ -62,6 +62,9 @@ class Player {
       broadcast(msg, this.ws);
     } else if (msg.cmd == "selfkill") {
       this.kills--;
+    } else if (msg.cmd == "powerup") {
+      this.kills+=5;
+      broadcast(msg, this.ws);
     } else if (msg.cmd == "hit") {
       this.kills++;
       broadcast(msg, this.ws);

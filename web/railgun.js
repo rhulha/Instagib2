@@ -7,6 +7,7 @@ import {enemies, Enemy} from './networking.js';
 import game from './setup.js';
 import { getRail } from './rail.js';
 import camera from './camera.js';
+import {updateFragCounter} from './hud.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
@@ -120,7 +121,7 @@ function shoot(scene, player) {
             scene.add(explosion(scene, player.enemyPos, scene.elapsed));
 
             game.player.kills++;
-            document.getElementById("kills").innerText = ""+ (game.player.kills) + " Kills"; 
+            updateFragCounter();
             player.game.audio.gib.play();
         }
 

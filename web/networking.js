@@ -9,9 +9,14 @@ import webSocket from './lib/webSocket.js';
 import {getLine, explosion} from './railgun.js';
 import game from './setup.js';
 import scene from './scene.js';
+import powerups from './powerups.js';
 
 var enemies = {};
 var this_player_id;
+
+function damp(source, target, smoothing, dt) {
+	return MathUtils.lerp(source, target, 1 - Math.pow(smoothing, dt));
+}
 
 class Enemy {
 	constructor(id, name, room, color) {
@@ -25,7 +30,6 @@ class Enemy {
 			  obj.material = obj.material.clone();
 			  obj.material.color.set(this.color);
 			  obj.material.color.offsetHSL(0,0,0.1); // make the skins a bit brighter
-			  console.log(this.color);
 			}
 		});
 		this.p = this.obj3d.position;
@@ -92,8 +96,10 @@ webSocket.packet = function(msg) {
 					normalizedSpeed = MathUtils.clamp(speed/0.3, 0, 1);
 				}
 				//console.log(normalizedSpeed);
-				e.actions[0].setEffectiveWeight(1-normalizedSpeed); // idle animation
-				e.actions[2].setEffectiveWeight(normalizedSpeed); // run animation
+				var w = e.actions[0].getEffectiveWeight();
+				w = damp(w, 1-w, 0.3, 16);
+				e.actions[0].setEffectiveWeight(1-w); // idle animation
+				e.actions[2].setEffectiveWeight(w); // run animation
 				e.p.copy(player);
 				//e.r.x=player.rx;
 				e.r.z=player.ry;
@@ -142,6 +148,18 @@ webSocket.hit = function(msg) {
 		game.audio.gib.volume = old;
 	}
 	scene.add(explosion(scene, msg.pos, scene.elapsed));
+}
+
+webSocket.powerup = function(msg) {
+	if( msg.id != this_player_id) {
+		var old = game.audio.powerup.volume;
+		game.audio.powerup.volume = 0.3;
+		game.audio.powerup.play();
+		game.audio.powerup.volume = old;
+		msg.name = msg.name.substring(0, 40).replace(/[^A-Za-z0-9@]/g, '');
+		powerups[msg.name].hideStart=scene.elapsed;
+		powerups[msg.name].visible=false;
+	}
 }
 
 function sendCommand(command) {
