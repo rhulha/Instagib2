@@ -34,10 +34,10 @@ class Player {
   constructor(id, name, room, color, ws) {
     this.id = id;
     this.name = name;
-    this.color = color;
-    this.kills=0;
     Object.defineProperty(this, 'room', {value: 'static', writable: true});
     this.room = room;
+    this.color = color;
+    this.kills=0;
     Object.defineProperty(this, 'ws', {value: 'static', writable: true});
     this.ws = ws;
     this.x=0;
@@ -87,7 +87,7 @@ function sendPlayerPositions() {
       if( player.ws.readyState === WebSocket.OPEN ) {
         var packet = {
           cmd: "packet",
-          this_player_id:player.id,
+          this_player_id: player.id,
           players: room.players
         }
         player.ws.send(JSON.stringify(packet));
@@ -100,15 +100,15 @@ function sendPlayerPositions() {
 interval = setInterval(sendPlayerPositions, 16);
 
 wss.on('connection', (ws, req) => {
-  const { query: { name, room } } = req.url.length > 512 ? {query:{name:'hacker', room:'hacker'}}: url.parse(req.url, true);
+  var { query: { name, room, color } } = (req.url.length > 512 ? {query:{name:'hacker', room:'hacker', color:'red'}}: url.parse(req.url, true));
   var id = crypto.randomBytes(6).toString('hex');
   name = name.replace(/[^A-Za-z0-9]/g, '');
   room = room.replace(/[^A-Za-z0-9]/g, '');
-  console.log('client connected', name, room, id);
+  console.log('client connected', id, name, room, color);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
   }
-  var player = new Player(id, (name?name:id), rooms[room], ws);
+  var player = new Player(id, (name?name:id), rooms[room], color, ws);
   rooms[room].players.push(player);
   ws.on('message', player.handleUpdate.bind(player));
   ws.on('close', player.handleDisconnect.bind(player));

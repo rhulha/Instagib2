@@ -2,7 +2,7 @@
 // https://github.com/rhulha/Instagib2
 
 import {Vector3, MathUtils} from './three/build/three.module.js';
-import { AnimationMixer } from './three/build/three.module.js';
+import {AnimationMixer} from './three/build/three.module.js';
 import {soldierSingleton} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 import webSocket from './lib/webSocket.js';
@@ -14,16 +14,18 @@ var enemies = {};
 var this_player_id;
 
 class Enemy {
-	constructor(id, name, room) {
+	constructor(id, name, room, color) {
 		this.id = id;
-		this.name = name;
-		this.room = room;
+		this.name = name.substring(0, 40).replace(/[^A-Za-z0-9]/g, '');
+		//this.room = room.substring(0, 80).replace(/[^A-Za-z0-9]/g, '');
+		this.color = color.substring(0, 30).replace(/[^A-Za-z0-9]/g, '');
 		this.obj3d = SkeletonUtils.clone(soldierSingleton.glb.scene.children[0]);
 		this.obj3d.traverse( ( obj ) => {
 			if ( obj.isMesh ) {
-			  obj.material.color.r=1;
-              obj.material.color.b=0.4;
-              obj.material.color.g=0.4;
+			  obj.material = obj.material.clone();
+			  obj.material.color.set(this.color);
+			  obj.material.color.offsetHSL(0,0,0.1); // make the skins a bit brighter
+			  console.log(this.color);
 			}
 		});
 		this.p = this.obj3d.position;
@@ -70,8 +72,8 @@ webSocket.packet = function(msg) {
 			if( player.id !== this_player_id) {
 				//console.log("enemies id: ", player.id);
 				if (!enemies[player.id]) {
-					console.log("creating new enemy: ", player.id, player.name);
-					var e = new Enemy(player.id, player.name, player.room);
+					console.log("creating new enemy: ", player.id, player.name, player.color);
+					var e = new Enemy(player.id, player.name, player.room, player.color);
 					enemies[player.id] = e;
 					// e.soldier.glb is a GLTF object with animations, scenes and cameras.
 					// e.soldier.glb.isObject3D is undefined 

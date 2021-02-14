@@ -13,11 +13,12 @@ var lines3=fs.readFileSync('player_log3.txt', 'utf8').split("\r\n");
 
 class TestClient {
 
-    constructor(name, lines) {
+    constructor(name, color, lines) {
         this.name=name||"Bot";
+        this.color=color;
         this.lines=lines;
         this.lines_pos = Math.floor(Math.random() * lines.length-1) + 1;
-        this.ws = new WebSocket('ws://'+server_hostname+'/websocket?name='+name+'&room=Test');
+        this.ws = new WebSocket('ws://'+server_hostname+'/websocket?name='+name+'&room=Test'+'&color='+color);
         this.ws.on('open', this.sendPosToServer.bind(this) );
         this.ws.on('message', function incoming(data) {
             //console.log(data);
@@ -37,9 +38,9 @@ class TestClient {
     // clearInterval(interval)    
 }
 
-new TestClient("Bot1", lines1);
-new TestClient("Bot4", lines1);
-new TestClient("Bot5", lines1);
-new TestClient("Bot2", lines2);
-new TestClient("Bot3", lines3);
+new TestClient("Bot1", "red", lines1);
+new TestClient("Bot4", "green", lines1);
+new TestClient("Bot5", "blue", lines1);
+new TestClient("Bot2", "white", lines2);
+new TestClient("Bot3", "yellow", lines3);
 
