@@ -18,11 +18,7 @@ function animate() {
 	scene.elapsed = elapsed;
 	game.player.controls( deltaTime );
 	game.player.update( deltaTime );
-
-	for( var eid in enemies) {
-		var e = enemies[eid];
-		e.soldier.mixer.update( deltaTime );
-	}
+	Object.values(enemies).forEach(e=>e.mixer.update( deltaTime ));
 	game.render();
 	sendPlayerPositionToServer();
 	requestAnimationFrame( animate );

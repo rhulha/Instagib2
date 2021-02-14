@@ -38,16 +38,16 @@ var cache = [];
 
 function getRail() {
     if( cache.length>0) {
-        console.log("rail from cache");
+        //console.log("rail from cache");
         return cache.pop();
     } else {
-        console.log("new rail");
+        //console.log("new rail");
         return new Rail();
     }
 }
 
 function returnRail(rail) {
-    console.log("rail returned");
+    //console.log("rail returned");
     cache.push(rail);
 }
 

@@ -15,7 +15,6 @@ const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, 
 const count = 200;
 const speed = 10;
 
-
 /**
 * @param {Vector3} pos
 */
@@ -112,10 +111,9 @@ function shoot(scene, player) {
          * @Type {Enemy} enemy
          */
         var enemy = enemies[enemy_id];
-        var char = enemy.soldier.glb.scene.children[0];
-        if(raycaster.intersectObject(char, true ).length > 0) {
+        if(raycaster.intersectObject(enemy.obj3d, true ).length > 0) {
             //console.log(char);
-            char.getWorldPosition(player.enemyPos);
+            enemy.obj3d.getWorldPosition(player.enemyPos);
             player.enemyPos.y+=1.8;
 
             webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}, id: enemy_id});

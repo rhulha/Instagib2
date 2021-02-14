@@ -4,36 +4,37 @@
 const fs = require('fs');
 const WebSocket = require('ws');
 
-const client = new WebSocket('ws://localhost:8080/websocket?name=Bot&room=Test');
+var lines1=fs.readFileSync('player_log1.txt', 'utf8').split("\r\n");
+var lines2=fs.readFileSync('player_log2.txt', 'utf8').split("\r\n");
+var lines3=fs.readFileSync('player_log3.txt', 'utf8').split("\r\n");
 
-var lines;
-var lines_pos = 0;
+class TestClient {
 
-fs.readFile('player_log.txt', 'utf8', function (err, contents) {
-    lines = contents.split("\r\n");
-});
+    constructor(name, lines) {
+        this.name=name||"Bot";
+        this.lines=lines;
+        this.lines_pos = 0;
+        this.ws = new WebSocket('ws://localhost:8080/websocket?name='+name+'&room=Test');
+        this.ws.on('open', this.sendPosToServer.bind(this) );
+        this.ws.on('message', function incoming(data) {
+            //console.log(data);
+        });
+    }
 
-var player_log = "";
+    sendPosToServer() {
+        console.log('SetTimeout, setStuffSlowly');
+        var interval = setInterval((() => {
+            var line = this.lines[this.lines_pos++ % this.lines.length];
+            if (line === undefined)
+                return;
+            this.ws.send(line);
+        }).bind(this), 36);
+    }
 
-
-function sendStuffSlowly(client) {
-    console.log('SetTimeout, setStuffSlowly');
-    var interval = setInterval(() => {
-        var line = lines[lines_pos++ % lines.length];
-        if (line === undefined)
-            clearInterval(interval);
-        //console.log(line);
-        client.send(line);
-    }, 16);
+    // clearInterval(interval)    
 }
 
-
-client.on('open', function open() {
-    sendStuffSlowly(client);
-    // ws.send('something');
-});
-
-client.on('message', function incoming(data) {
-    //console.log(data);
-});
+new TestClient("Bot1", lines1);
+//new TestClient("Bot2", lines2);
+//new TestClient("Bot3", lines3);
 
