@@ -23,6 +23,8 @@ class Enemy {
 		this.id = id;
 		this.name = name.substring(0, 40).replace(/[^A-Za-z0-9]/g, '');
 		//this.room = room.substring(0, 80).replace(/[^A-Za-z0-9]/g, '');
+		if( color === undefined )
+			color = 'yellow';
 		this.color = color.substring(0, 30).replace(/[^A-Za-z0-9]/g, '');
 		this.obj3d = SkeletonUtils.clone(soldierSingleton.glb.scene.children[0]);
 		this.obj3d.traverse( ( obj ) => {

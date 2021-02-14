@@ -63,6 +63,7 @@ class Game {
         this.audio.jumppad.volume=0.5;
         this.audio.gib.volume=0.3;
         this.audio.teleport.volume=0.4;
+        this.audio.powerup.volume=0.3;
     }
 
     modifyModel1(model) {
