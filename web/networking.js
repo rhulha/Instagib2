@@ -19,6 +19,13 @@ class Enemy {
 		this.name = name;
 		this.room = room;
 		this.obj3d = SkeletonUtils.clone(soldierSingleton.glb.scene.children[0]);
+		this.obj3d.traverse( ( obj ) => {
+			if ( obj.isMesh ) {
+			  obj.material.color.r=1;
+              obj.material.color.b=0.2;
+              obj.material.color.g=0.2;
+			}
+		});
 		this.p = this.obj3d.position;
 		this.r = this.obj3d.rotation;
 		this.r.x=-Math.PI/2;
