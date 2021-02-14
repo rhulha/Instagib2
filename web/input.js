@@ -4,28 +4,19 @@
 import { MathUtils} from './three/build/three.module.js';
 import { shoot } from './railgun.js';
 import camera from './camera.js';
-import scene from './scene.js';
 import game from './setup.js';
 import {sendCommand} from './networking.js';
 
 var sensitivity=500;
 var keyStates = {};
 var touchStates = {};
+var mouseStates = {};
 
 window.sensitivity = (val) => {
     console.log("old sensitivity: " + sensitivity);
     if( val > 0 || val < 0 )
         sensitivity = val;
 }
-
-document.addEventListener( 'mousedown', (e) => {
-    if ( document.pointerLockElement !== document.body ) {
-        document.body.requestPointerLock();
-        return;
-    }
-    if (e.button == 0)
-        shoot(scene, game.player);
-}, false );
 
 document.body.addEventListener( 'mousemove', ( event ) => {
     if ( document.pointerLockElement === document.body ) {
@@ -36,6 +27,11 @@ document.body.addEventListener( 'mousemove', ( event ) => {
 }, false );
 
 document.addEventListener( 'mousedown', (e) => {
+    if ( document.pointerLockElement !== document.body ) {
+        document.body.requestPointerLock();
+        return;
+    }
+    mouseStates[e.button]=true;
     if (e.button == 2) {
         camera.zoom = 4;
         sensitivity *= 3;
@@ -43,6 +39,7 @@ document.addEventListener( 'mousedown', (e) => {
     }
 });
 document.addEventListener( 'mouseup', (e) => {
+    mouseStates[e.button]=false;
     if (e.button == 2) { 
         camera.zoom = 1;
         sensitivity /= 3;
@@ -94,5 +91,5 @@ document.addEventListener("keydown", (event)=>{
     }	
 });
 
-export {keyStates, touchStates};
+export {keyStates, mouseStates, touchStates};
 

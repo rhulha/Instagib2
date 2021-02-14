@@ -1,14 +1,15 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import { Vector3, Camera, Scene} from './three/build/three.module.js';
+import { Vector3 } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
-import { Octree } from './three/examples/jsm/math/Octree.js';
 import { getTargets, AimAtTarget } from './trigger.js';
 import q3dm17 from './models/q3dm17.js';
+import { shoot } from './railgun.js';
 import webSocket from './lib/webSocket.js';
 import camera from './camera.js';
-import {keyStates, touchStates} from './input.js';
+import scene from './scene.js';
+import {keyStates, mouseStates, touchStates} from './input.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -35,10 +36,7 @@ class Player {
     }
 
     /**
-     * @param {Octree} worldOctree
-     * @param {Octree} triggerOctree
-     * @param {Camera} camera
-     * @param {Scene} scene
+     * @param {Game} game
      */
     constructor(game) {
         this.game = game;
@@ -152,6 +150,9 @@ class Player {
     controls( deltaTime ) {
         this.wishdir.set(0,0,0);
 
+        if (mouseStates[0])
+            shoot(scene, this);
+        
         if( touchStates.rotate )
             camera.rotation.y -= (touchStates.pageX - touchStates.pageXStart) * 0.01 * deltaTime;
 
