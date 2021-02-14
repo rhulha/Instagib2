@@ -69,7 +69,7 @@ class Game {
             if ( child.isMesh ) {
                 //child.geometry.computeVertexNormals();
                 child.material.metalness = 0;
-                //child.material.color.setHex( 0x000000 );
+                // child.material.color.setHex( 0xffffff );
                 //child.material = new MeshBasicMaterial({vertexColors: true});
                 //child.castShadow = true;
                 //child.receiveShadow = true;
@@ -110,7 +110,7 @@ class Game {
             //update: shift not needed since this.scene.add removes the mesh from q3dm17.scene
             console.log("level was added in: " + (endTime-startTime).toFixed(2) + " seconds.")
             startTime = Date.now()/1000;
-            this.worldOctree.fromGraphNode( q3dm17.scene, false );
+            this.worldOctree.fromGraphNode( q3dm17.scene, false ); // q3dm17.scene is now the third child. Because scene.add above removed the others.
             endTime = Date.now()/1000;
             console.log("level was octreed in: " + (endTime-startTime).toFixed(2) + " seconds.")
             callback();

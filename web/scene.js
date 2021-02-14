@@ -13,7 +13,7 @@ var scene = new Scene();
 // pl.position.set( 0, 70, 0 );
 // scene.add( pl );
 
-scene.add( new AmbientLight( 0x9999ff, 1 ) );
+scene.add( new AmbientLight( 0xaaaaff, 1 ) );
 
 
 // https://threejs.org/examples/#webgl_shaders_sky
