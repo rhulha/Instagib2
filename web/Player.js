@@ -61,29 +61,8 @@ class Player {
     }
     
     playerCollisions() {
-        const result = this.worldOctree.capsuleIntersect( this.playerCollider );
-        this.playerOnFloor = false;
-        if ( result ) {
-            this.playerOnFloor = result.normal.y > 0;
-            if ( ! this.playerOnFloor ) {
-                this.playerVelocity.addScaledVector( result.normal, - result.normal.dot( this.playerVelocity ) );
-            }
-            this.playerCollider.translate( result.normal.multiplyScalar( result.depth ) );
-        }
-        
-        for(var pu_name in powerups) {
-            var pu = powerups[pu_name];
-            //pu.updateMatrixWorld( true );
-            this.tempBox.copy( pu.geometry.boundingBox ).applyMatrix4( pu.matrixWorld );
-            if( pu.visible && this.playerCollider.intersectsBox( this.tempBox )) {
-                game.audio.powerup.play();
-                pu.hideStart=scene.elapsed;
-                pu.visible=false;
-                this.frags += 3;
-                webSocket.send({cmd: "powerup", "name": pu.name});
-                updateFragsCounter();
-            }
-        }
+        this.checkWorld();
+        this.checkPowerups();
         //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
 
         if( this.playerCollider.end.y < -40) {
@@ -91,23 +70,55 @@ class Player {
             return;
         }
 
-        const triggerResult = this.triggerOctree.capsuleIntersect( this.playerCollider );
-        if ( triggerResult ) {
-            if( triggerResult.userData.classname == "trigger_push") {
-                var [x,z,y] = getTargets()[triggerResult.userData.target].split(" ");
+        this.checkTriggers();
+    }
+
+    checkTriggers() {
+        const triggerResult = this.triggerOctree.capsuleIntersect(this.playerCollider);
+        if (triggerResult) {
+            if (triggerResult.userData.classname == "trigger_push") {
+                var [x, z, y] = getTargets()[triggerResult.userData.target].split(" ");
                 // TODO: I think this should be this.playerCollider.start. start is where the feet are...
                 var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
                 this.playerVelocity.copy(vel);
                 this.game.audio.jumppad.play();
-                this.playerOnFloor=false;
-            } else if( triggerResult.userData.classname == "trigger_hurt") {
+                this.playerOnFloor = false;
+            } else if (triggerResult.userData.classname == "trigger_hurt") {
                 fragSelf();
-            } else if( triggerResult.userData.classname == "trigger_teleport") {
+            } else if (triggerResult.userData.classname == "trigger_teleport") {
                 // there is only one misc_teleporter_dest for all teleporters.
                 // TODO: fix this for other maps
                 this.game.audio.teleport.play();
                 var mtd = q3dm17.misc_teleporter_dest[0];
-                this.spawn(mtd.origin, mtd.angle); 
+                this.spawn(mtd.origin, mtd.angle);
+            }
+        }
+    }
+
+    checkWorld() {
+        const result = this.worldOctree.capsuleIntersect(this.playerCollider);
+        this.playerOnFloor = false;
+        if (result) {
+            this.playerOnFloor = result.normal.y > 0;
+            if (!this.playerOnFloor) {
+                this.playerVelocity.addScaledVector(result.normal, -result.normal.dot(this.playerVelocity));
+            }
+            this.playerCollider.translate(result.normal.multiplyScalar(result.depth));
+        }
+    }
+
+    checkPowerups() {
+        for (var pu_name in powerups) {
+            var pu = powerups[pu_name];
+            //pu.updateMatrixWorld( true );
+            this.tempBox.copy(pu.geometry.boundingBox).applyMatrix4(pu.matrixWorld);
+            if (pu.visible && this.playerCollider.intersectsBox(this.tempBox)) {
+                game.audio.powerup.play();
+                pu.hideStart = scene.elapsed;
+                pu.visible = false;
+                this.frags += 3;
+                webSocket.send({ cmd: "powerup", "name": pu.name });
+                updateFragsCounter();
             }
         }
     }
