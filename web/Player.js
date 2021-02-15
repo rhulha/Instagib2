@@ -21,7 +21,7 @@ class Player {
 
     playerCollider = new Capsule( new Vector3( 0, 0.7, 0 ), new Vector3( 0, 2.13+0.7, 0 ), 0.7 );
     playerVelocity = new Vector3();
-    enemyPos = new Vector3();
+    enemyPosTemp = new Vector3();
     wishdir = new Vector3(); // Quake
     wishJump=false;
     playerDirection = new Vector3();
@@ -42,8 +42,9 @@ class Player {
     /**
      * @param {Game} game
      */
-    constructor(game) {
+    constructor(game, color) {
         this.game = game;
+        this.color = color;
         this.kills=0;
         this.dead=false;
         this.worldOctree = game.worldOctree;

@@ -11,7 +11,8 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-var rooms = {}; // <name_str,Room>
+/** @Type {Object.<string:Room>} */
+var rooms = {};
 // var players_by_id = {};
 
 class Room {
@@ -32,6 +33,16 @@ function broadcast(msg, skipClientWS) {
 
 class Player {
   constructor(id, name, room, color, ws) {
+    if( !id || id.length < 4)
+      throw "id missing";
+    if( !name || name.length <= 0)
+      throw "name missing";
+    if( !room instanceof Room)
+      throw "room not instanceof Room";
+    if( !color || color.length < 3)
+      throw "color missing";
+    if( !ws instanceof WebSocket)
+     throw "websocket missing";
     this.id = id;
     this.name = name;
     Object.defineProperty(this, 'room', {value: 'static', writable: true});
@@ -59,15 +70,39 @@ class Player {
       this.rx = parseFloat(msg.rot.x);
       this.ry = parseFloat(msg.rot.y);
     } else if (msg.cmd == "rail") {
-      broadcast(msg, this.ws);
+      msg.color = this.color;
+      if( !msg.color || msg.color.length < 3)
+        console.log("ERROR: COLOR MISSING!!!", this.id, this.name, this.room);
+      broadcast(msg, this.ws);  // TODO: harden data
+    } else if (msg.cmd == "rail_random") {
+      msg.color = this.color;
+      var randomEnmemy;
+      // try 5 times to get another player than one self from the same room.
+      // this might fail if we are the only player.
+      for(var i=0; i<5; i++) {
+        randomEnmemy = this.room.players[Math.floor(Math.random() * this.room.players.length)];
+        if( randomEnmemy.id != this.id)
+          break;
+      }
+      if( randomEnmemy.id == this.id) {
+        console.log("did not find a randomEnmemy", this.id);
+        return;
+      }
+      msg = {
+        cmd: "rail",
+        color: this.color,
+        start: {x: this.x, y: this.y, z: this.z}, 
+        end: {x: randomEnmemy.x, y: randomEnmemy.y, z: randomEnmemy.z}, 
+      };
+      broadcast(msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "selfkill") {
       this.kills--;
     } else if (msg.cmd == "powerup") {
       this.kills+=3;
-      broadcast(msg, this.ws);
+      broadcast(msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "hit") {
       this.kills++;
-      broadcast(msg, this.ws);
+      broadcast(msg, this.ws);  // TODO: harden data
     }
   }
 
@@ -107,6 +142,10 @@ wss.on('connection', (ws, req) => {
   var id = crypto.randomBytes(6).toString('hex');
   name = name.replace(/[^A-Za-z0-9]/g, '');
   room = room.replace(/[^A-Za-z0-9]/g, '');
+  if(!color)
+    color = "yellow";
+  else
+    color = color.replace(/[^A-Za-z0-9]/g, '');
   console.log('client connected', id, name, room, color);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);

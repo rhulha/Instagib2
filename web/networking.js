@@ -11,6 +11,7 @@ import game from './setup.js';
 import scene from './scene.js';
 import powerups from './powerups.js';
 
+/** @Type {Object.<string:Enemy>} */
 var enemies = {};
 var this_player_id;
 
@@ -119,7 +120,8 @@ webSocket.packet = function(msg) {
 webSocket.rail = function(msg) {
 	var start = new Vector3().copy(msg.start);
 	var end = new Vector3().copy(msg.end);
-	scene.add(getLine(scene, start, end)); // TODO: it looks like getLine does not alter start and end.
+	//console.log("msg.color", msg.color);
+	scene.add(getLine(scene, start, end, msg.color)); // TODO: it looks like getLine does not alter start and end.
 	game.audio.railgun_enemy.play();
 }
 

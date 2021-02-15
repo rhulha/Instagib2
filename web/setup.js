@@ -10,6 +10,15 @@ import { getTriggerOctree } from './trigger.js';
 import camera from './camera.js';
 import scene from './scene.js';
 
+function getParameterByName(name, url = window.location.href) {
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
 function setupResizeListener(camera, renderer) {
     window.addEventListener( 'resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -47,7 +56,8 @@ class Game {
         console.log("triggerOctree was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
 
         this.worldOctree = new CustomOctree();
-        this.player = new Player(this);
+        var color = getParameterByName("color");
+        this.player = new Player(this, color || "yellow");
         this.audio = {
             railgun: new Audio('sounds/railgf1a.wav'),
             railgun_enemy: new Audio('sounds/railgf1a.wav'),

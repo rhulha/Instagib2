@@ -18,21 +18,27 @@ class TestClient {
         this.color=color;
         this.lines=lines;
         this.lines_pos = Math.floor(Math.random() * lines.length-1) + 1;
-        this.ws = new WebSocket('ws://'+server_hostname+'/websocket?name='+name+'&room=Test'+'&color='+color);
-        this.ws.on('open', this.sendPosToServer.bind(this) );
+        var url = 'ws://'+server_hostname+'/websocket?name='+name+'&room=Test&color='+color;
+        console.log(url);
+        this.ws = new WebSocket(url);
+        this.ws.sendObjAsJSON=function(obj){this.send(JSON.stringify(obj))};
+        this.ws.on('open', this.setupComms.bind(this) );
         this.ws.on('message', function incoming(data) {
             //console.log(data);
         });
     }
 
-    sendPosToServer() {
-        console.log('SetTimeout, setStuffSlowly');
-        var interval = setInterval((() => {
+    setupComms() {
+        console.log('setting up communication.');
+        this.ivpos = setInterval((() => {
             var line = this.lines[this.lines_pos++ % this.lines.length];
             if (line === undefined)
                 return;
             this.ws.send(line);
         }).bind(this), 16);
+        this.ivshoot = setInterval((() => {
+            this.ws.sendObjAsJSON({cmd:"rail_random"});
+        }).bind(this), 4000+Math.floor(Math.random() * 4000) + 1 );
     }
 
     // clearInterval(interval)    
@@ -41,6 +47,6 @@ class TestClient {
 new TestClient("Bot1", "red", lines1);
 new TestClient("Bot4", "green", lines1);
 new TestClient("Bot5", "blue", lines1);
-new TestClient("Bot2", "white", lines2);
-new TestClient("Bot3", "yellow", lines3);
+new TestClient("Bot2", "white", lines1);
+new TestClient("Bot3", "yellow", lines1);
 

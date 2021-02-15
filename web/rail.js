@@ -3,12 +3,8 @@
 
 import { Vector3, MeshBasicMaterial, TubeGeometry, Curve, Mesh, Object3D } from './three/build/three.module.js';
 
-
-const helixMaterial = new MeshBasicMaterial( { color: 0x0000dd, opacity: 0.5, transparent: true } );
-
 class HelixCurve extends Curve {
     constructor() {super();}
-
     getPoint(t, optionalTarget ) {
         var point = optionalTarget || new Vector3();
         var a = 0.2; // radius
@@ -27,9 +23,11 @@ var helixGeometry = new TubeGeometry( helix, 300, 0.1, 12, false );
 class Rail extends Object3D {
     constructor(){
         super();
+        var helixMaterial = new MeshBasicMaterial( { color: 0x0000dd, opacity: 0.5, transparent: true } );
         var helixMesh = new Mesh( helixGeometry, helixMaterial );
         helixMesh.rotation.z += Math.PI + 0.7;
         this.add(helixMesh);
+        this.helixMesh = helixMesh;
         this.update = delayedRemove;
     }
 }

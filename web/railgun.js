@@ -65,18 +65,19 @@ function delayedRemove(scene, delta, elapsed) {
 
 
 
-function getLine(scene, start, end) {
+function getLine(scene, start, end, color) {
     const points = [];
     points.push( start );
     points.push( end );
 
     var rail = getRail();
+    rail.helixMesh.material.color.set(color);
     rail.position.copy(start);
     rail.lookAt(end);
     rail.time = scene.elapsed;
     scene.add(rail);
 
-    const geometry = new BufferGeometry().setFromPoints( points );
+    const geometry = new BufferGeometry().setFromPoints( points ); // TODO cache line too.
     const line = new Line( geometry, lineMaterial );
     line.time = scene.elapsed;
     line.update = delayedRemove;
@@ -98,27 +99,23 @@ function shoot(scene, player) {
         return;
     player.game.audio.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
-    scene.add( getLine(scene, start, end) );
+    //console.log("player.color", player.color);
+    scene.add( getLine(scene, start, end, player.color) );
 
-    var dir = player.playerDirection;
+    // var dir = player.playerDirection;
     // webSocket.send({cmd: "rail", origin: {x: start.x, y: start.y, z: start.z}, dir: {x: dir.x, y: dir.y, z: dir.z}});
     webSocket.send({cmd: "rail", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
     const raycaster = new Raycaster(start, player.playerDirection);
     for( var enemy_id in enemies) {
-        // var char = scene.getObjectByName( "Character" );
         // TODO: check if we hit level first...
-        /**
-         * @Type {Enemy} enemy
-         */
         var enemy = enemies[enemy_id];
         if(raycaster.intersectObject(enemy.obj3d, true ).length > 0) {
-            //console.log(char);
-            enemy.obj3d.getWorldPosition(player.enemyPos);
-            player.enemyPos.y+=1.8;
+            enemy.obj3d.getWorldPosition(player.enemyPosTemp);
+            player.enemyPosTemp.y+=1.8;
 
-            webSocket.send({cmd: "hit", pos: {x: player.enemyPos.x, y: player.enemyPos.y, z: player.enemyPos.z}, id: enemy_id});
-            scene.add(explosion(scene, player.enemyPos, scene.elapsed));
+            webSocket.send({cmd: "hit", pos: {x: player.enemyPosTemp.x, y: player.enemyPosTemp.y, z: player.enemyPosTemp.z}, id: enemy_id});
+            scene.add(explosion(scene, player.enemyPosTemp, scene.elapsed));
 
             game.player.kills++;
             updateFragCounter();
