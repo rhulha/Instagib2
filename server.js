@@ -63,7 +63,7 @@ class Player {
     } else if (msg.cmd == "selfkill") {
       this.kills--;
     } else if (msg.cmd == "powerup") {
-      this.kills+=5;
+      this.kills+=3;
       broadcast(msg, this.ws);
     } else if (msg.cmd == "hit") {
       this.kills++;
@@ -100,7 +100,7 @@ function sendPlayerPositions() {
 }
 // TODO: clean up empty rooms over time.
 
-interval = setInterval(sendPlayerPositions, 16);
+interval = setInterval(sendPlayerPositions, 10);
 
 wss.on('connection', (ws, req) => {
   var { query: { name, room, color } } = (req.url.length > 512 ? {query:{name:'hacker', room:'hacker', color:'red'}}: url.parse(req.url, true));

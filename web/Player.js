@@ -78,7 +78,7 @@ class Player {
                 game.audio.powerup.play();
                 pu.hideStart=scene.elapsed;
                 pu.visible=false;
-                this.kills += 5;
+                this.kills += 3;
                 webSocket.send({cmd: "powerup", "name": pu.name});
                 updateFragCounter();
             }
