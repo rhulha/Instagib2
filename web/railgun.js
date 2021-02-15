@@ -7,7 +7,7 @@ import {enemies, Enemy} from './networking.js';
 import game from './setup.js';
 import { getRail } from './rail.js';
 import camera from './camera.js';
-import {updateFragCounter} from './hud.js';
+import {updateFragsCounter} from './hud.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
@@ -117,8 +117,8 @@ function shoot(scene, player) {
             webSocket.send({cmd: "hit", pos: {x: player.enemyPosTemp.x, y: player.enemyPosTemp.y, z: player.enemyPosTemp.z}, id: enemy_id});
             scene.add(explosion(scene, player.enemyPosTemp, scene.elapsed));
 
-            game.player.kills++;
-            updateFragCounter();
+            game.player.frags++;
+            updateFragsCounter();
             player.game.audio.gib.play();
         }
 

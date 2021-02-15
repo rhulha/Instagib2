@@ -1,8 +1,13 @@
 import game from './setup.js';
 
-function updateFragCounter()
+function updateFragsCounter()
 {
-    document.getElementById("kills").innerText = ""+ (game.player.kills) + " Kills";
+    document.getElementById("frags").innerText = ""+ (game.player.frags) + " frags";
 }
 
-export {updateFragCounter};
+function updateTopFragsCounter(playerWithMostFrags)
+{
+    document.getElementById("topfrags").innerText = "top score: "+ playerWithMostFrags.name + " " + playerWithMostFrags.frags;
+}
+
+export {updateFragsCounter, updateTopFragsCounter};

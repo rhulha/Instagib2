@@ -10,6 +10,7 @@ import {getLine, explosion} from './railgun.js';
 import game from './setup.js';
 import scene from './scene.js';
 import powerups from './powerups.js';
+import {updateTopFragsCounter} from './hud.js';
 
 /** @Type {Object.<string:Enemy>} */
 var enemies = {};
@@ -69,13 +70,13 @@ var packetCounter=0;
 webSocket.packet = function(msg) {
 	if(!soldierSingleton.ready)
 		return;
-	var playerWithMostKills;
+	var playerWithMostFrags;
 	if( msg.this_player_id && msg.players && msg.players.length && msg.players.length < 128 ) {
 		this_player_id = msg.this_player_id;
 		//console.log("this_player_id: ", this_player_id);
 		for( var player of msg.players) {
-			if( !playerWithMostKills || playerWithMostKills.kills <= player.kills)
-				playerWithMostKills = player;
+			if( !playerWithMostFrags || playerWithMostFrags.frags <= player.frags)
+				playerWithMostFrags = player;
 			if( player.id !== this_player_id) {
 				//console.log("enemies id: ", player.id);
 				if (!enemies[player.id]) {
@@ -110,9 +111,8 @@ webSocket.packet = function(msg) {
 		}
 		packetCounter++;
 		if(packetCounter%60==0) {
-			//console.log("setting topkills");
-			document.getElementById("topkills").innerText = "top score: "+ playerWithMostKills.name + " " + playerWithMostKills.kills;
-			packetCounter=MathUtils.randInt(2,7); // don't set topkills every frame and randomize it a bit.
+			updateTopFragsCounter(playerWithMostFrags);
+			packetCounter=MathUtils.randInt(2,7); // don't set topfrags every frame and randomize it a bit.
 		}
 	}
 }

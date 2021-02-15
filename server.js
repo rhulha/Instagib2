@@ -48,7 +48,7 @@ class Player {
     Object.defineProperty(this, 'room', {value: 'static', writable: true});
     this.room = room;
     this.color = color;
-    this.kills=0;
+    this.frags=0;
     Object.defineProperty(this, 'ws', {value: 'static', writable: true});
     this.ws = ws;
     this.x=0;
@@ -95,13 +95,13 @@ class Player {
         end: {x: randomEnmemy.x, y: randomEnmemy.y, z: randomEnmemy.z}, 
       };
       broadcast(msg, this.ws);  // TODO: harden data
-    } else if (msg.cmd == "selfkill") {
-      this.kills--;
+    } else if (msg.cmd == "fragself") {
+      this.frags--;
     } else if (msg.cmd == "powerup") {
-      this.kills+=3;
+      this.frags+=3;
       broadcast(msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "hit") {
-      this.kills++;
+      this.frags++;
       broadcast(msg, this.ws);  // TODO: harden data
     }
   }

@@ -12,7 +12,7 @@ import scene from './scene.js';
 import {keyStates, mouseStates, touchStates} from './input.js';
 import powerups from './powerups.js';
 import game from './setup.js';
-import {updateFragCounter} from './hud.js';
+import {updateFragsCounter} from './hud.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -45,18 +45,18 @@ class Player {
     constructor(game, color) {
         this.game = game;
         this.color = color;
-        this.kills=0;
+        this.frags=0;
         this.dead=false;
         this.worldOctree = game.worldOctree;
         this.triggerOctree = game.triggerOctree;
         this.respawn();
     }
 
-    selfKill() {
+    fragSelf() {
         this.game.audio.gib.play();
-        webSocket.send({cmd: "selfkill"});
-        this.kills--;
-        updateFragCounter();
+        webSocket.send({cmd: "fragself"});
+        this.frags--;
+        updateFragsCounter();
         this.respawn();
     }
     
@@ -79,15 +79,15 @@ class Player {
                 game.audio.powerup.play();
                 pu.hideStart=scene.elapsed;
                 pu.visible=false;
-                this.kills += 3;
+                this.frags += 3;
                 webSocket.send({cmd: "powerup", "name": pu.name});
-                updateFragCounter();
+                updateFragsCounter();
             }
         }
         //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
 
         if( this.playerCollider.end.y < -40) {
-            this.selfKill();
+            this.fragSelf();
             return;
         }
 
@@ -101,7 +101,7 @@ class Player {
                 this.game.audio.jumppad.play();
                 this.playerOnFloor=false;
             } else if( triggerResult.userData.classname == "trigger_hurt") {
-                selfKill();
+                fragSelf();
             } else if( triggerResult.userData.classname == "trigger_teleport") {
                 // there is only one misc_teleporter_dest for all teleporters.
                 // TODO: fix this for other maps
@@ -193,7 +193,7 @@ class Player {
         if ( keyStates[ 'KeyK' ] ) {
             if( ! this.game.audio.gib.paused)
                 return;
-            this.selfKill();
+            this.fragSelf();
             keyStates[ 'KeyK' ] = false;
         }
     }
