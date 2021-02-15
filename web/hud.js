@@ -10,4 +10,6 @@ function updateTopFragsCounter(playerWithMostFrags)
     document.getElementById("topfrags").innerText = "top score: "+ playerWithMostFrags.name + " " + playerWithMostFrags.frags;
 }
 
+//document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
+
 export {updateFragsCounter, updateTopFragsCounter};

@@ -29,16 +29,6 @@ class Player {
     aliveSince = 0;
     tempBox = new Box3();
     
-    getPos() {
-        var s=this.playerCollider.start;
-        return {x:s.x, y:s.y, z:s.z};
-    }
-
-    getRotation() {
-        var r=camera.rotation;
-        return {x:r.x, y:r.y};
-    }
-
     /**
      * @param {Game} game
      */
@@ -52,6 +42,16 @@ class Player {
         this.respawn();
     }
 
+    getPos() {
+        var s=this.playerCollider.start;
+        return {x:s.x, y:s.y, z:s.z};
+    }
+
+    getRotation() {
+        var r=camera.rotation;
+        return {x:r.x, y:r.y};
+    }
+
     fragSelf() {
         this.game.audio.gib.play();
         webSocket.send({cmd: "fragself"});
@@ -63,14 +63,11 @@ class Player {
     playerCollisions() {
         this.checkWorld();
         this.checkPowerups();
-        //document.getElementById("info").innerText = "playerOnFloor: "+ playerOnFloor;
-
+        this.checkTriggers();
         if( this.playerCollider.end.y < -40) {
             this.fragSelf();
             return;
         }
-
-        this.checkTriggers();
     }
 
     checkTriggers() {
