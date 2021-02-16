@@ -27,7 +27,9 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 app.get("/rooms", (request, response) => {
-  var sorted_rooms = Object.values(rooms).filter(e=>!e.private_&&e.players.length>0).sort((a,b)=>b.players.length-a.players.length).map(e=>{return {name:e.name, player:e.players.length}});
+  var sorted_rooms = Object.values(rooms).filter(r=>!r.private_ && r.players.length>0 && r.players.length<r.maxPlayers)
+                            .sort((a,b)=>b.players.length-a.players.length)
+                            .map(e=>{return {name:e.name, player:e.players.length}});
   response.json(sorted_rooms);
 });
 

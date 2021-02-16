@@ -60,13 +60,13 @@ class Game {
         var name = getParameterByName("name") || "Player";
         this.player = new Player(this, name, color);
         this.audio = {
-            railgun: new Audio('sounds/railgf1a.wav'),
-            railgun_enemy: new Audio('sounds/railgf1a.wav'),
-            jump: new Audio('sounds/sarge/jump1.wav'),
-            jumppad: new Audio('sounds/jumppad.wav'),
-            gib: new Audio('sounds/gibsplt1.wav'),
-            teleport: new Audio('sounds/telein.wav'),
-            powerup: new Audio('sounds/holdable.wav')
+            railgun: new Audio('sounds/railgf1a.mp3'),
+            railgun_enemy: new Audio('sounds/railgf1a.mp3'),
+            jump: new Audio('sounds/sarge/jump1.mp3'),
+            jumppad: new Audio('sounds/jumppad.mp3'),
+            gib: new Audio('sounds/gibsplt1.mp3'),
+            teleport: new Audio('sounds/telein.mp3'),
+            powerup: new Audio('sounds/holdable.mp3')
         }
         this.audio.railgun.volume=0.1;
         this.audio.railgun_enemy.volume=0.08;
@@ -111,7 +111,7 @@ class Game {
     loadMap(callback) {
         var startTime = Date.now()/1000;
         var loader = new GLTFLoader();
-        loader.load( './models/q3dm17.gltf', ( q3dm17 ) => {
+        loader.load( './models/q3dm17.glb', ( q3dm17 ) => {
             var endTime = Date.now()/1000;
             console.log("level was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
             startTime = Date.now()/1000;
