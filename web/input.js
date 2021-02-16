@@ -5,7 +5,8 @@ import { MathUtils} from './three/build/three.module.js';
 import { shoot } from './railgun.js';
 import camera from './camera.js';
 import game from './setup.js';
-import {sendCommand, enemies} from './networking.js';
+import {sendCommand} from './networking.js';
+import {displayScore, hideScore} from './hud.js';
 
 var keyStates = {};
 var touchStates = {};
@@ -57,37 +58,20 @@ document.addEventListener( 'mouseup', (e) => {
     }
 });
 
-function ac(type, father) {
-    return father.appendChild(document.createElement(type));
-}
-
-function addTableRow(t, name, frags) {
-    var tr = ac("tr", t);
-    var td_name = ac("td", tr);
-    var td_frags = ac("td", tr);
-    td_name.innerText = name;
-    td_frags.innerText = frags;
-}
 
 document.addEventListener( 'keydown', ( event ) => {
     if( event.repeat )
         return;
     keyStates[ event.code ] = true;
     if( event.code == "KeyQ") {
-        document.getElementById("score").style.visibility="visible";
-        var t = document.getElementById("score_table");
-        t.innerHTML = '';
-        addTableRow(t, "NAME", "FRAGS");
-        var array = Object.values(enemies);
-        array.push(game.player);
-        array.sort((a,b)=>a.frags-b.frags).forEach(e=>addTableRow(t, e.name, e.frags));
+        displayScore();
     }
 }, false );
 
 document.addEventListener( 'keyup', ( event ) => {
     keyStates[ event.code ] = false;
     if( event.code == "KeyQ") {
-        document.getElementById("score").style.visibility="hidden";
+        hideScore();
     }
 }, false );
 

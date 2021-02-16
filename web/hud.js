@@ -1,4 +1,5 @@
 import game from './setup.js';
+import {enemies} from './networking.js';
 
 function updateFragsCounter()
 {
@@ -15,4 +16,31 @@ function updateInfoText(text)
     document.getElementById("info").innerText = text;
 }
 
-export {updateInfoText, updateFragsCounter, updateTopFragsCounter};
+function ac(type, father) {
+    return father.appendChild(document.createElement(type));
+}
+
+function addTableRow(t, name, frags) {
+    var tr = ac("tr", t);
+    var td_name = ac("td", tr);
+    var td_frags = ac("td", tr);
+    td_name.innerText = name;
+    td_frags.innerText = frags;
+}
+
+function displayScore() {
+    document.getElementById("score").style.visibility="visible";
+    var t = document.getElementById("score_table");
+    t.innerHTML = '';
+    addTableRow(t, "NAME", "FRAGS");
+    var array = Object.values(enemies);
+    array.push(game.player);
+    array.sort((a,b)=>b.frags-a.frags).forEach(e=>addTableRow(t, e.name, e.frags));
+}
+
+function hideScore() {
+    document.getElementById("score").style.visibility="hidden";
+}
+
+
+export {updateInfoText, updateFragsCounter, updateTopFragsCounter, displayScore, hideScore, ac};
