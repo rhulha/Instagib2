@@ -97,7 +97,7 @@ class Player {
                     enemy.p.y += cameraHeight - playerRadius;
                     var dt = this.playerCollider.start.distanceTo(enemy.p);
                     if (dt < playerRadius * 2) {
-                        console.log("collision detected");
+                        //console.log("collision detected");
                         this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
                         this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
                     }
@@ -106,7 +106,7 @@ class Player {
                     // at this point the player head sphere center is below the enemy feet sphere center
                     var dt = this.playerCollider.end.distanceTo(enemy.p); // consider using dtSquared.
                     if (dt < playerRadius * 2) {
-                        console.log("collision detected");
+                        //console.log("collision detected");
                         this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
                         this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
                     }
@@ -117,7 +117,7 @@ class Player {
                     enemy.p.y = this.playerCollider.start.y;
                     var dt = this.playerCollider.start.distanceTo(enemy.p);
                     if (dt < playerRadius * 2) {
-                        console.log("collision detected");
+                        //console.log("collision detected");
                         this.tempVector.copy(this.playerCollider.start).sub(enemy.p).normalize(); // build a normal from enemy sphere to player sphere 
                         this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
                         this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));

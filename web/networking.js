@@ -85,29 +85,14 @@ webSocket.packet = function(msg) {
 					console.log("creating new enemy: ", player.id, player.name, player.color);
 					var e = new Enemy(player.id, player.name, player.color);
 					enemies[player.id] = e;
-					// e.soldier.glb is a GLTF object with animations, scenes and cameras.
-					// e.soldier.glb.isObject3D is undefined 
-					// e.soldier.glb.parent is undefined 
-					// console.log("e.soldier.glb", e.soldier.glb);
 					scene.add(e.obj3d)
 				}
 				var e = enemies[player.id];
-				var normalizedSpeed = 0;
 				player.y -= 0.35; // move model down a bit. Otherwise it looked like it was floating. Todo: Do this in a parent node instead...
-				if( e.p.y < player.y ) {
-					// player is flying upwards
-				} else {
-					e.p.y=player.y; // ignore movement in the up/down direction for the speed measurement.
-					var speed = e.p.distanceTo(player);
-					normalizedSpeed = MathUtils.clamp(speed/0.3, 0, 1);
-				}
-				//console.log(normalizedSpeed);
-				var w = e.actions[0].getEffectiveWeight();
-				w = damp(w, 1-w, 0.3, 16);
-				e.actions[0].setEffectiveWeight(1-w); // idle animation
-				e.actions[2].setEffectiveWeight(w); // run animation
+				e.actions[0].setEffectiveWeight(player.run?0:1); // idle animation
+				e.actions[2].setEffectiveWeight(player.run?1:0); // run animation
 				e.p.copy(player);
-				//e.r.x=player.rx;
+				//e.r.x=player.rx; // this can be used to lean the model. I don't like it.
 				e.r.z=player.ry; // we have to rotate the model around z because we rotated him upwards, because the model is lying on its back per default.
 				e.frags = player.frags;
 			}
@@ -181,7 +166,7 @@ function sendCommand(command) {
 
 function sendPlayerPositionToServer() {
 	if( webSocket.connection.readyState == 1) {
-		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation()});
+		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation(), run: game.player.playerOnFloor && (game.player.wishdir.lengthSq>0)});
 	}
 }
 

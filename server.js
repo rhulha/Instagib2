@@ -90,6 +90,7 @@ class Player {
     this.z=0;
     this.rx=0;
     this.ry=0;
+    this.run=false;
   }
 
   handleUpdate(msg) {
@@ -103,6 +104,7 @@ class Player {
       this.z = parseFloat(msg.pos.z);
       this.rx = parseFloat(msg.rot.x);
       this.ry = parseFloat(msg.rot.y);
+      this.run = (msg.run?true:false);
     } else if (msg.cmd == "rail") {
       msg.color = this.color;
       if( !msg.color || msg.color.length < 3)

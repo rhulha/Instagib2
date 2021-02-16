@@ -1,3 +1,6 @@
+// Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
+
 import game from './setup.js';
 import {enemies} from './networking.js';
 

@@ -37,6 +37,8 @@ class TestClient {
             var line = this.lines[this.lines_pos++ % this.lines.length];
             if (line === undefined)
                 return;
+            var pos = line.length-1;
+            line = line.substring(0, pos) + ',"run":true' + line.substring(pos);
             this.ws.send(line);
         }).bind(this), 16);
 
