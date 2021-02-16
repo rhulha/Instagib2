@@ -7,6 +7,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const crypto = require('crypto');
 const url = require('url');
+const basicAuth = require('express-basic-auth');
 
 const myFormat = winston.format.printf(({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`);
 
@@ -23,6 +24,12 @@ const logger = winston.createLogger({
 
 
 const app = express();
+
+app.use(basicAuth({
+  users: { q3dm17: 'q3dm17' },
+  challenge: true
+}));
+
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
