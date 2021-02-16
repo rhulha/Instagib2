@@ -114,6 +114,9 @@ class Game {
             var endTime = Date.now()/1000;
             console.log("level was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
             startTime = Date.now()/1000;
+            q3dm17.scene.children[0].name = "level";
+            q3dm17.scene.children[1].name = "levelBorders";
+            q3dm17.scene.children[2].name = "levelCollisionShape";
             this.modifyModel1(q3dm17.scene.children[0]);
             this.modifyModel2(q3dm17.scene.children[1]);
             scene.add( q3dm17.scene.children[0] ); // scene.add removes the mesh from q3dm17.scene
@@ -123,7 +126,7 @@ class Game {
             //update: shift not needed since this.scene.add removes the mesh from q3dm17.scene
             console.log("level was added in: " + (endTime-startTime).toFixed(2) + " seconds.")
             startTime = Date.now()/1000;
-            this.worldOctree.fromGraphNode( q3dm17.scene, false ); // q3dm17.scene is now the third child. Because scene.add above removed the others.
+            this.worldOctree.fromGraphNode( q3dm17.scene, false ); // q3dm17.scene is now only having the third child. Because scene.add above removed the others.
             endTime = Date.now()/1000;
             console.log("level was octreed in: " + (endTime-startTime).toFixed(2) + " seconds.")
             callback();

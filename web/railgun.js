@@ -106,7 +106,14 @@ function shoot(scene, player) {
     // webSocket.send({cmd: "rail", origin: {x: start.x, y: start.y, z: start.z}, dir: {x: dir.x, y: dir.y, z: dir.z}});
     webSocket.send({cmd: "rail", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
-    const raycaster = new Raycaster(start, player.playerDirection);
+    const raycaster = new Raycaster(start, player.playerDirection); // player.playerDirection is set by getLinePositionsFromPlayer above.
+    console.log( scene.getObjectByName("level") )
+    var result = raycaster.intersectObject(scene.getObjectByName("level"));
+    
+    if( result && result.length > 0 && result[0].distance < 3) {
+        game.player.playerVelocity.y = 27.2; // railjump :-)
+    }
+
     for( var enemy_id in enemies) {
         // TODO: check if we hit level first...
         var enemy = enemies[enemy_id];
