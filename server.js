@@ -170,7 +170,7 @@ wss.on('connection', (ws, req) => {
 app.use(express.static('web'));
 app.use(express.static('icons'));
 
-server.listen(8080, function() {
+server.listen(process.env.PORT || 8080, function() {
   console.log('Listening on %d', server.address().port);
 });
 
