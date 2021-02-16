@@ -31,10 +31,9 @@ function damp(source, target, smoothing, dt) {
  * @property {AnimationMixer} mixer
  */
 class Enemy {
-	constructor(id, name, room, color) {
+	constructor(id, name, color) {
 		this.id = id;
 		this.name = name.substring(0, 40).replace(/[^A-Za-z0-9]/g, '');
-		//this.room = room.substring(0, 80).replace(/[^A-Za-z0-9]/g, '');
 		if( color === undefined )
 			color = 'yellow';
 		this.color = color.substring(0, 30).replace(/[^A-Za-z0-9]/g, '');
@@ -91,7 +90,7 @@ webSocket.packet = function(msg) {
 				//console.log("enemies id: ", player.id);
 				if (!enemies[player.id]) {
 					console.log("creating new enemy: ", player.id, player.name, player.color);
-					var e = new Enemy(player.id, player.name, player.room, player.color);
+					var e = new Enemy(player.id, player.name, player.color);
 					enemies[player.id] = e;
 					// e.soldier.glb is a GLTF object with animations, scenes and cameras.
 					// e.soldier.glb.isObject3D is undefined 
@@ -121,6 +120,9 @@ webSocket.packet = function(msg) {
 		}
 		packetCounter++;
 		if(packetCounter%60==0) {
+			if( msg.room == "RoomIsFull") {
+				hud.updateInfoText("THE ROOM YOU HAVE CHOSEN IS ALREADY FULL, YOU ARE NOW IN A ROOM CALLED RoomIsFull INSTEAD!");
+			}
 			hud.updateTopFragsCounter(playerWithMostFrags);
 			packetCounter=MathUtils.randInt(2,7); // don't set topfrags every frame and randomize it a bit.
 		}

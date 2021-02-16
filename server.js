@@ -33,6 +33,10 @@ var rooms = {};
 class Room {
   constructor(name, private_) {
     this.name = name;
+    this.maxPlayers = 128;
+    if(name.slice(-1)>0)
+      this.maxPlayers=parseInt(name.slice(-1), 10);
+    logger.info("Room created with name and maxPlayers: " + name + ", " + this.maxPlayers);
     this.private_ = private_;
     this.players = [];
   }
@@ -60,7 +64,7 @@ class Player {
      throw "websocket missing";
     this.id = id;
     this.name = name;
-    Object.defineProperty(this, 'room', {value: 'static', writable: true});
+    Object.defineProperty(this, 'room', {value: 'static', writable: true}); // Don't send room to clients, since it is the Room object and it leads to a circular JSON.
     this.room = room;
     this.color = color;
     this.frags=0;
@@ -151,6 +155,7 @@ function sendPlayerPositions() {
         var packet = {
           cmd: "packet",
           this_player_id: player.id,
+          room: room_name,
           players: room.players
         }
         player.ws.send(JSON.stringify(packet));
@@ -174,6 +179,12 @@ wss.on('connection', (ws, req) => {
   logger.info('client connected', id, name, room, color);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
+  }
+  if(rooms[room].players.length >= rooms[room].maxPlayers) {
+    room="RoomIsFull";
+    if( !rooms[room] ) {
+      rooms[room] = new Room(room);
+    }
   }
   var player = new Player(id, (name?name:id), rooms[room], color, ws);
   rooms[room].players.push(player);
