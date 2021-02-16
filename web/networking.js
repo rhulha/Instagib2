@@ -10,7 +10,7 @@ import {getLine, explosion} from './railgun.js';
 import game from './setup.js';
 import scene from './scene.js';
 import powerups from './powerups.js';
-import {updateTopFragsCounter} from './hud.js';
+import * as hud from './hud.js';
 
 /** @Type {Object.<string:Enemy>} */
 var enemies = {};
@@ -121,7 +121,7 @@ webSocket.packet = function(msg) {
 		}
 		packetCounter++;
 		if(packetCounter%60==0) {
-			updateTopFragsCounter(playerWithMostFrags);
+			hud.updateTopFragsCounter(playerWithMostFrags);
 			packetCounter=MathUtils.randInt(2,7); // don't set topfrags every frame and randomize it a bit.
 		}
 	}
@@ -153,6 +153,7 @@ webSocket.disconnect = function(msg) {
 
 webSocket.hit = function(msg) {
 	if( msg.id == this_player_id) {
+		hud.updateInfoText("Fragged by " + enemies[msg.source_id].name);
 		game.player.respawn();
 		game.audio.gib.play();
 	} else {

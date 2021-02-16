@@ -95,6 +95,15 @@ class Player {
         end: {x: randomEnmemy.x, y: randomEnmemy.y, z: randomEnmemy.z}, 
       };
       broadcast(msg, this.ws);  // TODO: harden data
+
+      msg = {
+        cmd: "hit",
+        pos: {x: randomEnmemy.x, y: randomEnmemy.y, z: randomEnmemy.z}, 
+        id: randomEnmemy.id,
+        source_id: this.id
+      };
+      broadcast(msg, this.ws);  // TODO: harden data
+
     } else if (msg.cmd == "fragself") {
       this.frags--;
     } else if (msg.cmd == "powerup") {
@@ -102,6 +111,7 @@ class Player {
       broadcast(msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "hit") {
       this.frags++;
+      msg.source_id = this.id;
       broadcast(msg, this.ws);  // TODO: harden data
     }
   }

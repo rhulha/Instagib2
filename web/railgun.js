@@ -8,6 +8,7 @@ import game from './setup.js';
 import { getRail } from './rail.js';
 import camera from './camera.js';
 import {updateFragsCounter} from './hud.js';
+import * as hud from './hud.js';
 
 const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
@@ -107,7 +108,7 @@ function shoot(scene, player) {
     webSocket.send({cmd: "rail", start: {x: start.x, y: start.y, z: start.z}, end: {x: end.x, y: end.y, z: end.z}});
 
     const raycaster = new Raycaster(start, player.playerDirection); // player.playerDirection is set by getLinePositionsFromPlayer above.
-    console.log( scene.getObjectByName("level") )
+    //console.log( scene.getObjectByName("level") )
     var result = raycaster.intersectObject(scene.getObjectByName("level"));
     
     if( result && result.length > 0 && result[0].distance < 3) {
@@ -116,6 +117,7 @@ function shoot(scene, player) {
 
     for( var enemy_id in enemies) {
         // TODO: check if we hit level first...
+        /** @type {Enemy} */
         var enemy = enemies[enemy_id];
         if(raycaster.intersectObject(enemy.obj3d, true ).length > 0) {
             enemy.obj3d.getWorldPosition(player.enemyPosTemp);
@@ -123,6 +125,8 @@ function shoot(scene, player) {
 
             webSocket.send({cmd: "hit", pos: {x: player.enemyPosTemp.x, y: player.enemyPosTemp.y, z: player.enemyPosTemp.z}, id: enemy_id});
             scene.add(explosion(scene, player.enemyPosTemp, scene.elapsed));
+
+            hud.updateInfoText("You fragged " + enemy.name)
 
             game.player.frags++;
             updateFragsCounter();
