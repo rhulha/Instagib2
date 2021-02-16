@@ -144,15 +144,17 @@ webSocket.newCon = function(msg) {
 }
 
 webSocket.disconnect = function(msg) {
-	console.log(msg);
+	console.log("disconnected: ", msg.id);
 	var e = enemies[msg.id];
-	if( e === undefined )
+	if( e === undefined ) {
 		console.log("enemy could not be found.")
-	e.mixer.stopAllAction();
-	if( scene.children.indexOf( e.obj3d ) == -1 )
-		console.log("disconnected player model could not be found in scene.")
-	scene.remove(e.obj3d); // TODO: clean up animations and geometry ?
-	delete enemies[msg.id];
+	} else {
+		e.mixer.stopAllAction();
+		if( scene.children.indexOf( e.obj3d ) == -1 )
+			console.log("disconnected player model could not be found in scene.")
+		scene.remove(e.obj3d); // TODO: clean up animations and geometry ?
+		delete enemies[msg.id];
+	}
 }
 
 webSocket.hit = function(msg) {

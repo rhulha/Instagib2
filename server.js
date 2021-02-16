@@ -185,10 +185,12 @@ wss.on('connection', (ws, req) => {
   var id = crypto.randomBytes(6).toString('hex');
   name = name.replace(/[^A-Za-z0-9]/g, '');
   room = room.replace(/[^A-Za-z0-9]/g, '');
-  if(!color)
+  if(!color || color.length < 3)
     color = "yellow";
   else
     color = color.replace(/[^A-Za-z0-9]/g, '');
+  if(!room || room.length < 1)
+    room = "TheLongestYard";
   logger.info('client connected' + id +", " + name + ", " + room + ", " + color);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
