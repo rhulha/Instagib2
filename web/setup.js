@@ -57,6 +57,8 @@ class Game {
 
         this.worldOctree = new CustomOctree();
         var color = getParameterByName("color") || "yellow";
+        if(color && color.startsWith("#"))
+            color=color.split("#")[1];
         var name = getParameterByName("name") || "Player";
         this.player = new Player(this, name, color);
         this.audio = {
