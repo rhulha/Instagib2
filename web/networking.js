@@ -1,7 +1,7 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import {Vector3, MathUtils} from './three/build/three.module.js';
+import {Vector3, MathUtils, Color} from './three/build/three.module.js';
 import {AnimationMixer} from './three/build/three.module.js';
 import {soldierSingleton} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
@@ -42,7 +42,10 @@ class Enemy {
 		this.obj3d.traverse( ( obj ) => {
 			if ( obj.isMesh ) {
 			  obj.material = obj.material.clone();
-			  obj.material.color.set(this.color);
+			  if( Color.NAMES[this.color])
+			  	obj.material.color.set(this.color);
+			  else
+			    obj.material.color.set(parseInt(this.color,16));
 			  obj.material.color.offsetHSL(0,0,0.1); // make the skins a bit brighter
 			}
 		});
@@ -50,19 +53,8 @@ class Enemy {
 		this.r = this.obj3d.rotation;
 		this.r.x=-Math.PI/2;
 		this.r.y=0;
-		//this.r.z=Math.PI;
 		this.r.order = 'YXZ'
-		/*this.soldier.traverse((obj) => {
-			if (obj.type === 'Object3D') {
-				obj.scale.set(0.017, 0.017, 0.017);
-				obj.updateMatrix();
-				console.log("scale");
-			}
-		});*/
-		//this.soldier.scale.set(0.017, 0.017, 0.017);
-		//this.soldier.updateMatrix();
 		this.mixer = new AnimationMixer( this.obj3d );
-		//this.mixer.timeScale = 1;
 		var idleAction = this.mixer.clipAction( soldierSingleton.glb.animations[ 0 ] );
 		var walkAction = this.mixer.clipAction( soldierSingleton.glb.animations[ 3 ] );
 		var runAction = this.mixer.clipAction( soldierSingleton.glb.animations[ 1 ] );
@@ -116,7 +108,7 @@ webSocket.packet = function(msg) {
 				e.actions[2].setEffectiveWeight(w); // run animation
 				e.p.copy(player);
 				//e.r.x=player.rx;
-				e.r.z=player.ry;
+				e.r.z=player.ry; // we have to rotate the model around z because we rotated him upwards, because the model is lying on its back per default.
 				e.frags = player.frags;
 			}
 		}

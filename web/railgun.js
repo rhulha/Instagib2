@@ -1,7 +1,7 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, LineBasicMaterial, TextureLoader, Raycaster, Line } from './three/build/three.module.js';
+import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, LineBasicMaterial, TextureLoader, Raycaster, Line, Color } from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies, Enemy} from './networking.js';
 import game from './setup.js';
@@ -72,7 +72,10 @@ function getLine(scene, start, end, color) {
     points.push( end );
 
     var rail = getRail();
-    rail.helixMesh.material.color.set(color);
+    if( Color.NAMES[color])
+        rail.helixMesh.material.color.set(color);
+    else
+        rail.helixMesh.material.color.set(parseInt(color,16));
     rail.position.copy(start);
     rail.lookAt(end);
     rail.time = scene.elapsed;
