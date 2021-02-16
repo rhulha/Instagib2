@@ -24,6 +24,7 @@ function damp(source, target, smoothing, dt) {
  * @class Enemy
  * @property {string} id
  * @property {string} name
+ * @property {number} frags
  * @property {string} color
  * @property {Object3D} objt3d
  * @property {Vector3} p
@@ -116,6 +117,7 @@ webSocket.packet = function(msg) {
 				e.p.copy(player);
 				//e.r.x=player.rx;
 				e.r.z=player.ry;
+				e.frags = player.frags;
 			}
 		}
 		packetCounter++;

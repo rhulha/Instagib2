@@ -56,8 +56,9 @@ class Game {
         console.log("triggerOctree was loaded in: " + (endTime-startTime).toFixed(2) + " seconds.")
 
         this.worldOctree = new CustomOctree();
-        var color = getParameterByName("color");
-        this.player = new Player(this, color || "yellow");
+        var color = getParameterByName("color") || "yellow";
+        var name = getParameterByName("name") || "Player";
+        this.player = new Player(this, name, color);
         this.audio = {
             railgun: new Audio('sounds/railgf1a.wav'),
             railgun_enemy: new Audio('sounds/railgf1a.wav'),

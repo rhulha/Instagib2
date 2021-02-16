@@ -37,8 +37,9 @@ class Player {
     /**
      * @param {Game} game
      */
-    constructor(game, color) {
+    constructor(game, name, color) {
         this.game = game;
+        this.name = name;
         this.color = color;
         this.frags=0;
         this.dead=false;
