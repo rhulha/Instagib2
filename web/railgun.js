@@ -1,16 +1,15 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, LineBasicMaterial, TextureLoader, Raycaster, Line, Color } from './three/build/three.module.js';
+import { Vector3, Points, PointsMaterial, BufferGeometry, Float32BufferAttribute, TextureLoader, Raycaster } from './three/build/three.module.js';
 import webSocket from './lib/webSocket.js';
 import {enemies, Enemy} from './networking.js';
 import game from './setup.js';
-import { getRail } from './rail.js';
+import { addRailToScene } from './rail.js';
 import camera from './camera.js';
 import {updateFragsCounter} from './hud.js';
 import * as hud from './hud.js';
 
-const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 10 } );
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
@@ -56,38 +55,6 @@ function explosion(scene, pos, elapsedTime)
     return particles;
 }
 
-function delayedRemove(scene, delta, elapsed) {
-    if(this.time + 1.5 < elapsed) {
-        if(!scene.remove_me)
-            scene.remove_me=[];
-        scene.remove_me.push(this);
-    }
-}
-
-
-
-function getLine(scene, start, end, color) {
-    const points = [];
-    points.push( start );
-    points.push( end );
-
-    var rail = getRail();
-    if( Color.NAMES[color])
-        rail.helixMesh.material.color.set(color);
-    else
-        rail.helixMesh.material.color.set(parseInt(color,16));
-    rail.position.copy(start);
-    rail.lookAt(end);
-    rail.time = scene.elapsed;
-    scene.add(rail);
-
-    const geometry = new BufferGeometry().setFromPoints( points ); // TODO cache line too.
-    const line = new Line( geometry, lineMaterial );
-    line.time = scene.elapsed;
-    line.update = delayedRemove;
-    return line;
-}
-
 function getLinePositionsFromPlayer(player) {
     var start = new Vector3();
     var end = new Vector3();
@@ -104,7 +71,7 @@ function shoot(scene, player) {
     player.game.audio.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     //console.log("player.color", player.color);
-    scene.add( getLine(scene, start, end, player.color) );
+    addRailToScene(scene, start, end, player.color);
 
     // var dir = player.playerDirection;
     // webSocket.send({cmd: "rail", origin: {x: start.x, y: start.y, z: start.z}, dir: {x: dir.x, y: dir.y, z: dir.z}});
@@ -139,5 +106,5 @@ function shoot(scene, player) {
     }
 }
 
-export {shoot, explosion, getLine};
+export {shoot, explosion, addRailToScene};
 

@@ -1,12 +1,13 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import {Vector3, MathUtils, Color} from './three/build/three.module.js';
+import {MathUtils, Color} from './three/build/three.module.js';
 import {AnimationMixer} from './three/build/three.module.js';
 import {soldierSingleton} from './soldier.js';
 import {SkeletonUtils} from './three/examples/jsm/utils/SkeletonUtils.js';
 import webSocket from './lib/webSocket.js';
-import {getLine, explosion} from './railgun.js';
+import {explosion} from './railgun.js';
+import { addRailToScene } from './rail.js';
 import game from './setup.js';
 import scene from './scene.js';
 import powerups from './powerups.js';
@@ -109,10 +110,8 @@ webSocket.packet = function(msg) {
 }
 
 webSocket.rail = function(msg) {
-	var start = new Vector3().copy(msg.start);
-	var end = new Vector3().copy(msg.end);
-	//console.log("msg.color", msg.color);
-	scene.add(getLine(scene, start, end, msg.color)); // TODO: it looks like getLine does not alter start and end.
+	//console.log("rail", msg);
+	addRailToScene(scene, msg.start, msg.end, msg.color);
 	game.audio.railgun_enemy.play();
 }
 

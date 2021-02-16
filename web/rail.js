@@ -1,14 +1,16 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
-import { Vector3, MeshBasicMaterial, TubeGeometry, Curve, Mesh, Object3D } from './three/build/three.module.js';
+import { Vector3, LineBasicMaterial, MeshBasicMaterial, TubeGeometry, Curve, Mesh, Object3D, Line, BufferGeometry, Color } from './three/build/three.module.js';
+
+const railLength = 125;
 
 class HelixCurve extends Curve {
     constructor() {super();}
     getPoint(t, optionalTarget ) {
         var point = optionalTarget || new Vector3();
         var a = 0.2; // radius
-        var b = 125; // length
+        var b = railLength; // length
         var t2 = 2 * Math.PI * t * b / 3;
         var x = Math.cos( t2 ) * a;
         var y = Math.sin( t2 ) * a;
@@ -19,44 +21,52 @@ class HelixCurve extends Curve {
 
 var helix = new HelixCurve();
 var helixGeometry = new TubeGeometry( helix, 300, 0.1, 12, false );
+const points = [];
+points.push( new Vector3(0,0,0) );
+points.push( new Vector3(0,0,railLength) );
+const lineGeometry = new BufferGeometry().setFromPoints( points );
 
 class Rail extends Object3D {
     constructor(){
         super();
+        //console.log("created new Rail");
         var helixMaterial = new MeshBasicMaterial( { color: 0x0000dd, opacity: 0.5, transparent: true } );
         var helixMesh = new Mesh( helixGeometry, helixMaterial );
         helixMesh.rotation.z += Math.PI + 0.7;
         this.add(helixMesh);
         this.helixMesh = helixMesh;
+        const lineMaterial = new LineBasicMaterial( { color: 0x0000ff, linewidth: 2 } ); // linewidth is happily ignored by WebGL...
+        const line = new Line( lineGeometry, lineMaterial );
+        this.add(line);
+        this.line = line;
         this.update = delayedRemove;
     }
 }
 
-var cache = [];
-
-function getRail() {
-    if( cache.length>0) {
-        //console.log("rail from cache");
-        return cache.pop();
-    } else {
-        //console.log("new rail");
-        return new Rail();
-    }
-}
-
-function returnRail(rail) {
-    //console.log("rail returned");
-    cache.push(rail);
-}
+const railCache = [];
 
 function delayedRemove(scene, delta, elapsed) {
     if(this.time + 1.5 < elapsed) {
         if(!scene.remove_me)
             scene.remove_me=[];
         scene.remove_me.push(this);
-        returnRail(this);
+        railCache.push(this);
     }
 }
 
-export {getRail, returnRail}
+function addRailToScene(scene, start, end, color) {
+    var rail = railCache.length>0?railCache.pop():new Rail();
+    rail.helixMesh.material.color.set(Color.NAMES[color]?color:parseInt(color,16));
+    rail.line.material.color.copy(rail.helixMesh.material.color);
+    var temp = rail.line.material.color.r;
+    rail.line.material.color.r=rail.line.material.color.g;
+    rail.line.material.color.g=rail.line.material.color.b;
+    rail.line.material.color.b=temp; // shift the colors around a bit to add some eye candy.
+    rail.position.copy(start);
+    rail.lookAt(end.x, end.y, end.z);
+    rail.time = scene.elapsed;
+    scene.add(rail);
+}
+
+export {addRailToScene}
 
