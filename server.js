@@ -145,7 +145,7 @@ function sendPlayerPositions() {
 }
 // TODO: clean up empty rooms over time.
 
-interval = setInterval(sendPlayerPositions, 10);
+interval = setInterval(sendPlayerPositions, 16);
 
 wss.on('connection', (ws, req) => {
   var { query: { name, room, color } } = (req.url.length > 512 ? {query:{name:'hacker', room:'hacker', color:'red'}}: url.parse(req.url, true));
