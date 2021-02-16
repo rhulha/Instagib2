@@ -43,9 +43,17 @@ class Room {
 }
 
 function broadcast(msg, skipClientWS) {
-  wss.clients.forEach(function each(client) {
+  wss.clients.forEach((client) => {
     if (client !== skipClientWS && client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify(msg));
+    }
+  });
+}
+
+function broadcastRoom(room, msg, skipClientWS) {
+  room.players.forEach((player) => {
+    if (player.ws !== skipClientWS && player.ws.readyState === WebSocket.OPEN) {
+      player.ws.send(JSON.stringify(msg));
     }
   });
 }
@@ -92,7 +100,7 @@ class Player {
       msg.color = this.color;
       if( !msg.color || msg.color.length < 3)
         logger.error("ERROR: COLOR MISSING!!!", this.id, this.name, this.room);
-      broadcast(msg, this.ws);  // TODO: harden data
+      broadcastRoom(this.room, msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "rail_random") {
       msg.color = this.color;
       var randomEnmemy;
@@ -113,7 +121,7 @@ class Player {
         start: {x: this.x, y: this.y, z: this.z}, 
         end: {x: randomEnmemy.x, y: randomEnmemy.y, z: randomEnmemy.z}, 
       };
-      broadcast(msg, this.ws);  // TODO: harden data
+      broadcastRoom(this.room, msg, this.ws);  // TODO: harden data
 
       msg = {
         cmd: "hit",
@@ -121,17 +129,17 @@ class Player {
         id: randomEnmemy.id,
         source_id: this.id
       };
-      broadcast(msg, this.ws);  // TODO: harden data
+      broadcastRoom(this.room, msg, this.ws);  // TODO: harden data
 
     } else if (msg.cmd == "fragself") {
       this.frags--;
     } else if (msg.cmd == "powerup") {
       this.frags+=3;
-      broadcast(msg, this.ws);  // TODO: harden data
+      broadcastRoom(this.room, msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "hit") {
       this.frags++;
       msg.source_id = this.id;
-      broadcast(msg, this.ws);  // TODO: harden data
+      broadcastRoom(this.room, msg, this.ws);  // TODO: harden data
     }
   }
 
@@ -176,7 +184,7 @@ wss.on('connection', (ws, req) => {
     color = "yellow";
   else
     color = color.replace(/[^A-Za-z0-9]/g, '');
-  logger.info('client connected', id, name, room, color);
+  logger.info('client connected' + id +", " + name + ", " + room + ", " + color);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
   }
