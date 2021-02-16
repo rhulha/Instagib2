@@ -1,11 +1,26 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
 // https://github.com/rhulha/Instagib2
 
+const winston = require('winston');
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const crypto = require('crypto');
 const url = require('url');
+
+const myFormat = winston.format.printf(({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`);
+
+const transports = {
+  console: new winston.transports.Console({ level: 'info' }),
+  file: new winston.transports.File({ filename: 'stdout.log' })
+};
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(winston.format.timestamp(), myFormat),
+  transports: [transports.console, transports.file]
+});
+
 
 const app = express();
 const server = http.createServer(app);
@@ -72,7 +87,7 @@ class Player {
     } else if (msg.cmd == "rail") {
       msg.color = this.color;
       if( !msg.color || msg.color.length < 3)
-        console.log("ERROR: COLOR MISSING!!!", this.id, this.name, this.room);
+        logger.error("ERROR: COLOR MISSING!!!", this.id, this.name, this.room);
       broadcast(msg, this.ws);  // TODO: harden data
     } else if (msg.cmd == "rail_random") {
       msg.color = this.color;
@@ -85,7 +100,7 @@ class Player {
           break;
       }
       if( randomEnmemy.id == this.id) {
-        console.log("did not find a randomEnmemy", this.id);
+        logger.info("did not find a randomEnmemy", this.id);
         return;
       }
       msg = {
@@ -117,7 +132,7 @@ class Player {
   }
 
   handleDisconnect() {
-    console.log("player disconnected: ", this.name, this.room.name, this.id)
+    logger.info("player disconnected: ", this.name, this.room.name, this.id)
     broadcast({cmd:"disconnect", id: this.id}, this.ws);
     var index = this.room.players.indexOf(this);
     if (index > -1) {
@@ -156,7 +171,7 @@ wss.on('connection', (ws, req) => {
     color = "yellow";
   else
     color = color.replace(/[^A-Za-z0-9]/g, '');
-  console.log('client connected', id, name, room, color);
+  logger.info('client connected', id, name, room, color);
   if( !rooms[room] ) {
     rooms[room] = new Room(room);
   }
@@ -171,11 +186,11 @@ app.use(express.static('web'));
 app.use(express.static('icons'));
 
 server.listen(process.env.PORT || 8080, function() {
-  console.log('Listening on %d', server.address().port);
+  logger.info('Listening on ' + server.address().port);
 });
 
 process.on('SIGINT', function() {
-  console.log('closing.');
+  logger.info('closing.');
   try {
     clearInterval(interval);
   } catch (error) {}
