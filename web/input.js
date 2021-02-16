@@ -16,11 +16,21 @@ window.sensitivity = (val) => {
     console.log("old sensitivity: " + mouseStates.sensitivity);
     if( val > 0 || val < 0 )
         mouseStates.sensitivity = val;
+    return "done";
+}
+
+window.fov = (val) => {
+    console.log("old fov: " + camera.fov);
+    if( val > 0 || val < 0 ) {
+        camera.fov = val;
+        camera.updateProjectionMatrix();
+    }
+    return "done";
 }
 
 document.body.addEventListener( 'mousemove', ( event ) => {
     if ( document.pointerLockElement === document.body ) {
-        camera.rotation.y -= event.movementX / mouseStates.sensitivity;
+        camera.rotation.y -= event.movementX / Math.abs(mouseStates.sensitivity);
         camera.rotation.x -= event.movementY / mouseStates.sensitivity;
         camera.rotation.x = MathUtils.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
     }

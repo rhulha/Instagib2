@@ -13,21 +13,26 @@ import {keyStates, mouseStates, touchStates} from './input.js';
 import powerups from './powerups.js';
 import game from './setup.js';
 import {updateFragsCounter} from './hud.js';
+import { enemies, Enemy } from "./networking.js";
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
+const playerHeight = 3.53; // a bit crazy? Shouldn't it be 2.13 from Quake3?
+const playerRadius = 0.7;
+const cameraHeight = playerHeight-playerRadius;
 
 class Player {
 
-    playerCollider = new Capsule( new Vector3( 0, 0.7, 0 ), new Vector3( 0, 2.13+0.7, 0 ), 0.7 );
+    playerCollider = new Capsule( new Vector3( 0, playerRadius, 0 ), new Vector3( 0, cameraHeight, 0 ), playerRadius );
     playerVelocity = new Vector3();
     enemyPosTemp = new Vector3();
-    wishdir = new Vector3(); // Quake
+    wishdir = new Vector3();
     wishJump=false;
     playerDirection = new Vector3();
     playerOnFloor = false;
     aliveSince = 0;
     tempBox = new Box3();
+    tempVector = new Vector3();
     
     /**
      * @param {Game} game
@@ -62,11 +67,63 @@ class Player {
     
     playerCollisions() {
         this.checkWorld();
+        this.checkPlayerPlayerCollisions();
         this.checkPowerups();
         this.checkTriggers();
         if( this.playerCollider.end.y < -40) {
             this.fragSelf();
             return;
+        }
+    }
+
+    checkPlayerPlayerCollisions() {
+        for (var enemy_id in enemies) {
+            /** @type {Enemy} */
+            const enemy = enemies[enemy_id];
+            const bottom = this.playerCollider.start.y - playerRadius;
+            const top = this.playerCollider.end.y + playerRadius;
+            // this.playerCollider.start - playerRadius is the location of our feet
+            // enemy.p - playerRadius is the location of the enemy feet (lowest point)
+            // enemy.p + playerHeight is the location of the enemy head (highest point)
+            if (bottom < enemy.p.y + playerHeight // the player feet are below the enemy tip of the head
+                && top > enemy.p.y - playerRadius) // and the player tip of the head is above the enemy feet
+            {
+                // at this point we have a potential collision since the player and the enemy are at the same height.
+                // cameraHeight-playerRadius is the distance between the two points that make up the playerCollider capsule.
+                if (this.playerCollider.start.y > enemy.p.y + cameraHeight - playerRadius) {
+                    // at this point the player feet sphere center is above the enemy head sphere center
+                    // remember that enemy.p is not a real Vector3
+                    enemy.p.y += cameraHeight - playerRadius;
+                    var dt = this.playerCollider.start.distanceTo(enemy.p);
+                    if (dt < playerRadius * 2) {
+                        console.log("collision detected");
+                        this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
+                        this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
+                    }
+                    enemy.p.y -= cameraHeight - playerRadius;
+                } else if (this.playerCollider.end.y < enemy.p.y) {
+                    // at this point the player head sphere center is below the enemy feet sphere center
+                    var dt = this.playerCollider.end.distanceTo(enemy.p); // consider using dtSquared.
+                    if (dt < playerRadius * 2) {
+                        console.log("collision detected");
+                        this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
+                        this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
+                    }
+                } else {
+                    // at this point we can do a simple cylinder collision check.
+                    // In other words we can check the distance between two spheres at the same height.
+                    var temp = enemy.p.y;
+                    enemy.p.y = this.playerCollider.start.y;
+                    var dt = this.playerCollider.start.distanceTo(enemy.p);
+                    if (dt < playerRadius * 2) {
+                        console.log("collision detected");
+                        this.tempVector.copy(this.playerCollider.start).sub(enemy.p).normalize(); // build a normal from enemy sphere to player sphere 
+                        this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
+                        this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
+                    }
+                    enemy.p.y = temp;
+                }
+            }
         }
     }
 

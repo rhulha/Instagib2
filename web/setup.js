@@ -82,7 +82,7 @@ class Game {
                 //child.geometry.computeVertexNormals();
                 child.material.metalness = 0;
                 child.material.color.setHex( 0x009DFF );
-                console.log(child.material.vertexColors)
+                // console.log(child.material.vertexColors) // is true
                 //child.material = new MeshBasicMaterial({vertexColors: true});
                 //child.castShadow = true;
                 //child.receiveShadow = true;
