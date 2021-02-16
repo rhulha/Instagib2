@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "express-basic-auth": "1.2.0",
     "ws": "^6.2.1",
     "winston": "3.3.3"
   },
