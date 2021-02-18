@@ -87,7 +87,6 @@ function checkTriggers(player) {
 }
 
 function checkWorld(player) {
-    player=player;
     const result = player.worldOctree.capsuleIntersect(player.playerCollider);
     player.playerOnFloor = false;
     if (result) {
@@ -100,7 +99,6 @@ function checkWorld(player) {
 }
 
 function checkPowerups(player) {
-    player=player;
     for (var pu_name in powerups) {
         var pu = powerups[pu_name];
         //pu.updateMatrixWorld( true );
