@@ -75,6 +75,7 @@ class Game {
         this.audio.jump.volume=0.2;
         this.audio.jumppad.volume=0.5;
         this.audio.gib.volume=0.3;
+        //this.audio.gib.playbackRate=0.8;
         this.audio.teleport.volume=0.4;
         this.audio.powerup.volume=0.3;
     }

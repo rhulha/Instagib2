@@ -81,7 +81,7 @@ function checkTriggers(player) {
             // there is only one misc_teleporter_dest for all teleporters in q3dm17.
             player.game.audio.teleport.play();
             var dest = q3dm17.misc_teleporter_dest[0]; // TODO: fix this for other maps
-            player.spawn(mtd.origin, dest.angle);
+            player.spawn(dest.origin, dest.angle);
         }
     }
 }

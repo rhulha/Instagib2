@@ -152,6 +152,10 @@ class Player {
     } else if (msg.cmd == "powerup") {
       this.frags+=3;
       broadcastRoom(this.room, msg, this.ws);  // TODO: harden data
+    } else if (msg.cmd == "respawn") {
+      msg = {cmd:"respawn"};
+      msg.id = this.id;
+      broadcastRoom(this.room, msg, this.ws);
     } else if (msg.cmd == "hit") {
       this.frags++;
       msg.source_id = this.id;

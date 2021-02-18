@@ -5,7 +5,7 @@ import { Box3, Vector3 } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
 import q3dm17 from './models/q3dm17.js';
 import { shoot } from './railgun.js';
-import webSocket from './lib/webSocket.js';
+import {sendCommand} from './networking.js';
 import camera from './camera.js';
 import scene from './scene.js';
 import {keyStates, mouseStates, touchStates} from './input.js';
@@ -39,6 +39,7 @@ class Player {
         this.color = color;
         this.frags=0;
         this.dead=false;
+        this.timeOfDeath=0;
         this.worldOctree = game.worldOctree;
         this.triggerOctree = game.triggerOctree;
         this.respawn();
@@ -56,7 +57,7 @@ class Player {
 
     fragSelf() {
         this.game.audio.gib.play();
-        webSocket.send({cmd: "fragself"});
+        sendCommand("fragself");
         this.frags--;
         updateFragsCounter();
         this.respawn();
@@ -113,7 +114,12 @@ class Player {
         const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
         this.playerCollider.translate( deltaPosition );
         this.playerCollisions();
-        camera.position.copy( this.playerCollider.end );
+        if(this.dead){
+            this.tempVector.copy(this.playerCollider.end).lerp(this.playerCollider.start, Math.min(scene.elapsed - this.timeOfDeath, 1)); // slowly move camera down on death.
+            camera.position.copy( this.tempVector );
+        } else {
+            camera.position.copy( this.playerCollider.end );
+        }
     }
 
     getPlayerRelativeVector(side) {
@@ -128,9 +134,22 @@ class Player {
     controls( deltaTime ) {
         this.wishdir.set(0,0,0);
 
-        if (mouseStates[0])
-            shoot(scene, this);
-        
+        if (mouseStates[0]) {
+            if(this.dead) {
+                this.dead = false;
+                sendCommand("respawn");
+                this.game.audio.teleport.play();
+                this.respawn();
+                mouseStates[0]=false;
+                return;
+            } else {
+                shoot(scene, this);
+            }
+        }
+
+        if(this.dead)
+            return;
+    
         if( touchStates.rotate )
             camera.rotation.y -= (touchStates.pageX - touchStates.pageXStart) * 0.01 * deltaTime;
 

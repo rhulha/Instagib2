@@ -25,9 +25,13 @@ class TestClient {
         this.ws = new WebSocket(url);
         this.ws.sendObjAsJSON=function(obj){this.send(JSON.stringify(obj))};
         this.ws.on('open', this.setupComms.bind(this) );
-        this.ws.on('message', function incoming(data) {
-            //console.log(data);
-        });
+        this.ws.on('message', (function(msg) {
+            msg = JSON.parse(msg);
+            if (msg.cmd == "hit") {
+                this.dead=true;
+                console.log(this.name + " is dead.")
+            }
+        }).bind(this));
     }
 
     setupComms() {
@@ -43,7 +47,13 @@ class TestClient {
         }).bind(this), 16);
 
         this.ivshoot = setInterval((() => {
-            this.ws.sendObjAsJSON({cmd:"rail_random"});
+            if( this.dead ) {
+                this.dead=false;
+                console.log(this.name + " is respawning.")
+                this.ws.sendObjAsJSON({cmd:"respawn"});
+            } else {
+                this.ws.sendObjAsJSON({cmd:"rail_random"});
+            }
         }).bind(this), 4000+Math.floor(Math.random() * 8000) + 1 );
     }
 

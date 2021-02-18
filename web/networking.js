@@ -115,10 +115,6 @@ webSocket.rail = function(msg) {
 	game.audio.railgun_enemy.play();
 }
 
-webSocket.newCon = function(msg) {
-	console.log(msg);
-}
-
 webSocket.disconnect = function(msg) {
 	console.log("disconnected: ", msg.id);
 	var e = enemies[msg.id];
@@ -133,12 +129,22 @@ webSocket.disconnect = function(msg) {
 	}
 }
 
+webSocket.respawn = function(msg) {
+	if( msg.id != this_player_id) {
+		if( !enemies[msg.id] )
+			return;
+		enemies[msg.id].obj3d.visible=true;
+	}
+}
+
 webSocket.hit = function(msg) {
 	if( msg.id == this_player_id) {
 		hud.updateInfoText("Fragged by " + enemies[msg.source_id].name);
-		game.player.respawn();
+		game.player.dead=true;
+		game.player.timeOfDeath=scene.elapsed;
 		game.audio.gib.play();
 	} else {
+		enemies[msg.id].obj3d.visible=false;
 		var old = game.audio.gib.volume;
 		game.audio.gib.volume = 0.1;
 		game.audio.gib.play();
@@ -160,7 +166,10 @@ webSocket.powerup = function(msg) {
 }
 
 function sendCommand(command) {
-	webSocket.send({cmd: command});
+	if (typeof command === 'string' || command instanceof String)
+		webSocket.send({cmd: command});
+	else
+		webSocket.send(command);
 }
 
 function sendPlayerPositionToServer() {

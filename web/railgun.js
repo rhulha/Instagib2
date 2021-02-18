@@ -89,10 +89,14 @@ function shoot(scene, player) {
         // TODO: check if we hit level first...
         /** @type {Enemy} */
         var enemy = enemies[enemy_id];
+        if( !enemy.obj3d.visible )
+            continue;
+
         if(raycaster.intersectObject(enemy.obj3d, true ).length > 0) {
             enemy.obj3d.getWorldPosition(player.enemyPosTemp);
-            player.enemyPosTemp.y+=1.8;
+            player.enemyPosTemp.y+=1.8; // make the explosion a bit higher than the enemy player feet position.
 
+            enemy.obj3d.visible=false;
             webSocket.send({cmd: "hit", pos: {x: player.enemyPosTemp.x, y: player.enemyPosTemp.y, z: player.enemyPosTemp.z}, id: enemy_id});
             scene.add(explosion(scene, player.enemyPosTemp, scene.elapsed));
 

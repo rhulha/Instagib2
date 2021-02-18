@@ -14,7 +14,7 @@ const clock = new Clock();
 
 function animate() {
 	var deltaTime = Math.min( 0.1, clock.getDelta() );
-	scene.elapsed = clock.getElapsedTime(); // warning, this call resets getDelta()
+	scene.elapsed = clock.getElapsedTime(); // warning, this call resets getDelta(). this value is in seconds.
 	game.player.controls( deltaTime );
 	game.player.update( deltaTime );
 	Object.values(enemies).forEach(e=>e.mixer.update( deltaTime ));
