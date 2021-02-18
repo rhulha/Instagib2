@@ -3,17 +3,14 @@
 
 import { Box3, Vector3 } from './three/build/three.module.js';
 import { Capsule } from './three/examples/jsm/math/Capsule.js';
-import { getTargets, AimAtTarget } from './trigger.js';
 import q3dm17 from './models/q3dm17.js';
 import { shoot } from './railgun.js';
 import webSocket from './lib/webSocket.js';
 import camera from './camera.js';
 import scene from './scene.js';
 import {keyStates, mouseStates, touchStates} from './input.js';
-import powerups from './powerups.js';
-import game from './setup.js';
 import {updateFragsCounter} from './hud.js';
-import { enemies, Enemy } from "./networking.js";
+import {checkPlayerPlayerCollisions, checkTriggers, checkWorld, checkPowerups} from './collisions.js'
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -22,7 +19,6 @@ const playerRadius = 0.7;
 const cameraHeight = playerHeight-playerRadius;
 
 class Player {
-
     playerCollider = new Capsule( new Vector3( 0, playerRadius, 0 ), new Vector3( 0, cameraHeight, 0 ), playerRadius );
     playerVelocity = new Vector3();
     enemyPosTemp = new Vector3();
@@ -33,7 +29,7 @@ class Player {
     aliveSince = 0;
     tempBox = new Box3();
     tempVector = new Vector3();
-    
+
     /**
      * @param {Game} game
      */
@@ -67,119 +63,17 @@ class Player {
     }
     
     playerCollisions() {
-        this.checkWorld();
-        this.checkPlayerPlayerCollisions();
-        this.checkPowerups();
-        this.checkTriggers();
+        checkWorld(this);
+        checkPlayerPlayerCollisions(this);
+        checkPowerups(this);
+        checkTriggers(this);
         if( this.playerCollider.end.y < -40) {
             this.fragSelf();
             return;
         }
     }
 
-    checkPlayerPlayerCollisions() {
-        for (var enemy_id in enemies) {
-            /** @type {Enemy} */
-            const enemy = enemies[enemy_id];
-            const bottom = this.playerCollider.start.y - playerRadius;
-            const top = this.playerCollider.end.y + playerRadius;
-            // this.playerCollider.start - playerRadius is the location of our feet
-            // enemy.p - playerRadius is the location of the enemy feet (lowest point)
-            // enemy.p + playerHeight is the location of the enemy head (highest point)
-            if (bottom < enemy.p.y + playerHeight // the player feet are below the enemy tip of the head
-                && top > enemy.p.y - playerRadius) // and the player tip of the head is above the enemy feet
-            {
-                // at this point we have a potential collision since the player and the enemy are at the same height.
-                // cameraHeight-playerRadius is the distance between the two points that make up the playerCollider capsule.
-                if (this.playerCollider.start.y > enemy.p.y + cameraHeight - playerRadius) {
-                    // at this point the player feet sphere center is above the enemy head sphere center
-                    // remember that enemy.p is not a real Vector3
-                    enemy.p.y += cameraHeight - playerRadius;
-                    var dt = this.playerCollider.start.distanceTo(enemy.p);
-                    if (dt < playerRadius * 2) {
-                        //console.log("collision detected");
-                        this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
-                        this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
-                    }
-                    enemy.p.y -= cameraHeight - playerRadius;
-                } else if (this.playerCollider.end.y < enemy.p.y) {
-                    // at this point the player head sphere center is below the enemy feet sphere center
-                    var dt = this.playerCollider.end.distanceTo(enemy.p); // consider using dtSquared.
-                    if (dt < playerRadius * 2) {
-                        //console.log("collision detected");
-                        this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
-                        this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
-                    }
-                } else {
-                    // at this point we can do a simple cylinder collision check.
-                    // In other words we can check the distance between two spheres at the same height.
-                    var temp = enemy.p.y;
-                    enemy.p.y = this.playerCollider.start.y;
-                    var dt = this.playerCollider.start.distanceTo(enemy.p);
-                    if (dt < playerRadius * 2) {
-                        //console.log("collision detected");
-                        this.tempVector.copy(this.playerCollider.start).sub(enemy.p).normalize(); // build a normal from enemy sphere to player sphere 
-                        this.playerVelocity.addScaledVector(this.tempVector, -this.tempVector.dot(this.playerVelocity));
-                        this.playerCollider.translate(this.tempVector.multiplyScalar(playerRadius * 2 - dt));
-                    }
-                    enemy.p.y = temp;
-                }
-            }
-        }
-    }
-
-    checkTriggers() {
-        const triggerResult = this.triggerOctree.capsuleIntersect(this.playerCollider);
-        if (triggerResult) {
-            if (triggerResult.userData.classname == "trigger_push") {
-                var [x, z, y] = getTargets()[triggerResult.userData.target].split(" ");
-                // TODO: I think this should be this.playerCollider.start. start is where the feet are...
-                var vel = AimAtTarget(this.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
-                this.playerVelocity.copy(vel);
-                this.game.audio.jumppad.play();
-                this.playerOnFloor = false;
-            } else if (triggerResult.userData.classname == "trigger_hurt") {
-                fragSelf();
-            } else if (triggerResult.userData.classname == "trigger_teleport") {
-                // there is only one misc_teleporter_dest for all teleporters.
-                // TODO: fix this for other maps
-                this.game.audio.teleport.play();
-                var mtd = q3dm17.misc_teleporter_dest[0];
-                this.spawn(mtd.origin, mtd.angle);
-            }
-        }
-    }
-
-    checkWorld() {
-        const result = this.worldOctree.capsuleIntersect(this.playerCollider);
-        this.playerOnFloor = false;
-        if (result) {
-            this.playerOnFloor = result.normal.y > 0;
-            if (!this.playerOnFloor) {
-                this.playerVelocity.addScaledVector(result.normal, -result.normal.dot(this.playerVelocity));
-            }
-            this.playerCollider.translate(result.normal.multiplyScalar(result.depth));
-        }
-    }
-
-    checkPowerups() {
-        for (var pu_name in powerups) {
-            var pu = powerups[pu_name];
-            //pu.updateMatrixWorld( true );
-            this.tempBox.copy(pu.geometry.boundingBox).applyMatrix4(pu.matrixWorld);
-            if (pu.visible && this.playerCollider.intersectsBox(this.tempBox)) {
-                game.audio.powerup.play();
-                pu.hideStart = scene.elapsed;
-                pu.visible = false;
-                this.frags += 3;
-                webSocket.send({ cmd: "powerup", "name": pu.name });
-                updateFragsCounter();
-            }
-        }
-    }
-
     update( deltaTime ) {
-
         if ( this.playerOnFloor && this.playerVelocity.y <= 0) {
             // GROUND MOVE
             /*
