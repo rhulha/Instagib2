@@ -19,21 +19,22 @@ const playerRadius = 0.7;
 const cameraHeight = playerHeight-playerRadius;
 
 class Player {
-    playerCollider = new Capsule( new Vector3( 0, playerRadius, 0 ), new Vector3( 0, cameraHeight, 0 ), playerRadius );
-    playerVelocity = new Vector3();
-    enemyPosTemp = new Vector3();
-    wishdir = new Vector3();
-    wishJump=false;
-    playerDirection = new Vector3();
-    playerOnFloor = false;
-    aliveSince = 0;
-    tempBox = new Box3();
-    tempVector = new Vector3();
-
     /**
      * @param {Game} game
+     * @param {string} name
+     * @param {string} color
      */
     constructor(game, name, color) {
+        this.playerCollider = new Capsule( new Vector3( 0, playerRadius, 0 ), new Vector3( 0, cameraHeight, 0 ), playerRadius );
+        this.playerVelocity = new Vector3();
+        this.enemyPosTemp = new Vector3();
+        this.wishdir = new Vector3();
+        this.wishJump=false;
+        this.playerDirection = new Vector3();
+        this.playerOnFloor = false;
+        this.aliveSince = 0;
+        this.tempBox = new Box3();
+        this.tempVector = new Vector3();
         this.game = game;
         this.name = name;
         this.color = color;

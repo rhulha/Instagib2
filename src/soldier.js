@@ -5,10 +5,11 @@ import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 
 
 class Soldier {
-    glb;
-    obj3d;
-    ready=false;
-    constructor() {}
+    // glb;
+    // obj3d;
+    constructor() {
+		this.ready=false;
+	}
 }
 
 var soldierSingleton = new Soldier();

@@ -4,13 +4,11 @@ import {Vector3, Plane} from '../three/build/three.module.js';
 
 
 class Brush {
-    planes = [];
-    polys = [];
-    polysInitialized=false;
-	epsilon = 1e-5;
-	userData;
-
     constructor(planes, userData) {
+		this.epsilon = 1e-5;
+		this.planes = [];
+		this.polys = [];
+		this.polysInitialized=false;
 		this.userData=userData;
 		this.planes = planes;
 		for (var i = 0; i < planes.length; i++) {

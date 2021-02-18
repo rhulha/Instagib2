@@ -225,6 +225,11 @@ wss.on('connection', (ws, req) => {
 
 app.use(express.static('web'));
 app.use(express.static('icons'));
+if (process.env.PORT == "80" ) {
+  app.use(express.static('dist'));
+} else {
+  app.use(express.static('src'));
+}
 
 server.listen(process.env.PORT || 8080, function() {
   logger.info('Listening on ' + server.address().port);
