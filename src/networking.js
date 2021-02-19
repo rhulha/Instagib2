@@ -170,7 +170,7 @@ function sendCommand(command) {
 
 function sendPlayerPositionToServer() {
 	if( webSocket.connection.readyState == 1) {
-		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation(), run: game.player.playerOnFloor && (game.player.wishdir.lengthSq>0)});
+		webSocket.send({cmd: "pos", pos: game.player.getPos(), rot: game.player.getRotation(), run: game.player.playerOnFloor && (game.player.wishdir.lengthSq()>0)});
 	}
 }
 

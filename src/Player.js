@@ -178,6 +178,13 @@ class Player {
             this.fragSelf();
             keyStates[ 'KeyK' ] = false;
         }
+        if ( keyStates[ 'KeyP' ] ) {
+            if(!this.dead)
+                return;
+            var enemiesArray = Object.values(enemies);
+            this.watchPlayer = enemiesArray[Math.floor(Math.random() * enemiesArray.length)]
+            keyStates[ 'KeyP' ] = false;
+        }
     }
 
     respawn() {
