@@ -7,6 +7,7 @@ import camera from './camera.js';
 import game from './setup.js';
 import {sendCommand} from './networking.js';
 import {displayScore, hideScore} from './hud.js';
+import { audioHolder } from './audio.js';
 
 var keyStates = {};
 var touchStates = {};
@@ -17,6 +18,13 @@ window.sensitivity = (val) => {
     console.log("old sensitivity: " + mouseStates.sensitivity);
     if( val > 0 || val < 0 )
         mouseStates.sensitivity = val;
+    return "done";
+}
+
+window.volume = (val) => {
+    console.log("old volume: " + audioHolder.volume);
+    if( val > 0 || val < 0 )
+        audioHolder.volume = val;
     return "done";
 }
 
@@ -112,7 +120,7 @@ document.body.addEventListener('touchend', (e)=>{
 
 document.addEventListener("keydown", (event)=>{	
     if (event.key === "Enter") {	
-        sendCommand("sendTestData");
+        //sendCommand("sendTestData");
     }	
 });
 

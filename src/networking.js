@@ -113,7 +113,7 @@ webSocket.packet = function(msg) {
 webSocket.rail = function(msg) {
 	//console.log("rail", msg);
 	addRailToScene(scene, msg.start, msg.end, msg.color);
-	audioHolder.railgun_enemy.play();
+	audioHolder.play("railgun_enemy");
 }
 
 webSocket.disconnect = function(msg) {
@@ -144,7 +144,7 @@ webSocket.hit = function(msg) {
 		game.player.dead=true;
 		game.player.timeOfDeath=scene.elapsed;
 		document.getElementById("gun").style.visibility='hidden';
-		audioHolder.gib.play();
+		audioHolder.play("gib");
 	} else {
 		enemies[msg.id].obj3d.visible=false;
 		audioHolder.play("gib", 0.1);

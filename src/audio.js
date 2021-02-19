@@ -2,10 +2,9 @@
 var audioHolder = {};
 
 audioHolder.play = function(name, volume) {
-    var old = this[name].volume;
-    this[name].volume=volume;
+    volume = volume || this[name].defaultVolume;
+    this[name].volume=volume*this.volume;
     this[name].play();
-    this[name].volume=old;
 }
 
 function getSound(propName, fileName)
@@ -29,14 +28,15 @@ function initializeAudio() {
     getSound("gib", "gibsplt1");
     getSound("teleport", "telein");
     getSound("powerup", "holdable");
-    audioHolder.railgun.volume=0.1;
-    audioHolder.railgun_enemy.volume=0.08;
-    audioHolder.jump.volume=0.2;
-    audioHolder.jumppad.volume=0.5;
-    audioHolder.gib.volume=0.3;
+    audioHolder.railgun.defaultVolume=0.1;
+    audioHolder.railgun_enemy.defaultVolume=0.08;
+    audioHolder.jump.defaultVolume=0.2;
+    audioHolder.jumppad.defaultVolume=0.5;
+    audioHolder.gib.defaultVolume=0.3;
     //this.audio.gib.playbackRate=0.8;
-    audioHolder.teleport.volume=0.4;
-    audioHolder.powerup.volume=0.3;
+    audioHolder.teleport.defaultVolume=0.4;
+    audioHolder.powerup.defaultVolume=0.3;
+    audioHolder.volume = 1.0;
 }
 
 export {audioHolder, initializeAudio};

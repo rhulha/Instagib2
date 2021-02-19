@@ -65,18 +65,18 @@ function getLinePositionsFromPlayer(player) {
     return [start, end];
 }
 
-var railgunLastShotTime=0;
+var railgunLastShotTime=-1.492;
 
 function shoot(scene, player) {
     if(railgunLastShotTime + 1.492 >= scene.elapsed)
         return;
     railgunLastShotTime=scene.elapsed;
     if(audioHolder.railgun.paused)
-        audioHolder.railgun.play();
+        audioHolder.play("railgun");
     else {
         audioHolder.railgun.currentTime = 0;
+        audioHolder.play("railgun");
     }
-    audioHolder.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     //console.log("player.color", player.color);
     addRailToScene(scene, start, end, player.color);
@@ -112,7 +112,7 @@ function shoot(scene, player) {
 
             game.player.frags++;
             updateFragsCounter();
-            audioHolder.gib.play();
+            audioHolder.play("gib");
         }
 
     }

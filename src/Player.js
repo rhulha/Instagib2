@@ -58,7 +58,7 @@ class Player {
     }
 
     fragSelf() {
-        audioHolder.gib.play();
+        audioHolder.play("gib");
         sendCommand("fragself");
         this.frags--;
         updateFragsCounter();
@@ -104,7 +104,7 @@ class Player {
             if(this.wishJump) {
                 this.playerVelocity.y = 9;
                 this.wishJump = false;
-                audioHolder.jump.play();
+                audioHolder.play("jump");
             }
         } else {
             // AIR MOVE
@@ -140,7 +140,7 @@ class Player {
             if(this.dead) {
                 this.dead = false;
                 sendCommand("respawn");
-                audioHolder.teleport.play();
+                audioHolder.play("teleport");
                 this.respawn();
                 document.getElementById("gun").style.visibility='visible';
                 mouseStates[0]=false;
