@@ -70,8 +70,12 @@ var railgunLastShotTime=0;
 function shoot(scene, player) {
     if(railgunLastShotTime + 1.492 >= scene.elapsed)
         return;
-    audioHolder.railgun.pause();
-    audioHolder.railgun.currentTime = 0;
+    railgunLastShotTime=scene.elapsed;
+    if(audioHolder.railgun.paused)
+        audioHolder.railgun.play();
+    else {
+        audioHolder.railgun.currentTime = 0;
+    }
     audioHolder.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     //console.log("player.color", player.color);
