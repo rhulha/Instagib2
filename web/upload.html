@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" style="margin: 0; height:90%">
+
+<head>
+    <title>instagib.me upload sounds</title>
+    <meta charset=utf-8 />
+</head>
+
+<body style="margin: 0; height:90%">
+    <div id="fileDropZone" style="border: 3px solid #00F; height:90%">
+        Drag sound files in here...
+    </div>
+
+    <script>
+
+        function doit(file) {
+            var reader = new FileReader();
+            reader.onload = (event) => {
+                localStorage.setItem(file.name, event.target.result);
+            }
+            reader.readAsDataURL(file);
+            //reader.readAsArrayBuffer
+        }
+
+        function drop(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            var fileList = event.dataTransfer.files;
+            document.getElementById("fileDropZone").style.borderColor="blue";
+            console.log(fileList);
+            for(var file of fileList) {
+                //console.log(file);
+                doit(file);
+            }
+        }
+
+        function dragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'link';
+            document.getElementById("fileDropZone").style.borderColor="red";
+        }
+        function dragleave(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'link';
+            document.getElementById("fileDropZone").style.borderColor="blue";
+        }
+
+        var dropZone = document.getElementById("fileDropZone");
+        dropZone.addEventListener("dragover", dragOver, false);
+        dropZone.addEventListener("dragleave", dragleave, false);
+        dropZone.addEventListener("drop", drop, false);
+    </script>
+
+    <button id="mybutton" onclick="document.all.myaudio.src=localStorage.getItem('railgf1a.wav');document.all.myaudio.play()">play railgf1a.wav
+    </button>
+
+    <audio id="myaudio">
+    </audio>
+
+</body>
+
+</html>

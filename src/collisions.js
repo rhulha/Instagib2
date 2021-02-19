@@ -4,9 +4,9 @@ import q3dm17 from './models/q3dm17.js';
 import webSocket from './lib/webSocket.js';
 import scene from './scene.js';
 import powerups from './powerups.js';
-import game from './setup.js';
 import {updateFragsCounter} from './hud.js';
 import { enemies, Enemy } from "./networking.js";
+import {audioHolder} from './audio.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -73,13 +73,13 @@ function checkTriggers(player) {
             // TODO: I think this should be player.playerCollider.start. start is where the feet are...
             var vel = AimAtTarget(player.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             player.playerVelocity.copy(vel);
-            player.game.audio.jumppad.play();
+            audioHolder.jumppad.play();
             player.playerOnFloor = false;
         } else if (triggerResult.userData.classname == "trigger_hurt") {
             fragSelf();
         } else if (triggerResult.userData.classname == "trigger_teleport") {
             // there is only one misc_teleporter_dest for all teleporters in q3dm17.
-            player.game.audio.teleport.play();
+            audioHolder.teleport.play();
             var dest = q3dm17.misc_teleporter_dest[0]; // TODO: fix this for other maps
             player.spawn(dest.origin, dest.angle);
         }
@@ -104,7 +104,7 @@ function checkPowerups(player) {
         //pu.updateMatrixWorld( true );
         player.tempBox.copy(pu.geometry.boundingBox).applyMatrix4(pu.matrixWorld);
         if (pu.visible && player.playerCollider.intersectsBox(player.tempBox)) {
-            game.audio.powerup.play();
+            audioHolder.powerup.play();
             pu.hideStart = scene.elapsed;
             pu.visible = false;
             player.frags += 3;

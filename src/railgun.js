@@ -9,7 +9,7 @@ import { addRailToScene } from './rail.js';
 import camera from './camera.js';
 import {updateFragsCounter} from './hud.js';
 import * as hud from './hud.js';
-
+import {audioHolder} from './audio.js';
 
 const sprite = new TextureLoader().load( 'images/disc.png' );
 const material = new PointsMaterial( { size: 1,  color: "darkred", map: sprite, alphaTest: 0.5, transparent: true });
@@ -66,9 +66,9 @@ function getLinePositionsFromPlayer(player) {
 }
 
 function shoot(scene, player) {
-    if( ! player.game.audio.railgun.paused)
+    if( ! audioHolder.railgun.paused)
         return;
-    player.game.audio.railgun.play();
+    audioHolder.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     //console.log("player.color", player.color);
     addRailToScene(scene, start, end, player.color);
@@ -104,7 +104,7 @@ function shoot(scene, player) {
 
             game.player.frags++;
             updateFragsCounter();
-            player.game.audio.gib.play();
+            audioHolder.gib.play();
         }
 
     }

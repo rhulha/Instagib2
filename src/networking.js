@@ -12,6 +12,7 @@ import game from './setup.js';
 import scene from './scene.js';
 import powerups from './powerups.js';
 import * as hud from './hud.js';
+import {audioHolder} from './audio.js';
 
 /** @Type {Object.<string:Enemy>} */
 var enemies = {};
@@ -112,7 +113,7 @@ webSocket.packet = function(msg) {
 webSocket.rail = function(msg) {
 	//console.log("rail", msg);
 	addRailToScene(scene, msg.start, msg.end, msg.color);
-	game.audio.railgun_enemy.play();
+	audioHolder.railgun_enemy.play();
 }
 
 webSocket.disconnect = function(msg) {
@@ -142,23 +143,17 @@ webSocket.hit = function(msg) {
 		hud.updateInfoText("Fragged by " + enemies[msg.source_id].name);
 		game.player.dead=true;
 		game.player.timeOfDeath=scene.elapsed;
-		game.audio.gib.play();
+		audioHolder.gib.play();
 	} else {
 		enemies[msg.id].obj3d.visible=false;
-		var old = game.audio.gib.volume;
-		game.audio.gib.volume = 0.1;
-		game.audio.gib.play();
-		game.audio.gib.volume = old;
+		audioHolder.play("gib", 0.1);
 	}
 	scene.add(explosion(scene, msg.pos, scene.elapsed));
 }
 
 webSocket.powerup = function(msg) {
 	if( msg.id != this_player_id) {
-		var old = game.audio.powerup.volume;
-		game.audio.powerup.volume = 0.3;
-		game.audio.powerup.play();
-		game.audio.powerup.volume = old;
+		audioHolder.play("powerup", 0.3);
 		msg.name = msg.name.substring(0, 40).replace(/[^A-Za-z0-9@]/g, '');
 		powerups[msg.name].hideStart=scene.elapsed;
 		powerups[msg.name].visible=false;

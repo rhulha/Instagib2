@@ -11,6 +11,7 @@ import scene from './scene.js';
 import {keyStates, mouseStates, touchStates} from './input.js';
 import {updateFragsCounter} from './hud.js';
 import {checkPlayerPlayerCollisions, checkTriggers, checkWorld, checkPowerups} from './collisions.js'
+import {audioHolder} from './audio.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -57,7 +58,7 @@ class Player {
     }
 
     fragSelf() {
-        this.game.audio.gib.play();
+        audioHolder.gib.play();
         sendCommand("fragself");
         this.frags--;
         updateFragsCounter();
@@ -103,7 +104,7 @@ class Player {
             if(this.wishJump) {
                 this.playerVelocity.y = 9;
                 this.wishJump = false;
-                this.game.audio.jump.play();
+                audioHolder.jump.play();
             }
         } else {
             // AIR MOVE
@@ -139,7 +140,7 @@ class Player {
             if(this.dead) {
                 this.dead = false;
                 sendCommand("respawn");
-                this.game.audio.teleport.play();
+                audioHolder.teleport.play();
                 this.respawn();
                 mouseStates[0]=false;
                 return;
@@ -171,7 +172,7 @@ class Player {
             keyStates[ 'Space' ] = false;
         }
         if ( keyStates[ 'KeyK' ] ) {
-            if( ! this.game.audio.gib.paused)
+            if( ! audioHolder.gib.paused)
                 return;
             this.fragSelf();
             keyStates[ 'KeyK' ] = false;

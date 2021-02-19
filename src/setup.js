@@ -9,6 +9,7 @@ import { CustomOctree } from './lib/CustomOctree.js';
 import { getTriggerOctree } from './trigger.js';
 import camera from './camera.js';
 import scene from './scene.js';
+import {initializeAudio} from './audio.js';
 
 function getParameterByName(name, url = window.location.href) {
     name = name.replace(/[\[\]]/g, '\\$&');
@@ -61,23 +62,7 @@ class Game {
             color=color.split("#")[1];
         var name = getParameterByName("name") || "Player";
         this.player = new Player(this, name, color);
-        this.audio = {
-            railgun: new Audio('sounds/railgf1a.mp3'),
-            railgun_enemy: new Audio('sounds/railgf1a.mp3'),
-            jump: new Audio('sounds/sarge/jump1.mp3'),
-            jumppad: new Audio('sounds/jumppad.mp3'),
-            gib: new Audio('sounds/gibsplt1.mp3'),
-            teleport: new Audio('sounds/telein.mp3'),
-            powerup: new Audio('sounds/holdable.mp3')
-        }
-        this.audio.railgun.volume=0.1;
-        this.audio.railgun_enemy.volume=0.08;
-        this.audio.jump.volume=0.2;
-        this.audio.jumppad.volume=0.5;
-        this.audio.gib.volume=0.3;
-        //this.audio.gib.playbackRate=0.8;
-        this.audio.teleport.volume=0.4;
-        this.audio.powerup.volume=0.3;
+        initializeAudio();
     }
 
     modifyModel1(model) {
