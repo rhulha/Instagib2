@@ -65,9 +65,12 @@ function getLinePositionsFromPlayer(player) {
     return [start, end];
 }
 
+var railgunLastShotTime=0;
+
 function shoot(scene, player) {
-    if( ! audioHolder.railgun.paused)
+    if(railgunLastShotTime + 1.492 >= elapsed)
         return;
+    audioHolder.railgun.stop();
     audioHolder.railgun.play();
     var [start, end] = getLinePositionsFromPlayer(player);
     //console.log("player.color", player.color);
