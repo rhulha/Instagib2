@@ -142,6 +142,7 @@ class Player {
                 sendCommand("respawn");
                 audioHolder.teleport.play();
                 this.respawn();
+                document.getElementById("gun").style.visibility='visible';
                 mouseStates[0]=false;
                 return;
             } else {

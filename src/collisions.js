@@ -18,6 +18,10 @@ function checkPlayerPlayerCollisions(player) {
     for (var enemy_id in enemies) {
         /** @type {Enemy} */
         const enemy = enemies[enemy_id];
+
+        if( !enemy.obj3d.visible )
+            continue;
+            
         const bottom = player.playerCollider.start.y - playerRadius;
         const top = player.playerCollider.end.y + playerRadius;
         // player.playerCollider.start - playerRadius is the location of our feet
