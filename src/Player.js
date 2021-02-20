@@ -9,9 +9,10 @@ import {sendCommand} from './networking.js';
 import camera from './camera.js';
 import scene from './scene.js';
 import {keyStates, mouseStates, touchStates} from './input.js';
-import {updateFragsCounter} from './hud.js';
+import * as hud from './hud.js';
 import {checkPlayerPlayerCollisions, checkTriggers, checkWorld, checkPowerups} from './collisions.js'
 import {audioHolder} from './audio.js';
+import {enemies} from './networking.js';
 
 const GRAVITY = 30;
 const QuakeScale = 0.038;
@@ -61,7 +62,7 @@ class Player {
         audioHolder.play("gib");
         sendCommand("fragself");
         this.frags--;
-        updateFragsCounter();
+        hud.updateFragsCounter();
         this.respawn();
     }
     
@@ -116,9 +117,14 @@ class Player {
         const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
         this.playerCollider.translate( deltaPosition );
         this.playerCollisions();
-        if(this.dead){
+        if(this.dead) {
             this.tempVector.copy(this.playerCollider.end).lerp(this.playerCollider.start, Math.min(scene.elapsed - this.timeOfDeath, 1)); // slowly move camera down on death.
-            camera.position.copy( this.tempVector );
+            if( this.watchPlayer ) {
+                camera.position.copy( this.watchPlayer.p ).x+=3;
+                camera.position.y+=cameraHeight;
+            } else {
+                camera.position.copy( this.tempVector );
+            }
         } else {
             camera.position.copy( this.playerCollider.end );
         }
@@ -142,7 +148,8 @@ class Player {
                 sendCommand("respawn");
                 audioHolder.play("teleport");
                 this.respawn();
-                document.getElementById("gun").style.visibility='visible';
+                this.watchPlayer=undefined;
+                hud.showGunAndCrosshairs();
                 mouseStates[0]=false;
                 return;
             } else {
@@ -150,11 +157,20 @@ class Player {
             }
         }
 
-        if(this.dead)
-            return;
-    
+        if ( keyStates[ 'KeyP' ] ) {
+            if(!this.dead)
+                return;
+            var enemiesArray = Object.values(enemies);
+            this.watchPlayer = enemiesArray[Math.floor(Math.random() * enemiesArray.length)]
+            console.log(this.watchPlayer);
+            keyStates[ 'KeyP' ] = false;
+        }
+
         if( touchStates.rotate )
             camera.rotation.y -= (touchStates.pageX - touchStates.pageXStart) * 0.01 * deltaTime;
+
+        if(this.dead)
+            return;
 
         if ( keyStates[ 'KeyW' ] ) {
             this.wishdir.add( this.getPlayerRelativeVector(false) )
@@ -177,13 +193,6 @@ class Player {
                 return;
             this.fragSelf();
             keyStates[ 'KeyK' ] = false;
-        }
-        if ( keyStates[ 'KeyP' ] ) {
-            if(!this.dead)
-                return;
-            var enemiesArray = Object.values(enemies);
-            this.watchPlayer = enemiesArray[Math.floor(Math.random() * enemiesArray.length)]
-            keyStates[ 'KeyP' ] = false;
         }
     }
 

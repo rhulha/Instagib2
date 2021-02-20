@@ -45,5 +45,15 @@ function hideScore() {
     document.getElementById("score").style.visibility="hidden";
 }
 
+function hideGunAndCrosshairs() {
+    document.getElementById("gun").style.visibility="hidden";
+    document.getElementById("crosshair").style.visibility="hidden";
+}
 
-export {updateInfoText, updateFragsCounter, updateTopFragsCounter, displayScore, hideScore, ac};
+function showGunAndCrosshairs() {
+    document.getElementById("gun").style.visibility="visible";
+    document.getElementById("crosshair").style.visibility="visible";
+}
+
+
+export {updateInfoText, updateFragsCounter, updateTopFragsCounter, displayScore, hideScore, ac, hideGunAndCrosshairs, showGunAndCrosshairs};

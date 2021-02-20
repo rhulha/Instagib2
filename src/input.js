@@ -36,6 +36,7 @@ window.fov = (val) => {
     }
     return "done";
 }
+console.log("Feel free to change volume(0.4), sensitivity(500) higher is slower or fov(75).")
 
 document.body.addEventListener( 'mousemove', ( event ) => {
     if ( document.pointerLockElement === document.body ) {
@@ -92,6 +93,7 @@ touchStates.rotate = false;
 document.body.addEventListener( 'touchstart', (e)=>{
     if( e.touches.length > 1) {
         shoot(game.scene, game.player);
+        document.getElementById("gun").style.visibility='hidden'; // Gun is too big on mobiles. TODO: don't hide, make smaller.
     }
     touchStates.pageXStart = e.touches[0].pageX;
     touchStates.pageYStart = e.touches[0].pageY;

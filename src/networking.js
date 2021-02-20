@@ -143,10 +143,11 @@ webSocket.hit = function(msg) {
 		hud.updateInfoText("Fragged by " + enemies[msg.source_id].name);
 		game.player.dead=true;
 		game.player.timeOfDeath=scene.elapsed;
-		document.getElementById("gun").style.visibility='hidden';
+		hud.hideGunAndCrosshairs();
 		audioHolder.play("gib");
 	} else {
-		enemies[msg.id].obj3d.visible=false;
+		if(enemies[msg.id])
+			enemies[msg.id].obj3d.visible=false;
 		audioHolder.play("gib", 0.1);
 	}
 	scene.add(explosion(scene, msg.pos, scene.elapsed));
