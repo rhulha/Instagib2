@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" style="margin: 0; height:100%">
+
+<head>
+    <title>Instagib</title>
+    <meta charset=utf-8 />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+    <style>
+        /* https://grid.layoutit.com */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 0.4fr 1.6fr 1fr;
+            grid-template-rows: 1.6fr 0.4fr;
+            gap: 0px 0px;
+            grid-template-areas:
+                "left middle middle"
+                "left bottom bottom";
+        }
+
+        .left {
+            grid-area: left;
+            background-color: rgb(255, 185, 127);
+        }
+
+        .bottom {
+            grid-area: bottom;
+            background-color: aquamarine;
+        }
+
+        .middle {
+            grid-area: middle;
+        }
+    </style>
+</head>
+
+<body style="margin: 0; height:100%">
+
+
+    <div class="grid-container" style="margin: 0; height:100%">
+        <div class="left">
+            <select id="brushList">
+                <option value="Brush1">Brush1</option>
+                <option value="Brush2">Brush2</option>
+            </select>
+        </div>
+        <div class="bottom">
+        </div>
+        <div class="middle">
+            <div id="container" style="margin: 0; height:100%; width:100%" oncontextmenu="return false;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', (event) => {
+            import('./edit.js');
+        })
+    </script>
+</body>
+
+</html>
