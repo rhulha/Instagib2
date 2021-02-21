@@ -1,25 +1,31 @@
 import * as THREE from './three/build/three.module.js';
-import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 import Parser from './parser.js';
 
 const clock = new THREE.Clock();
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x88ccff);
+//scene.background = new THREE.Color(0x88ccff);
+scene.background = new THREE.CubeTextureLoader().setPath( 'images/MilkyWay/dark-s_' )
+.load( [
+    'px.jpg',
+    'nx.jpg',
+    'py.jpg',
+    'ny.jpg',
+    'pz.jpg',
+    'nz.jpg'
+] );
 
 const container = document.getElementById('container');
 const w = container.clientWidth;
 const h = container.clientHeight;
 
-const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
 camera.rotation.order = 'YXZ';
 
-const ambientlight = new THREE.AmbientLight(0x6688cc);
-scene.add(ambientlight);
+scene.add(new THREE.AmbientLight(0x6688cc));
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(w, h);
-
 container.appendChild(renderer.domElement);
 
 const keyStates = {};
@@ -43,13 +49,11 @@ container.addEventListener('mousemove', (event) => {
     }
 });
 
-window.addEventListener('resize', onWindowResize);
-
-function onWindowResize() {
+window.addEventListener('resize', e=>{
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
-}
+});
 
 document.addEventListener('click', () => {
     //camera.getWorldDirection(playerDirection);
@@ -66,64 +70,82 @@ function getPlayerRelativeVector(side) {
 
 const playerVelocity = new THREE.Vector3();
 const playerDirection = new THREE.Vector3();
-const playerPosition = new THREE.Vector3(0,-19,0);
-const deltaPosition = new THREE.Vector3();
+camera.position.set(0,0,10);
 
-keyStates['KeyW']=keyStates['KeyA']=keyStates['KeyS']=keyStates['KeyD']=false;
+keyStates['Space']=keyStates['KeyW']=keyStates['KeyA']=keyStates['KeyS']=keyStates['KeyD']=false;
 
 function controls(deltaTime) {
     const speed = 125;
     playerVelocity.add(getPlayerRelativeVector(false).multiplyScalar(speed * deltaTime * (keyStates['KeyW'] - keyStates['KeyS'])));
     playerVelocity.add(getPlayerRelativeVector(true).multiplyScalar(speed * deltaTime * (keyStates['KeyD'] - keyStates['KeyA'])));
-
-    if (keyStates['Space']) {
-        playerVelocity.y = 15;
-    }
-
+    playerVelocity.y = 15*keyStates['Space'];
     const damping = Math.exp( - 3 * deltaTime ) - 1;
     playerVelocity.addScaledVector( playerVelocity, damping );
-    deltaPosition.copy(playerVelocity).multiplyScalar( deltaTime );
-    playerPosition.add(deltaPosition);
-	camera.position.copy( playerPosition );
+    camera.position.addScaledVector(playerVelocity, deltaTime);
 }
 
-const loader = new GLTFLoader();
-loader.load('./models/q3dm17.glb', (gltf) => {
-    gltf.scene.traverse( child => {
-        if ( child.isMesh ) {
-            //child.geometry.computeVertexNormals();
-            child.material.metalness = 0;
-            // child.material.color.setHex( 0x009DFF );
-            // console.log(child.material.vertexColors) // is true
-            //child.material = new MeshBasicMaterial({vertexColors: true});
-        }
-    } );
-    gltf.scene.remove(gltf.scene.children[2]);
-    scene.add(gltf.scene);
-    animate();
-});
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+const cube = new THREE.Mesh( geometry, material );
+scene.add( cube );
+
+animate();
+
+var mapElements = [];
+var worldspawn = [];
+var parser;
+var parserInterval;
+
+function parseMapElement() {
+    console.log("hi");
+    if( parser.peek() == '"') {
+        var [key, val] = parser.readTextPair();
+        worldspawn[key] = val;
+        parser.swallowEOL();
+    } else if( parser.peek() == '{') {
+        var b = parser.parseBrush();
+        worldspawn.push(b);
+    } else if( parser.peek() == ' ') {
+        worldspawn.push(parser.readPatchDef2());
+    } else if( parser.peek() == '}') {
+        done();
+    } else {
+        parser.next();
+    }
+}
+
+function done() {
+    console.log("done");
+    clearInterval(parserInterval);
+    console.log("parser.countNewLine", parser.countNewLine);
+    mapElements.push(worldspawn);
+
+    const brushList = document.getElementById('brushList');
+    for(var i=0; i< worldspawn.length; i++) {
+        var option = document.createElement("option");
+        option.text = "Brush" + i;
+        option.value = i++;
+        brushList.options.add(option)
+    }
+}
 
 fetch("models/q3dm17.map").then(response => response.text()).then(text=>{
-    const brushList = document.getElementById('brushList');
-    var map = {};
-    var parser = new Parser(text);
+    parser = new Parser(text);
     parser.assertNext('{');
     parser.swallowEOL();
-    while(true) {
-        if( parser.peek() == '"') {
-            var [key, val] = parser.getTextPair();
-            map[key] = val;
-            parser.swallowEOL();
-        } else if( parser.peek() == '"') {
-            var b = parser.parseBrush();
-        }
-    
-    }
 
-    //console.log(lines.length)
+    parserInterval = setInterval(()=>{
+        parseMapElement();
+    }, 0);
     
 });
 
+document.getElementById('brushList').addEventListener('change', event=>{
+    console.log("onchange");
+    var brushNr = document.getElementById('brushList').value;
+    document.getElementById('bottom').innerText = worldspawn[brushNr];
+
+});
 
 function animate() {
     const deltaTime = Math.min(0.1, clock.getDelta());
