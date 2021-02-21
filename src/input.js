@@ -5,7 +5,6 @@ import { MathUtils} from './three/build/three.module.js';
 import { shoot } from './railgun.js';
 import camera from './camera.js';
 import game from './setup.js';
-import {sendCommand} from './networking.js';
 import {displayScore, hideScore} from './hud.js';
 import { audioHolder } from './audio.js';
 
@@ -43,6 +42,7 @@ console.log("Feel free to change volume(0.4), sensitivity(500) higher is slower 
 document.body.addEventListener( 'mousemove', ( event ) => {
     if ( document.pointerLockElement === document.body ) {
         camera.rotation.y -= event.movementX / Math.abs(mouseStates.sensitivity);
+        camera.rotationy -= event.movementX / Math.abs(mouseStates.sensitivity); // for death spectator cam.
         camera.rotation.x -= event.movementY / mouseStates.sensitivity;
         camera.rotation.x = MathUtils.clamp(camera.rotation.x, -Math.PI/2, Math.PI/2)
     }

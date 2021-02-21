@@ -119,11 +119,15 @@ class Player {
         this.playerCollider.translate( this.deltaPosition );
         this.playerCollisions();
         if(this.dead) {
-            this.tempVector.copy(this.playerCollider.end).lerp(this.playerCollider.start, Math.min(scene.elapsed - this.timeOfDeath, 1)); // slowly move camera down on death.
             if( this.watchPlayer ) {
-                camera.position.copy( this.watchPlayer.p ).x+=3;
+                camera.position.copy( this.watchPlayer.p );
+                camera.position.x+=Math.sin(camera.rotationy)*3;
+                camera.position.z+=Math.cos(camera.rotationy)*3;
                 camera.position.y+=cameraHeight;
+                this.tempVector.copy(this.watchPlayer.p).y+=cameraHeight;
+                camera.lookAt( this.tempVector );
             } else {
+                this.tempVector.copy(this.playerCollider.end).lerp(this.playerCollider.start, Math.min(scene.elapsed - this.timeOfDeath, 1)); // slowly move camera down on death.
                 camera.position.copy( this.tempVector );
             }
         } else {
@@ -159,8 +163,11 @@ class Player {
         }
 
         if ( keyStates[ 'KeyP' ] ) {
-            if(!this.dead)
-                return;
+            if(!this.dead) {
+                this.dead=true;
+                this.timeOfDeath=scene.elapsed;
+                hud.hideGunAndCrosshairs();
+            }
             var enemiesArray = Object.values(enemies);
             this.watchPlayer = enemiesArray[Math.floor(Math.random() * enemiesArray.length)]
             console.log(this.watchPlayer);
