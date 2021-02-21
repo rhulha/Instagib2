@@ -70,8 +70,10 @@ class Player {
     playerCollisions() {
         checkWorld(this);
         checkPlayerPlayerCollisions(this);
-        checkPowerups(this);
-        checkTriggers(this);
+        if(!this.dead) {
+            checkPowerups(this);
+            checkTriggers(this);
+        }
         if( this.playerCollider.end.y < -40) {
             this.fragSelf();
             return;
