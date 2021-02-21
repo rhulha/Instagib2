@@ -29,6 +29,7 @@ class Player {
     constructor(game, name, color) {
         this.playerCollider = new Capsule( new Vector3( 0, playerRadius, 0 ), new Vector3( 0, cameraHeight, 0 ), playerRadius );
         this.playerVelocity = new Vector3();
+        this.deltaPosition = new Vector3();
         this.enemyPosTemp = new Vector3();
         this.wishdir = new Vector3();
         this.wishJump=false;
@@ -114,8 +115,8 @@ class Player {
             this.playerVelocity.add( this.wishdir );
             this.playerVelocity.y -= GRAVITY * deltaTime;
         }
-        const deltaPosition = this.playerVelocity.clone().multiplyScalar( deltaTime );
-        this.playerCollider.translate( deltaPosition );
+        this.deltaPosition.copy(this.playerVelocity).multiplyScalar( deltaTime );
+        this.playerCollider.translate( this.deltaPosition );
         this.playerCollisions();
         if(this.dead) {
             this.tempVector.copy(this.playerCollider.end).lerp(this.playerCollider.start, Math.min(scene.elapsed - this.timeOfDeath, 1)); // slowly move camera down on death.
@@ -171,19 +172,10 @@ class Player {
 
         if(this.dead)
             return;
+        
+        this.wishdir.add(this.getPlayerRelativeVector(false).multiplyScalar(keyStates['KeyW'] - keyStates['KeyS']));
+        this.wishdir.add(this.getPlayerRelativeVector(true).multiplyScalar(keyStates['KeyD'] - keyStates['KeyA']));
 
-        if ( keyStates[ 'KeyW' ] ) {
-            this.wishdir.add( this.getPlayerRelativeVector(false) )
-        }
-        if ( keyStates[ 'KeyS' ] ) {
-            this.wishdir.sub( this.getPlayerRelativeVector(false) )
-        }
-        if ( keyStates[ 'KeyA' ] ) {
-            this.wishdir.sub( this.getPlayerRelativeVector(true) )
-        }
-        if ( keyStates[ 'KeyD' ] ) {
-            this.wishdir.add( this.getPlayerRelativeVector(true) )
-        }
         if ( keyStates[ 'Space' ] ) {
             this.wishJump=true;
             keyStates[ 'Space' ] = false;

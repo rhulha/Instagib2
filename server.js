@@ -198,6 +198,10 @@ interval = setInterval(sendPlayerPositions, 16);
 wss.on('connection', (ws, req) => {
   var { query: { name, room, color } } = (req.url.length > 512 ? {query:{name:'hacker', room:'hacker', color:'red'}}: url.parse(req.url, true));
   var id = crypto.randomBytes(6).toString('hex');
+  if(!name)
+    name="Player";
+  if(!room)
+    room="TheLongestYard";
   name = name.replace(/[^A-Za-z0-9]/g, '');
   room = room.replace(/[^A-Za-z0-9]/g, '');
   if(!color || color.length < 3)

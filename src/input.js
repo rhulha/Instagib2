@@ -10,6 +10,8 @@ import {displayScore, hideScore} from './hud.js';
 import { audioHolder } from './audio.js';
 
 var keyStates = {};
+keyStates['KeyW']=keyStates['KeyA']=keyStates['KeyS']=keyStates['KeyD']=false;
+
 var touchStates = {};
 var mouseStates = {};
 mouseStates.sensitivity = 500; // higher values are slower
