@@ -45,14 +45,24 @@ function hideScore() {
     document.getElementById("score").style.visibility="hidden";
 }
 
-function hideGunAndCrosshairs() {
+function hideGunAndCrosshairs(alsoHideFrags) {
     document.getElementById("gun").style.visibility="hidden";
     document.getElementById("crosshair").style.visibility="hidden";
+    if(alsoHideFrags) {
+        document.getElementById("frags").style.visibility="hidden";
+        document.getElementById("topfrags").style.visibility="hidden";
+        document.getElementById("stats").style.visibility="hidden";
+    }
 }
 
-function showGunAndCrosshairs() {
+function showGunAndCrosshairs(alsoShowFrags) {
     document.getElementById("gun").style.visibility="visible";
     document.getElementById("crosshair").style.visibility="visible";
+    if(alsoShowFrags) {
+        document.getElementById("frags").style.visibility="visible";
+        document.getElementById("topfrags").style.visibility="visible";
+        document.getElementById("stats").style.visibility="visible";
+    }
 }
 
 

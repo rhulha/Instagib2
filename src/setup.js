@@ -45,6 +45,7 @@ class Game {
         this.container = document.getElementById( 'container' );
         this.stats = new Stats();
         this.stats.domElement.style.cssText  = 'position:fixed;top:0;right:0;cursor:pointer;opacity:0.8;z-index:10000'
+        this.stats.domElement.id = "stats";
         this.container.appendChild( this.stats.domElement );
 
         this.renderer = setupRenderer(this.container);

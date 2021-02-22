@@ -156,7 +156,7 @@ class Player {
                 audioHolder.play("teleport");
                 this.respawn();
                 this.watchPlayer=undefined;
-                hud.showGunAndCrosshairs();
+                hud.showGunAndCrosshairs(true);
                 mouseStates[0]=false;
                 return;
             } else {
@@ -168,7 +168,7 @@ class Player {
             if(!this.dead) {
                 this.dead=true;
                 this.timeOfDeath=scene.elapsed;
-                hud.hideGunAndCrosshairs();
+                hud.hideGunAndCrosshairs(true);
             }
             var enemiesArray = Object.values(enemies);
             this.watchPlayer = enemiesArray[Math.floor(Math.random() * enemiesArray.length)]

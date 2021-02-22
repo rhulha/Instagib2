@@ -8,6 +8,8 @@ const WebSocket = require('ws');
 const crypto = require('crypto');
 const url = require('url');
 const basicAuth = require('express-basic-auth');
+//const fs = require('fs')
+//var fileStream = fs.createWriteStream('log.txt', {flags: 'a'});
 
 const myFormat = winston.format.printf(({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`);
 
@@ -112,6 +114,7 @@ class Player {
       this.rx = parseFloat(msg.rot.x);
       this.ry = parseFloat(msg.rot.y);
       this.run = (msg.run?true:false);
+      //fileStream.write(JSON.stringify(msg)+"\r\n");
     } else if (msg.cmd == "rail") {
       msg.color = this.color;
       if( !msg.color || msg.color.length < 3)
@@ -247,6 +250,7 @@ process.on('SIGINT', function() {
   try {
     wss.close();
     server.close();
+    //fileStream.end();
   } catch (error) {}
   process.exit(1)
 });
