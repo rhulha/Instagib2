@@ -1,5 +1,5 @@
 import { Vector3 } from './three/build/three.module.js';
-import { getTargets, AimAtTarget } from './trigger.js';
+import { getTargets, propel } from './trigger.js';
 import q3dm17 from './models/q3dm17.js';
 import webSocket from './lib/webSocket.js';
 import scene from './scene.js';
@@ -75,7 +75,7 @@ function checkTriggers(player) {
         if (triggerResult.userData.classname == "trigger_push") {
             var [x, z, y] = getTargets()[triggerResult.userData.target].split(" ");
             // TODO: I think this should be player.playerCollider.start. start is where the feet are...
-            var vel = AimAtTarget(player.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
+            var vel = propel(player.playerCollider.end, new Vector3(x, y, z).multiplyScalar(QuakeScale), GRAVITY);
             player.playerVelocity.copy(vel);
             audioHolder.play("jumppad");
             player.playerOnFloor = false;

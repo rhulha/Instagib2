@@ -1,4 +1,5 @@
 // Copyright 2021 Raymond Hulha, Licensed under Affero General Public License https://www.gnu.org/licenses/agpl-3.0.en.html
+// https://github.com/rhulha/Instagib2
 
 import {Vector3, Plane, Geometry, Face3, Group, Mesh, BufferGeometry} from './three/build/three.module.js';
 import { Brush } from './lib/Brush.js';
@@ -97,10 +98,9 @@ function getTargets() {
  * @param {Vector3} target
  * @param {number} gravity
  */
-function AimAtTarget(origin, target, gravity) {
+function propel(origin, target, gravity) {
     var height = target.y - origin.y;
     var time = Math.sqrt(height / (0.5 * gravity));
-    // set origin2 to the push velocity
     var origin2 = target.clone();
     origin2.sub(origin);
     origin2.y = 0.0;
@@ -113,4 +113,4 @@ function AimAtTarget(origin, target, gravity) {
     return origin2;
 }
 
-export {getTriggerBrushes, getTriggerOctree, getBrushFromMapDef, getTargets, AimAtTarget};
+export {getTriggerBrushes, getTriggerOctree, getBrushFromMapDef, getTargets, propel};
