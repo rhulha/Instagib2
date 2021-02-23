@@ -163,6 +163,9 @@ class Player {
                 shoot(scene, this);
             }
         }
+        if ( keyStates[ 'KeyR' ] ) {
+            camera.rotationy += 0.02;
+        }
 
         if ( keyStates[ 'KeyP' ] ) {
             if(!this.dead) {

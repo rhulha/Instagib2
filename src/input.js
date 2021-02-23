@@ -37,7 +37,7 @@ window.fov = (val) => {
     }
     return "done";
 }
-console.log("Feel free to change volume(0.4), sensitivity(500) higher is slower or fov(75).")
+console.log("Feel free to change volume(0.4), sensitivity(500) [higher is slower] or fov(75).")
 
 document.body.addEventListener( 'mousemove', ( event ) => {
     if ( document.pointerLockElement === document.body ) {

@@ -36,7 +36,7 @@ function initializeAudio() {
     //this.audio.gib.playbackRate=0.8;
     audioHolder.teleport.defaultVolume=0.4;
     audioHolder.powerup.defaultVolume=0.3;
-    audioHolder.volume = 0.1;
+    audioHolder.volume = 0.2;
 }
 
 export {audioHolder, initializeAudio};

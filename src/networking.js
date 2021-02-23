@@ -112,6 +112,9 @@ webSocket.packet = function(msg) {
 
 webSocket.rail = function(msg) {
 	//console.log("rail", msg);
+	if(enemies[msg.id]) {
+		enemies[msg.id].obj3d.visible=true; // workaround for when a player is ghosting.
+	}
 	addRailToScene(scene, msg.start, msg.end, msg.color);
 	audioHolder.play("railgun_enemy");
 }

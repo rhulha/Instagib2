@@ -28,7 +28,7 @@ const logger = winston.createLogger({
 const app = express();
 
 app.use(basicAuth({
-  users: { q3dm17: 'q3dm17' },
+  users: { q3dm16: 'q3dm16' },
   challenge: true
 }));
 
@@ -116,6 +116,7 @@ class Player {
       this.run = (msg.run?true:false);
       //fileStream.write(JSON.stringify(msg)+"\r\n");
     } else if (msg.cmd == "rail") {
+      msg.id = this.id;
       msg.color = this.color;
       if( !msg.color || msg.color.length < 3)
         logger.error("ERROR: COLOR MISSING!!!", this.id, this.name, this.room);
