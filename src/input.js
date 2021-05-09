@@ -73,6 +73,7 @@ document.addEventListener( 'mouseup', (e) => {
 document.addEventListener( 'keydown', ( event ) => {
     if( event.repeat )
         return;
+    //console.log(event.code)
     keyStates[ event.code ] = true;
     if( event.code == "KeyQ") {
         displayScore();

@@ -164,10 +164,10 @@ class Player {
             }
         }
         if ( keyStates[ 'ArrowLeft' ] ) {
-            camera.rotationy += 0.02;
+            camera.rotationy -= 0.02;
         }
         if ( keyStates[ 'ArrowRight' ] ) {
-            camera.rotationy -= 0.02;
+            camera.rotationy += 0.02;
         }
 
         if ( keyStates[ 'KeyP' ] ) {

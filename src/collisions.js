@@ -106,7 +106,7 @@ function checkPowerups(player) {
     for (var pu_name in powerups) {
         var pu = powerups[pu_name];
         //pu.updateMatrixWorld( true );
-        player.tempBox.copy(pu.geometry.boundingBox).applyMatrix4(pu.matrixWorld);
+        player.tempBox.copy(pu.geometry.boundingBox).applyMatrix4(pu.matrixWorld); // TODO: cache the transformed bounding box per powerup. since this is called every frame.
         if (pu.visible && player.playerCollider.intersectsBox(player.tempBox)) {
             audioHolder.play("powerup");
             pu.hideStart = scene.elapsed;
