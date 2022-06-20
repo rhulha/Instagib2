@@ -9,7 +9,7 @@ const WebSocket = require('ws');
 const crypto = require('crypto');
 const url = require('url');
 const basicAuth = require('express-basic-auth');
-//const fs = require('fs')
+const fs = require('fs')
 //var fileStream = fs.createWriteStream('log.txt', {flags: 'a'});
 
 const myFormat = winston.format.printf(({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`);
@@ -253,8 +253,9 @@ if (process.env.NODE_ENV === "production") {
 }
 
 
-server.listen(process.env.PORT || 80, function() {
-  logger.info('Listening on ' + server.address().port);
+var port = process.env.PORT || (process.env.NODE_ENV == "production" ? 443 : 8080);
+server.listen(port , function() {
+   logger.info('Listening on ' + server.address().port);
 });
 
 process.on('SIGINT', function() {
