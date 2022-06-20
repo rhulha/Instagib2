@@ -4,6 +4,7 @@
 const winston = require('winston');
 const express = require('express');
 const http = require('http');
+const https = require('https');
 const WebSocket = require('ws');
 const crypto = require('crypto');
 const url = require('url');
@@ -27,16 +28,23 @@ const logger = winston.createLogger({
 
 const app = express();
 
-/*
-if (process.env.PORT == "80" ) {
+if (process.env.USE_BASIC_AUTH == "true" ) {
   app.use(basicAuth({
   users: { q3dm16: 'q3dm16' },
   challenge: true
 }));
 }
-*/
 
-const server = http.createServer(app);
+if (process.env.NODE_ENV === "production") {
+  var server = https.createServer({
+    key: fs.readFileSync("/etc/letsencrypt/live/instagib.me/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/instagib.me/fullchain.pem")
+  }, app)
+} else {
+  var server = http.createServer(app);
+}
+
+
 const wss = new WebSocket.Server({ server });
 
 app.get("/rooms", (request, response) => {
@@ -237,13 +245,15 @@ wss.on('connection', (ws, req) => {
 
 app.use(express.static('web'));
 app.use(express.static('icons'));
-if (process.env.PORT == "80" ) {
+
+if (process.env.NODE_ENV === "production") {
   app.use(express.static('dist'));
 } else {
   app.use(express.static('src'));
 }
 
-server.listen(process.env.PORT || 8080, function() {
+
+server.listen(process.env.PORT || 80, function() {
   logger.info('Listening on ' + server.address().port);
 });
 

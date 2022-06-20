@@ -5,6 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start_production": "export NODE_ENV=production;node server.js",
+    "start_production_alt": "NODE_ENV=production node server.js",
     "start_port80": "export PORT=80;node server.js"
   },
   "dependencies": {
