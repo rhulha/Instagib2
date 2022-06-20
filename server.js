@@ -27,12 +27,14 @@ const logger = winston.createLogger({
 
 const app = express();
 
+/*
 if (process.env.PORT == "80" ) {
-app.use(basicAuth({
+  app.use(basicAuth({
   users: { q3dm16: 'q3dm16' },
   challenge: true
 }));
 }
+*/
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });

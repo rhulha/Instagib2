@@ -4,7 +4,8 @@
   "description": "Q3DM17 in WebGL",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "start_port80": "export PORT=80;node server.js"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -16,7 +17,7 @@
     "node": "12.x"
   },
   "devDependencies": {
-    "webpack": "^5.22.0",
+    "webpack": "^5.27.1",
     "webpack-cli": "^4.5.0"
   }
 }
