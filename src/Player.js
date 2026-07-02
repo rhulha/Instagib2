@@ -14,8 +14,15 @@ import {checkPlayerPlayerCollisions, checkTriggers, checkWorld, checkPowerups} f
 import {audioHolder} from './audio.js';
 import {enemies} from './networking.js';
 
-const GRAVITY = 30;
 const QuakeScale = 0.038;
+// Quake 3 movement values (bg_pmove.c / g_main.c), speeds scaled from Quake units to ours
+const GRAVITY = 800 * QuakeScale;
+const MAX_SPEED = 320 * QuakeScale;
+const STOP_SPEED = 100 * QuakeScale;
+const JUMP_VELOCITY = 270 * QuakeScale;
+const ACCELERATE = 10; // per-second rates, unit-independent
+const AIR_ACCELERATE = 1;
+const FRICTION = 6;
 const playerHeight = 3.53; // a bit crazy? Shouldn't it be 2.13 from Quake3?
 const playerRadius = 0.7;
 const cameraHeight = playerHeight-playerRadius;
@@ -80,41 +87,47 @@ class Player {
         }
     }
 
+    applyFriction( deltaTime ) {
+        const vel = this.playerVelocity;
+        const speed = Math.hypot( vel.x, vel.z );
+        if ( speed < 1 * QuakeScale ) {
+            vel.x = 0;
+            vel.z = 0;
+            return;
+        }
+        const control = speed < STOP_SPEED ? STOP_SPEED : speed;
+        const newspeed = Math.max( 0, speed - control * FRICTION * deltaTime );
+        vel.x *= newspeed / speed;
+        vel.z *= newspeed / speed;
+    }
+
+    accelerate( wishspeed, accel, deltaTime ) {
+        const currentspeed = this.playerVelocity.dot( this.wishdir );
+        const addspeed = wishspeed - currentspeed;
+        if ( addspeed <= 0 )
+            return;
+        const accelspeed = Math.min( accel * wishspeed * deltaTime, addspeed );
+        this.playerVelocity.addScaledVector( this.wishdir, accelspeed );
+    }
+
     update( deltaTime ) {
-        if ( this.playerOnFloor && this.playerVelocity.y <= 0) {
+        const wishspeed = this.wishdir.lengthSq() > 0 ? MAX_SPEED : 0;
+        this.wishdir.normalize();
+
+        let grounded = this.playerOnFloor && this.playerVelocity.y <= 0;
+        if ( grounded && this.wishJump ) {
+            this.playerVelocity.y = JUMP_VELOCITY;
+            this.wishJump = false;
+            audioHolder.play("jump");
+            grounded = false; // Q3 jumps switch to air move in the same frame, skipping friction
+        }
+        if ( grounded ) {
             // GROUND MOVE
-            /*
-            if(!this.wishJump)
-                this.ApplyFriction(1, deltaTime);
-            else
-                this.ApplyFriction(0, deltaTime);
-            */
-           
-            if( this.wishdir.lengthSq() == 0 ) {
-                this.playerVelocity.addScaledVector( this.playerVelocity, -0.1 );
-            } else {
-                this.wishdir.normalize();
-                this.wishdir.multiplyScalar(2*25*deltaTime); // CHANGED: 2 * 
-                //document.getElementById("info").innerText = "this.wishdir.dot(this.playerVelocity): "+ this.wishdir.dot(this.playerVelocity).toFixed(2);
-                if( this.wishdir.dot(this.playerVelocity) < 0 ) {
-                    // user is trying to change direction, let's make it feel quick by increasing the wishdir
-                    this.wishdir.multiplyScalar(10); // CHANGED: 2 * 
-                }
-                this.playerVelocity.add( this.wishdir );
-                const damping = Math.exp( - 3 * deltaTime ) - 1;
-                this.playerVelocity.addScaledVector( this.playerVelocity, damping );
-                // playerVelocity.y = 0;
-            }
-            if(this.wishJump) {
-                this.playerVelocity.y = 9;
-                this.wishJump = false;
-                audioHolder.play("jump");
-            }
+            this.applyFriction( deltaTime );
+            this.accelerate( wishspeed, ACCELERATE, deltaTime );
         } else {
             // AIR MOVE
-            this.wishdir.normalize();
-            this.wishdir.multiplyScalar(10*deltaTime); // some aircontrol
-            this.playerVelocity.add( this.wishdir );
+            this.accelerate( wishspeed, AIR_ACCELERATE, deltaTime );
             this.playerVelocity.y -= GRAVITY * deltaTime;
         }
         this.deltaPosition.copy(this.playerVelocity).multiplyScalar( deltaTime );
