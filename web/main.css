@@ -132,6 +132,25 @@ button {
 	visibility: visible;
 }
 
+#menu {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	background: #fff;
+	border-radius: 4px;
+	padding: 20px 40px;
+	font-family: Helvetica;
+	color: black;
+	text-align: center;
+	visibility: hidden;
+	z-index: 2;
+}
+
+#menu.visible {
+	visibility: visible;
+}
+
 a, button, input, select {
 	pointer-events: auto;
 }

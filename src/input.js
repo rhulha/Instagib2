@@ -8,6 +8,9 @@ import game from './setup.js';
 import {displayScore, hideScore} from './hud.js';
 import { audioHolder } from './audio.js';
 
+const $ = (id) => document.getElementById(id);
+const ga = (el, n, cb) => $(el).addEventListener(n, cb);
+
 var keyStates = {};
 keyStates['KeyW']=keyStates['KeyA']=keyStates['KeyS']=keyStates['KeyD']=false;
 
@@ -48,9 +51,26 @@ document.body.addEventListener( 'mousemove', ( event ) => {
     }
 }, false );
 
+// The slider maps left=slow to right=fast, while sensitivity is a divisor (higher is slower).
+const SENS_SLIDER_MAX = 1600;
+
+document.addEventListener('pointerlockchange', () => {
+    if ( document.pointerLockElement === document.body ) {
+        $("menu").classList.remove("visible");
+    } else {
+        $("sens_slider").value = SENS_SLIDER_MAX - Math.abs(mouseStates.sensitivity);
+        $("menu").classList.add("visible");
+    }
+});
+
+ga("sens_slider", "input", (e) => {
+    mouseStates.sensitivity = SENS_SLIDER_MAX - e.target.value;
+});
+
 document.addEventListener( 'mousedown', (e) => {
     if ( document.pointerLockElement !== document.body ) {
-        document.body.requestPointerLock();
+        if( !$("menu").contains(e.target) )
+            document.body.requestPointerLock();
         return;
     }
     mouseStates[e.button]=true;
